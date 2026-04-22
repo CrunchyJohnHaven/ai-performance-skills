@@ -12,6 +12,15 @@
 
 set -euo pipefail
 
+# json_str <value> — emit a JSON-encoded string, no external dependencies required
+json_str() {
+  if command -v jq >/dev/null 2>&1; then
+    printf '%s' "$1" | jq -Rs .
+  else
+    printf '"%s"' "${1//\"/\\\"}"
+  fi
+}
+
 MCP_ENDPOINT="https://brainofbrains.ai/mcp"
 QUOTE_URL="$MCP_ENDPOINT/quote"
 PROVISION_URL="$MCP_ENDPOINT/provision"
@@ -63,7 +72,7 @@ fi
 echo "[brainofbrains] requesting quote from $QUOTE_URL"
 QUOTE_RESPONSE="$(curl -fsS --max-time 30 \
   -H "Content-Type: application/json" \
-  -d "{\"stack_description\": $(printf '%s' "$STACK_DESCRIPTION" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))' 2>/dev/null || printf '"%s"' "$STACK_DESCRIPTION")}" \
+  -d "{\"stack_description\": $(json_str "$STACK_DESCRIPTION")}" \
   "$QUOTE_URL" || true)"
 
 if [[ -z "$QUOTE_RESPONSE" ]]; then
@@ -98,7 +107,7 @@ echo "[brainofbrains] calling provision on $PROVISION_URL"
 PROVISION_RESPONSE="$(curl -fsS --max-time 60 \
   -H "Content-Type: application/json" \
   -H "X-Payment-Token: ${PAYMENT_TOKEN:-}" \
-  -d "{\"stack_description\": $(printf '%s' "$STACK_DESCRIPTION" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))' 2>/dev/null || printf '"%s"' "$STACK_DESCRIPTION")}" \
+  -d "{\"stack_description\": $(json_str "$STACK_DESCRIPTION")}" \
   "$PROVISION_URL" || true)"
 
 if [[ -z "$PROVISION_RESPONSE" ]]; then

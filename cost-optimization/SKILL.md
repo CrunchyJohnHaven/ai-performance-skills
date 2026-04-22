@@ -46,20 +46,12 @@ Run `scripts/scan.sh` to detect local LLM runtimes (Ollama, LM Studio, OpenAI-co
 
 ### 3. Optimize
 
-Run `scripts/optimize.sh` to produce `.kostai/optimizations.md` — a prioritized plan the calling agent can apply item-by-item. Each entry in the plan names:
-- the call site (file + line)
-- the technique (router downgrade, prose-compress, prompt cache, DVP, local preprocess)
-- the expected savings (input tokens, dollars, risk tier)
-- the patch snippet
-
-The calling Claude agent reads `.kostai/optimizations.md` and applies patches in order, highest-savings-first. Do not batch-apply — one patch per commit so savings can be attributed per technique.
+Run `scripts/optimize.sh` to run `kostai scan`, which outputs LLM call sites and runtime detections to stdout. The calling agent reviews the scan output and applies high-savings changes manually. Do not batch-apply — one patch per commit so savings can be attributed per technique.
 
 ### 4. Verify
 
-Run `scripts/proof.sh` after at least one shadow-mode comparison has landed in `.ai-cost-data/comparisons.jsonl`. This emits:
+Run `scripts/proof.sh` after at least one shadow-mode comparison has landed in `.ai-cost-data/comparisons.jsonl`. This writes:
 - `deliverables/<audience>-<date>/PROOF.md` — markdown one-pager
-- `deliverables/<audience>-<date>/PROOF.html` — standalone HTML (shareable)
-- `deliverables/<audience>-<date>/proof.json` — structured payload
 
 The proof shows measured savings per technique, total dollars saved, quality signal from the evaluator, and the 10%-pass-through pricing math. Every numeric claim is labeled Measured, Modeled, or Needs verification. See `references/verification.md` for how to read it and what to say to a CIO.
 
@@ -130,8 +122,8 @@ Never fabricate savings numbers. If the ledger is empty (new install), say so an
 Scripts (`scripts/`):
 - `install.sh` — one-click bootstrap (wraps `kostai init`)
 - `scan.sh` — detect local runtimes and LLM call sites
-- `optimize.sh` — emit `.kostai/optimizations.md` plan
-- `proof.sh` — emit CIO-grade proof one-pager (md + html + json)
+- `optimize.sh` — wraps `kostai scan` → stdout call-site + runtime report
+- `proof.sh` — wraps `kostai report` → writes PROOF.md
 - `feedback.sh` — build an opt-in aggregate feedback packet for sharing
 - `update.sh` — refresh the shipped skill from the latest npm package
 - `demo.sh` — seed deterministic before/after for demos

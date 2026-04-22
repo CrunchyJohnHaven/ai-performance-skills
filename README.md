@@ -1,5 +1,9 @@
 # AI Performance Skills — a three-skill open-source suite for Claude
 
+![CI](https://github.com/CrunchyJohnHaven/ai-performance-skills/actions/workflows/ci.yml/badge.svg)
+[![npm](https://img.shields.io/npm/v/@sapperjohn/kostai.svg)](https://www.npmjs.com/package/@sapperjohn/kostai)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Three Claude skills that cut AI bills, orchestrate work across tools, and catch AI slop before it leaves the building — shipped together under one MIT license.
 
 ---

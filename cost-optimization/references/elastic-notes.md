@@ -90,6 +90,49 @@ Opt-in posture:
 - Do not claim unmeasured savings in an exec artifact. Every number carries a Measured / Modeled / Needs verification label.
 - Do not use second-person or "you should" language in SKILL.md or references. Imperative form only.
 
+## 2026-04-22 CIO meeting commitments
+
+Outcome of the Adnan CIO meeting on 2026-04-22. These are binding commitments that shape every Elastic-facing artifact and rollout decision.
+
+- **Ship as Claude skill for Agent Builder catalog.** Do not create a new product line. Package as `AI Performance` in the existing skills catalog alongside Brain Orchestration and Quality Judge.
+- **Zero MCP default.** No MCP server is installed or enabled by default. MCP remains an opt-in integration. Default-off posture is non-negotiable for the enterprise rollout.
+- **10%-of-savings pricing.** The default pass-through rate for any managed offering is 10% of measured savings. The proof artifact renders the math so an employee can justify the rollout to their CIO without hand-waving. Rate is configurable via `--rate` on the `report` command.
+- **Employee-benefit framing leads.** Every employee-facing message leads with personal benefit — faster responses, measurable savings, cleaner context — not with company cost reduction. Company-surveillance framing causes opt-out.
+- **Measured / Modeled / Needs-verification label on every numeric claim.** No numeric claim appears in any stakeholder-facing output without one of these three labels. This applies to PROOF.md, FEEDBACK.md, slide decks, and any email or Slack message that contains a savings figure.
+
+## Agent Builder catalog metadata
+
+- **Name:** AI Performance
+- **Category:** Productivity / Developer Tools
+- **Version:** 0.2.0
+- **Trigger phrases** (from SKILL.md `description` field):
+  - "AI Performance"
+  - "reduce my AI bill"
+  - "lower my AI bill"
+  - "cost optimization"
+  - "save dollars on Claude Code"
+  - "cut Claude Code spend"
+  - "optimize my LLM calls"
+  - "route to cheaper models"
+  - "compress my prompts"
+  - "set up cost optimization"
+  - "install cost-optimization"
+  - "how much am I spending on Claude or Codex"
+  - "am I wasting tokens"
+  - "prove my LLM savings"
+- **One-sentence pitch:** Cut LLM spend on Claude Code, Codex, and Gemini CLI work by 60–92% without changing what you ask for, and emit a one-page proof artifact any manager or CIO can read.
+- **Repo path:** `skills/cost-optimization/`
+
+## Elastic pilot rollout checklist
+
+Five steps for an employee participating in the internal pilot.
+
+1. **Install the skill.** Clone the repo or run `npm install -g @sapperjohn/kostai` and symlink `skills/cost-optimization/` into `~/.claude/skills/cost-optimization/`, or install via the Agent Builder catalog if it is already published there.
+2. **Run the demo in your repo.** From the root of any Claude Code workspace, run `scripts/demo.sh`. This seeds a deterministic before/after workload and shows a 92% savings swing (Measured on reference hardware; Modeled for other workloads). Takes roughly two minutes.
+3. **Review PROOF.md.** After at least one shadow-mode comparison has landed, run `scripts/proof.sh`. Open `deliverables/<audience>-<date>/PROOF.md`. Every number carries a Measured / Modeled / Needs-verification label. If the ledger is empty, rerun the demo first.
+4. **Optionally run scripts/feedback.sh.** This generates a privacy-safe local feedback packet — aggregate counts, savings totals, mechanism breakdown, optional note. Prompt and response bodies stay local. No data is sent automatically.
+5. **Share FEEDBACK.md with the pilot coordinator if you choose.** Paste or attach `deliverables/<audience>-<date>/FEEDBACK.md` to the pilot coordinator's Slack thread or email. This step is fully opt-in; skipping it does not affect your install or savings.
+
 ## Success signal
 
 The skill is working when:

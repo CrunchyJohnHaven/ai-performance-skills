@@ -2,6 +2,34 @@
 
 How to prove the brains installed in this workspace are actually working, and how to report brain health to a stakeholder without overclaiming.
 
+## How to prove the substrate is working
+
+Three tiers of verification, in increasing depth. Run them in order; stop when the tier answers your question.
+
+**Tier (a) — Local STATE.json check via `scripts/health.sh`**
+
+```bash
+scripts/health.sh
+```
+
+This is the fastest check. The script reads `evidence/brain/STATE.json` and `evidence/brain/brains.json` locally — no network call, no external dependency. It emits per-brain PASS/FAIL and the BIV headline. If a brain shows `breach` or `unwired`, the substrate is alive but that brain needs attention. If the script cannot find `STATE.json`, the install did not complete; run `scripts/install.sh` and then `bin/brain tick` to seed the state.
+
+**Tier (b) — Live query test via `scripts/ask.sh`**
+
+```bash
+scripts/ask.sh "what is the BIV score"
+```
+
+This exercises the full local query path: routing, closet retrieval, L0/L1/L2 context assembly, and synthesis. A successful response returns a synthesized answer that cites at least one closet path. If the response is empty or contains no citations, closets are stale — run `bin/brain tick` and retry. If the response cites closets but the BIV number differs from `STATE.json`, the tick loop has run since the last `ask` call; that is expected and healthy.
+
+**Tier (c) — Tick freshness check**
+
+```bash
+bin/brain status
+```
+
+Read the `last-tick timestamp` in the output. It should be within 24 hours of the current time. A timestamp older than 24 hours means the tick loop has stalled: restart with `bin/brain tick` (manual) or check the launchd plist if one was installed (`launchctl list | grep brain`). Do not present synthesized answers as current if the last tick is more than 24 hours old — say the substrate is stale and offer to re-tick before the briefing.
+
 ## Produce a health snapshot
 
 After an install has run and at least one tick has landed, run:
@@ -41,6 +69,16 @@ Every numeric claim in any output sent to a stakeholder must carry one of three 
 - **Needs verification** — value depends on a number the user supplied but the substrate has not validated (for example, "assume 40 customers installed" when the registry has not been polled)
 
 This labeling is not optional. Unlabeled numbers in a stakeholder-facing artifact are a fireable-level discipline break. See `feedback_exec_pitch_discipline.md` in project memory and the `cost-optimization` skill's `verification.md` for the canonical wording.
+
+Brain-metric examples:
+
+| Claim | Label | Reason |
+|---|---|---|
+| BIV score of 81 (from STATE.json) | **Measured** | Read directly from the local STATE file produced by the last tick; re-runnable via `scripts/health.sh` |
+| R@5 retrieval quality of 0.91 | **Measured** | Output of `bin/brain eval` against the frozen regression fixture |
+| Estimated $230/day savings from local routing | **Modeled** | Extrapolated from a 24-hour token-cost sample; assumes steady-state usage volume |
+| "Nine brains installed across Elastic's SE team" | **Needs verification** | Registry has not been polled across installs; headcount is an estimate supplied by the user |
+| Projected weekly BIV trajectory | **Modeled** | Trend line from the last 7 daily STATE snapshots; actual trajectory depends on tick cadence and new signal volume |
 
 ## What to say when briefing a stakeholder
 
@@ -91,3 +129,13 @@ If the loop is dead, restart with `bin/brain tick` (manual) or restart the launc
 ## Refresh cadence for stakeholder-facing snapshots
 
 Re-run `scripts/health.sh` immediately before any stakeholder-facing briefing. Do not reuse a stale snapshot — the substrate is a living system and the numbers will have moved. Date-stamp the artifact filename under `deliverables/<audience>-<topic>-<date>/` and cite the timestamp in the briefing so the stakeholder can see how fresh the data is.
+
+## What to say to a CIO
+
+Lead with posture and control, not mechanism. A CIO's first question is "what risk does this create for my org?" — answer that before they ask.
+
+- **Local-only operation.** Every tick, query, and closet rebuild runs on the employee's machine. No data traverses the network unless the employee explicitly triggers the provisioning flow. There is no always-on outbound connection, no background sync, and no cloud dependency for normal use.
+- **No surveillance posture.** The substrate reads artifacts the employee deliberately points it at — commits, meeting transcripts, KB files, explicit messages. It does not read screens, browser history, keystrokes, clipboard content, or any file outside the configured paths. Known secret patterns are redacted before any closet is written.
+- **Employee controls the data.** The brains, closets, and STATE files live entirely on the employee's machine. The employer does not have visibility into individual employees' closets or synthesized answers. If an employee leaves or uninstalls, `rm -rf evidence/brain/` removes the substrate completely — no residue on any external service.
+- **Adoption is voluntary.** The skill installs into Claude Code from the Agent Builder catalog — employees choose to install it, choose which artifacts to include, and choose whether to run the tick loop. There is no org-wide push, no silent enrollment, and no manager dashboard.
+- **Aggregate-only sharing, if they choose.** If the org later wants to see aggregate health metrics (BIV distributions, routing quality trends across a team), that is a future opt-in flow. No individual's closet or query is ever part of an aggregate report without that employee's explicit consent. Default is: nothing shared, nothing visible to anyone but the employee.

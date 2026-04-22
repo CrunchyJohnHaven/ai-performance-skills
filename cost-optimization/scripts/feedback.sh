@@ -40,10 +40,12 @@ DELIV_DIR="deliverables/${AUDIENCE}-${DATE}"
 mkdir -p "$DELIV_DIR"
 
 echo "[cost-optimization] building local feedback packet in $DELIV_DIR"
-npx --yes @sapperjohn/kostai proof \
-  --json "$DELIV_DIR/feedback.json" \
-  "${EXTRA_ARGS[@]}" \
+npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]}" \
   > "$DELIV_DIR/PROOF.md"
+npx --yes @sapperjohn/kostai export \
+  --format json \
+  --output "$DELIV_DIR/feedback.json" \
+  "${EXTRA_ARGS[@]}"
 
 FEEDBACK_JSON_PATH="$DELIV_DIR/feedback.json" \
 FEEDBACK_MD_PATH="$DELIV_DIR/FEEDBACK.md" \
@@ -57,28 +59,53 @@ const mdPath = process.env.FEEDBACK_MD_PATH;
 const slackPath = process.env.FEEDBACK_SLACK_PATH;
 const note = (process.env.FEEDBACK_NOTE || "").trim();
 
-const report = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+const events = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
 const money = (n, digits = 2) => `$${Number(n || 0).toFixed(digits)}`;
 const pct = (n) => `${Number(n || 0).toFixed(1)}%`;
-const quality =
-  typeof report.avgQualityScore === "number"
-    ? report.avgQualityScore.toFixed(2)
-    : "n/a";
-const mechanisms = Array.isArray(report.mechanisms) ? report.mechanisms.slice(0, 3) : [];
+
+// Aggregate from raw event array (kostai export --format json)
+const baseline = events.filter((e) => e.shadowRole === "baseline");
+const optimized = events.filter((e) => e.shadowRole && e.shadowRole !== "baseline");
+const baselineCostUsd = baseline.reduce((s, e) => s + (e.costUsd || 0), 0);
+const optimizedCostUsd = optimized.reduce((s, e) => s + (e.costUsd || 0), 0);
+const savedUsd = Math.max(0, baselineCostUsd - optimizedCostUsd);
+const savedPct = baselineCostUsd > 0 ? (savedUsd / baselineCostUsd) * 100 : 0;
+const pairs = new Set(events.map((e) => e.comparisonId).filter(Boolean)).size;
+const qualityScores = events.map((e) => e.qualityScore).filter((q) => typeof q === "number");
+const avgQualityScore = qualityScores.length ? qualityScores.reduce((s, q) => s + q, 0) / qualityScores.length : null;
+const quality = avgQualityScore !== null ? avgQualityScore.toFixed(2) : "n/a";
+
+// Mechanism breakdown from tags
+const tagCosts = {};
+for (const e of optimized) {
+  const saving = (baseline.find((b) => b.comparisonId === e.comparisonId)?.costUsd || 0) - (e.costUsd || 0);
+  for (const tag of (e.tags || [])) {
+    tagCosts[tag] = (tagCosts[tag] || 0) + Math.max(0, saving / Math.max(1, (e.tags || []).length));
+  }
+}
+const mechanisms = Object.entries(tagCosts)
+  .sort(([, a], [, b]) => b - a)
+  .slice(0, 3)
+  .map(([tag, usd]) => ({ tag, savedUsd: usd, pctOfTotal: savedUsd > 0 ? (usd / savedUsd) * 100 : 0 }));
 const mechLines = mechanisms.length
   ? mechanisms.map((row) => `- ${row.tag}: ${money(row.savedUsd, 4)} (${pct(row.pctOfTotal)})`).join("\n")
   : "- None";
+
+const timestamps = events.map((e) => e.ts).filter(Boolean).sort();
+const window = timestamps.length >= 2
+  ? `${timestamps[0].slice(0, 10)} to ${timestamps[timestamps.length - 1].slice(0, 10)}`
+  : timestamps.length === 1 ? timestamps[0].slice(0, 10) : "n/a";
 
 const lines = [
   "# AI Performance feedback packet",
   "",
   "## Summary",
   "",
-  `- Window: ${report.window}`,
-  `- Paired comparisons: ${report.pairs}`,
-  `- Baseline cost: ${money(report.baselineCostUsd, 4)}`,
-  `- Optimized cost: ${money(report.optimizedCostUsd, 4)}`,
-  `- Measured savings: ${money(report.savedUsd, 4)} (${pct(report.savedPct)})`,
+  `- Window: ${window}`,
+  `- Paired comparisons: ${pairs}`,
+  `- Baseline cost: ${money(baselineCostUsd, 4)}`,
+  `- Optimized cost: ${money(optimizedCostUsd, 4)}`,
+  `- Measured savings: ${money(savedUsd, 4)} (${pct(savedPct)})`,
   `- Quality signal: ${quality}`,
   "",
   "## Top mechanisms",
@@ -104,8 +131,8 @@ fs.writeFileSync(mdPath, lines.join("\n"), "utf8");
 const slackLines = [
   "AI Performance results",
   "",
-  `Measured savings: ${money(report.savedUsd, 2)} (${pct(report.savedPct)}) over ${report.pairs} paired calls.`,
-  `Baseline: ${money(report.baselineCostUsd, 2)} -> Optimized: ${money(report.optimizedCostUsd, 2)}.`,
+  `Measured savings: ${money(savedUsd, 2)} (${pct(savedPct)}) over ${pairs} paired calls.`,
+  `Baseline: ${money(baselineCostUsd, 2)} -> Optimized: ${money(optimizedCostUsd, 2)}.`,
   mechanisms.length
     ? `Top drivers: ${mechanisms.map((row) => `${row.tag} ${pct(row.pctOfTotal)}`).join(", ")}.`
     : "Top drivers: none yet.",

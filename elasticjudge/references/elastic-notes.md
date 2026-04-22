@@ -49,13 +49,29 @@ No always-on process. No background network calls other than the manually invoke
 
 Do not start with rubric explanations. Do not start with axis-by-axis inventory. Lead with outcome.
 
+## 2026-04-22 CIO meeting commitments
+
+Source: Adnan CIO meeting 2026-04-22. Adnan endorsed the thesis. These are the confirmed commitments from that session.
+
+**Ship as Claude skill for Agent Builder catalog.** The directive from the meeting was to package the judge as a Claude skill that drops into the Agent Builder catalog, not as a standalone product or MCP server. Distribution path: catalog install, voluntary, zero mandate.
+
+**Judge is cloud-hosted at elasticjudge.com.** The grading engine is not local. `scripts/judge.sh` is a thin HTTP wrapper that POSTs the artifact to https://elasticjudge.com/ and returns a verdict JSON. The employee never runs a local model for grading.
+
+**Grading is AI-slop detection, not surveillance.** The framing agreed in the meeting: the judge catches common AI-generated quality failures (factual drift, unsourced superlatives, persona mismatch, banned phrases) before the artifact reaches a human reviewer. The grading result goes to the employee, not to a manager dashboard. Nothing is auto-reported.
+
+**Employee-benefit framing.** The agreed pitch to employees: "fewer embarrassing sends, faster reviewer trust." Do not lead with "the company wants to verify your output quality." Lead with the employee getting a better result with less rework. This framing was explicitly endorsed in the meeting as the right distribution posture for an infra-heritage organization.
+
 ## Agent Builder catalog metadata
 
 - **Skill name:** Quality Judge
+- **Version:** 0.1.0
 - **Category:** Productivity / Exec Readiness
+- **One-sentence pitch:** Catch AI slop before it lands in front of a human — the Quality Judge grades your AI-generated output for factual correctness, Elastic accuracy, brand voice, and exec-readiness in one command.
 - **Short description:** Evaluates AI-generated output for factual correctness, Elastic accuracy, brand voice, and exec-readiness — catches AI slop before it lands in front of a human.
-- **Trigger phrases:** "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "fit-for-CIO review", "brand voice check", "elasticjudge"
+- **Trigger phrases:** "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "fit-for-CIO review", "brand voice check", "elasticjudge", "run the judge", "evaluate this artifact", "is this exec-ready"
 - **Repo path:** `skills/elasticjudge/`
+- **Install method:** catalog install (Agent Builder) or `npm install -g kostai` with skill symlink; see `skills/elasticjudge/INSTALL.md`
+- **Network egress:** one POST per artifact to https://elasticjudge.com/ — no background calls, no telemetry
 
 ## Update path
 
@@ -112,3 +128,17 @@ The skill is working when:
 - **elasticjudge (this skill)** — the shared quality evaluator across both
 
 The canonical shadow-mode A/B pattern: cost-optimization produces a cheaper optimized response, the Quality Judge grades it against the baseline, the pair is logged to prove savings did not degrade quality. Neither skill depends on the other, but the pair is the three-skill thesis.
+
+## What the judge does NOT do
+
+This section exists to answer the employee's first objection. Lead with this framing when rolling out the skill inside an organization.
+
+**Does not auto-edit.** The judge returns a verdict with axis scores and a plain-English rationale. It does not rewrite the artifact. The employee decides whether and how to revise. No automated edits, no auto-replace, no silent modifications to any file.
+
+**Does not store prompt bodies.** The artifact submitted to https://elasticjudge.com/ is used to produce the verdict and is not retained as a training corpus, a compliance log, or a searchable database of employee work. The API operator's data retention policy at https://elasticjudge.com/ is the authoritative statement; the skill itself performs no additional storage.
+
+**Does not report to management.** The verdict JSON lands under `deliverables/<audience>-<date>/JUDGE.md` on the employee's local machine. The skill never POSTs the verdict to a manager dashboard, a Slack channel, a ticketing system, or any other management surface. Sharing the verdict upward is a voluntary decision made by the employee, not a default behavior of the skill.
+
+**Grading stays with the employee.** The score, the rationale, and the revision decision belong to the employee who ran the judge. No aggregate scoring, no leaderboard, no per-employee quality tracking in v1. The only network egress is the per-artifact POST to https://elasticjudge.com/ — nothing else leaves the local machine.
+
+**Does not run unless manually invoked.** There is no background process, no file-watcher, no hook that triggers the judge automatically on save or commit. The employee runs `scripts/judge.sh path/to/artifact.md` explicitly, once, per artifact they choose to evaluate.
