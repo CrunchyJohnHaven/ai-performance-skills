@@ -6,13 +6,13 @@ To run each skill against the sample, use the wrapper scripts from the repo root
 
 ```bash
 # Judge the sample memo for content, formatting, and persona
-scripts/judge.sh examples/sample-memo.md
+elasticjudge/scripts/judge.sh examples/sample-memo.md
 
 # Run the cost-optimization scan across the repo (no sample input required)
-scripts/scan.sh
+cost-optimization/scripts/scan.sh
 
 # Generate a proof-of-savings report after scanning
-scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
+cost-optimization/scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
 ```
 
 Each command writes its output to stdout and, where applicable, drops a structured artifact into `deliverables/`. The judge script exits non-zero on a `rebuild` verdict, so it can be wired into CI as a quality gate.

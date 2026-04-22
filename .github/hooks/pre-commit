@@ -5,4 +5,5 @@ echo "Running pre-commit checks..."
 bash -n cost-optimization/scripts/*.sh
 bash -n brainofbrains/scripts/*.sh
 bash -n elasticjudge/scripts/*.sh
+bash -n scripts/*.sh
 echo "All script syntax checks passed."
