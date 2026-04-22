@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quality Judge"
+  short_description: "Evaluates AI-generated output for factual correctness, Elastic accuracy, and exec-readiness."
+  default_prompt: "Use $elasticjudge to evaluate this deliverable before I send it."

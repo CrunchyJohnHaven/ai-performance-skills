@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brain Orchestration"
+  short_description: "Routes expert questions to specialist brains and returns synthesized answers."
+  default_prompt: "Use $brainofbrains to bootstrap specialist brains into this workspace and route my expert questions to the right one."

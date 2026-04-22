@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Seed a deterministic before/after workload for demo walkthroughs.
-# Same workload used in the 2026-04-22 Adnan (Elastic CIO) pitch: ten
-# questions, 92% cost reduction, stable numbers across runs. Use this for
-# first-time-user demos or when the ledger is empty.
+# Ten-question benchmark; reproducibly shows a ~92% cost reduction on
+# the reference hardware. Use this for first-time-user demos or when
+# the ledger is empty.
 
 set -euo pipefail
 

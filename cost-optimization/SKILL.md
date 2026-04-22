@@ -84,7 +84,7 @@ This is the intended v1 update path for employees before a richer catalog-manage
 
 ### 7. Demonstrate (optional)
 
-For first-time users or demo walkthroughs, run `scripts/demo.sh` to seed a deterministic before/after workload. The demo is the same one used in the 2026-04-22 Adnan (Elastic CIO) pitch, showing a 92% savings swing on a ten-question test. Use this when the user says "show me a demo" or "run the KostAI demo".
+For first-time users or demo walkthroughs, run `scripts/demo.sh` to seed a deterministic before/after workload. The demo is a ten-question test that reproducibly shows a 92% savings swing (Measured on the reference hardware; Modeled for other workloads). Use this when the user says "show me a demo" or "run the KostAI demo".
 
 ## Which models this covers
 
