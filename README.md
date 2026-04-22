@@ -85,6 +85,81 @@ Each skill is standalone. The arrows are conventions, not dependencies: nothing 
 
 ---
 
+## Testing
+
+Four levels of quality assurance are available, from fast syntax checks to full end-to-end integration.
+
+### `make check` — bash syntax for all scripts
+
+Runs `bash -n` across every `.sh` file in all three skill directories. Fastest check; no network required.
+
+```bash
+make check
+```
+
+Expected output: one `PASS <path>` line per script, then `Results: N passed, 0 failed`. Any syntax error prints the offending script and exits non-zero.
+
+### `npx pulser-cli . --no-anim` — skill linting (100/100 target)
+
+Validates SKILL.md frontmatter, required sections, script references, and catalog metadata across all three skills. Target score is 100/100 — the CI gate runs with `--strict` and fails on any warning.
+
+```bash
+npx --yes pulser-cli . --no-anim
+```
+
+Runs automatically in CI via the `pulser` job in `.github/workflows/ci.yml`.
+
+### `scripts/smoke-test.sh` — kostai integration from any repo
+
+Verifies the cost-optimization skill end-to-end from a directory that has an `ai-cost.config.json`. Safe to run against a real project or against the seeded demo data.
+
+```bash
+# From the repo root (uses the bundled smoke-test):
+make smoke-test
+
+# Or from any repo that already has ai-cost.config.json:
+bash /path/to/aips/cost-optimization/scripts/smoke-test.sh
+```
+
+### `scripts/test-integration.sh` — full integration test suite
+
+Runs all four test groups (A–D) and exits 0 only if every test passes. Requires Node.js >=18 and `npx` on `$PATH`. Network access is needed for Group A (npm package availability) and Group B's kostai calls.
+
+```bash
+# From the repo root:
+bash scripts/test-integration.sh
+```
+
+Test groups:
+
+| Group | What it checks |
+|---|---|
+| **A — CLI availability** | `@sapperjohn/kostai` version, `scan`, `report` |
+| **B — Script behavior** | per-skill script exit codes and error messages |
+| **C — Skill structure** | SKILL.md frontmatter, `## Gotchas`, script inventory |
+| **D — Install** | `install-all.sh --dry-run`, `make check` |
+
+A grouped summary (PASS/FAIL counts per group) is printed at the end.
+
+### ShellCheck
+
+The CI `shellcheck` job runs [ShellCheck](https://www.shellcheck.net/) at the `warning` severity level across every `.sh` in the repo. To run locally:
+
+```bash
+# macOS
+brew install shellcheck
+shellcheck -S warning cost-optimization/scripts/*.sh \
+                      brainofbrains/scripts/*.sh \
+                      elasticjudge/scripts/*.sh \
+                      scripts/*.sh
+```
+
+The CI badge at the top of this file links directly to the GitHub Actions runs:
+
+[![CI](https://github.com/CrunchyJohnHaven/ai-performance-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/CrunchyJohnHaven/ai-performance-skills/actions/workflows/ci.yml)
+
+---
+
 ## Install any one skill
 
 Pick the one you want. Each block is copy-paste ready.

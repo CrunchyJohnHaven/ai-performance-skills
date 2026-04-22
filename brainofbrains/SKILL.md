@@ -3,6 +3,7 @@ name: brainofbrains
 description: Use when the user says "Brain Orchestration", "install brains", "brainofbrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "set up specialist brains", or mentions needing a synthesized answer from multiple expert views. Bootstraps specialist brains into the workspace, routes expert questions to the right brain, and returns synthesized answers. No data egress without explicit opt-in.
 version: 0.1.0
 allowed-tools: Bash
+when_to_use: "Use when the user wants to query or install specialist context brains in the current workspace."
 ---
 
 # Brain Orchestration

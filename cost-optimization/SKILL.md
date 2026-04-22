@@ -3,6 +3,7 @@ name: cost-optimization
 description: Use when the user says "AI Performance", "reduce LLM cost", "lower my AI bill", "cut Claude Code spend", "optimize my LLM calls", "route to cheaper models", "am I wasting tokens", "prove my LLM savings", or mentions Claude Code / Codex / Gemini CLI spend getting out of hand. Runs the KostAI toolchain (`@sapperjohn/kostai`) to scan, optimize, and emit a proof-of-savings artifact.
 version: 0.2.0
 allowed-tools: Bash
+when_to_use: "Use when the active workspace has a Claude Code / Codex / Gemini CLI workflow and the user wants to reduce LLM spend or prove savings."
 ---
 
 # AI Performance

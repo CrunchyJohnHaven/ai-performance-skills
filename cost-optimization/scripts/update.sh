@@ -17,6 +17,21 @@ if ! command -v npm >/dev/null 2>&1; then
   exit 1
 fi
 
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --check)
+      CURRENT=$(npx @sapperjohn/kostai --version 2>/dev/null || echo "not installed")
+      LATEST=$(npm show @sapperjohn/kostai version 2>/dev/null || echo "unknown")
+      echo "current: $CURRENT  latest: $LATEST"
+      [[ "$CURRENT" == "$LATEST" ]] && echo "up to date" || echo "update available"
+      exit 0
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 echo "[cost-optimization] refreshing $PKG"
 npm install -g "${PKG}@latest"
 

@@ -3,6 +3,7 @@ name: elasticjudge
 description: Use when the user says "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "evaluate this deliverable", "quality check this", "fit-for-CIO review", "brand voice check", "is this ready to send", "run this through the judge", or "elasticjudge". Calls the ElasticJudge API to return a structured verdict (pass / needs-revision / reject) with per-axis scores and line-level critiques.
 version: 0.1.0
 allowed-tools: Bash
+when_to_use: "Use when the user has an AI-generated artifact (memo, deck, email, slide) ready to be graded before sending."
 ---
 
 # Quality Judge

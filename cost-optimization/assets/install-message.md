@@ -17,12 +17,10 @@ Use the AI Performance skill to do the following, in order:
    and seed the ten-question before/after workload so there is real ledger
    data. No code other than config should change. The demo workload is
    deterministic — the numbers will be stable across runs.
-2. Run `kostai report --audience demo --date $(date +%Y-%m-%d)` to emit a
-   one-page proof-of-savings artifact (markdown + HTML + JSON) under
-   `deliverables/demo-<date>/`.
-3. Show me the markdown proof inline.
-4. Tell me three concrete next steps I can take to lock in the savings on my
-   real workload, starting with `.kostai/optimizations.md` after running
+2. Run `scripts/proof.sh --audience demo --date $(date +%Y-%m-%d)` to write
+   `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md`.
+3. Show me `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md` inline.
+4. Tell me three concrete next steps I can take based on the scan output from
    `scripts/optimize.sh`.
 5. Optionally run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)` to prepare a local aggregate feedback packet I can choose to share back with the rollout team. Do not send anything automatically.
 

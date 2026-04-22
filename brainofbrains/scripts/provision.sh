@@ -17,7 +17,7 @@ json_str() {
   if command -v jq >/dev/null 2>&1; then
     printf '%s' "$1" | jq -Rs .
   else
-    printf '"%s"' "${1//\"/\\\"}"
+    local s="${1//\\/\\\\}"; s="${s//\"/\\\"}"; printf '"%s"' "$s"
   fi
 }
 
@@ -30,8 +30,34 @@ STACK_DESCRIPTION=""
 AUTO_CONFIRM="no"
 PAYMENT_TOKEN="${BRAINOFBRAINS_PAYMENT_TOKEN:-}"
 
+usage() {
+  cat <<'EOF'
+Usage: scripts/provision.sh "<stack description>" [flags]
+
+Positional:
+  STACK DESCRIPTION    free-text description of the brain stack to provision
+                       (e.g. "elastic VE org, one stakeholder brain per AE")
+
+Recognized flags:
+  --yes, -y            skip the interactive confirmation prompt
+  --payment-token TOKEN  payment token (overrides BRAINOFBRAINS_PAYMENT_TOKEN env var)
+  --endpoint URL       override the MCP base URL (default: https://brainofbrains.ai/mcp)
+
+Environment:
+  BRAINOFBRAINS_PAYMENT_TOKEN  payment token used when --payment-token is not passed
+
+Examples:
+  scripts/provision.sh "elastic VE org, one stakeholder brain per AE, one product brain per offering"
+  scripts/provision.sh "small team, 3 brains" --yes --payment-token tok_xxx
+EOF
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      usage
+      exit 0
+      ;;
     --yes|-y)
       AUTO_CONFIRM="yes"
       shift

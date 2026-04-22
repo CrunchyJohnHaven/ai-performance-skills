@@ -34,6 +34,30 @@ OUTPUT_FILE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      cat <<'EOF'
+Usage: scripts/ask.sh "<question>" [flags]
+
+Positional:
+  QUESTION             the question to route through the brain substrate
+
+Recognized flags:
+  --depth l0|l1|l2     closet depth for retrieval (default: l1)
+  --output <file>      save the answer to <file> instead of stdout
+  --json               return raw JSON response from bin/brain query
+  --deep               include L2 closet excerpts in the response
+  --trace              show internal routing trace
+
+Pass-through flags:
+  Any unrecognized flag (and its value) is forwarded to `bin/brain query`.
+
+Examples:
+  scripts/ask.sh "what does the Jesse brain say about Q3?"
+  scripts/ask.sh --depth l2 "summarize revenue pipeline"
+  scripts/ask.sh --output answer.md "top risks this week?"
+EOF
+      exit 0
+      ;;
     --depth)
       if [[ $# -lt 2 ]]; then
         echo "error: --depth requires a value (l0, l1, or l2)" >&2
@@ -95,8 +119,8 @@ fi
 echo "[brainofbrains] routing question to the substrate"
 
 if [[ -n "$OUTPUT_FILE" ]]; then
-  "$BRAIN" query --query "$QUESTION" "${PASSTHROUGH[@]}" > "$OUTPUT_FILE"
+  "$BRAIN" query --query "$QUESTION" "${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}" > "$OUTPUT_FILE"
   echo "[brainofbrains] answer saved to $OUTPUT_FILE"
 else
-  "$BRAIN" query --query "$QUESTION" "${PASSTHROUGH[@]}"
+  "$BRAIN" query --query "$QUESTION" "${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}"
 fi

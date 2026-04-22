@@ -17,6 +17,22 @@ EXTRA_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      cat <<'EOF'
+Usage: scripts/feedback.sh [flags]
+
+Recognized flags:
+  --audience <name>    deliverables folder prefix (default: elastic-pilot)
+  --date <YYYY-MM-DD>  date suffix for the deliverables folder (default: today)
+  --note <text>        optional free-text note appended to the feedback packet
+
+Examples:
+  scripts/feedback.sh
+  scripts/feedback.sh --audience elastic-pilot --date 2026-04-22
+  scripts/feedback.sh --note "Pilot week 1 results"
+EOF
+      exit 0
+      ;;
     --audience)
       AUDIENCE="$2"
       shift 2
@@ -40,7 +56,7 @@ DELIV_DIR="deliverables/${AUDIENCE}-${DATE}"
 mkdir -p "$DELIV_DIR"
 
 echo "[cost-optimization] building local feedback packet in $DELIV_DIR"
-npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]}" \
+npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}" \
   > "$DELIV_DIR/PROOF.md"
 npx --yes @sapperjohn/kostai export \
   --format json \

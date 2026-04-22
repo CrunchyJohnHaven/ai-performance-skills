@@ -12,6 +12,21 @@ PKG="${ELASTICJUDGE_PKG:-elastic-judge}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --check)
+      CURRENT=$(npx @sapperjohn/kostai --version 2>/dev/null || echo "not installed")
+      LATEST=$(npm show @sapperjohn/kostai version 2>/dev/null || echo "unknown")
+      echo "current: $CURRENT  latest: $LATEST"
+      [[ "$CURRENT" == "$LATEST" ]] && echo "up to date" || echo "update available"
+      exit 0
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 # Detect available package manager: npm is canonical; bun/pnpm/yarn are accepted.
 # If none are present, print a manual fallback and exit cleanly.
 PKG_MGR=""

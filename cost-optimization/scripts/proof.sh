@@ -26,12 +26,35 @@ EXTRA_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      cat <<'EOF'
+Usage: scripts/proof.sh [flags] [pass-through-flags]
+
+Recognized flags:
+  --audience <name>    write output to deliverables/<name>-<date>/PROOF.md
+  --date <YYYY-MM-DD>  date suffix for the deliverables folder (default: today)
+  --last <period>      time window forwarded to `kostai report` (e.g. 7d, 30d)
+
+Pass-through flags:
+  Any unrecognized flag is forwarded directly to `kostai report`.
+
+Examples:
+  scripts/proof.sh
+  scripts/proof.sh --audience adnan-cio --date 2026-04-22
+  scripts/proof.sh --last 30d
+EOF
+      exit 0
+      ;;
     --audience)
       AUDIENCE="$2"
       shift 2
       ;;
     --date)
       DATE="$2"
+      shift 2
+      ;;
+    --last)
+      EXTRA_ARGS+=("--last" "$2")
       shift 2
       ;;
     *)
