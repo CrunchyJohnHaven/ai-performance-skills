@@ -44,3 +44,16 @@ jobs:
             exit 1
           fi
           echo "All SKILL.md files pass frontmatter validation."
+
+      - name: Check CHANGELOG exists
+        run: test -f CHANGELOG.md
+
+  validate-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check examples directory
+        run: |
+          ls examples/
+          test -f examples/sample-memo.md

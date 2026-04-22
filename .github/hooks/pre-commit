@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Install: cp .github/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+set -euo pipefail
+echo "Running pre-commit checks..."
+bash -n cost-optimization/scripts/*.sh
+bash -n brainofbrains/scripts/*.sh
+bash -n elasticjudge/scripts/*.sh
+echo "All script syntax checks passed."

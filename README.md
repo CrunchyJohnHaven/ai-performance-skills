@@ -4,6 +4,8 @@
 [![npm](https://img.shields.io/npm/v/@sapperjohn/kostai.svg)](https://www.npmjs.com/package/@sapperjohn/kostai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+**Quick start:** `bash scripts/install-all.sh` → restart Claude Code → `/cost-optimization`
+
 Three Claude skills that cut AI bills, orchestrate work across tools, and catch AI slop before it leaves the building — shipped together under one MIT license.
 
 ---
