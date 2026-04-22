@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Performance"
+  short_description: "Speeds AI work, cuts LLM waste, and proves savings."
+  default_prompt: "Use $cost-optimization to reduce AI coding-tool waste, generate a proof packet, and suggest the top savings actions for this repo."
