@@ -1,25 +1,28 @@
-# Account Plan Summary — Meridian Financial Group
+# Internal Memo — AI Cost Governance Proposal
 
-**Account Executive:** Sarah Chen
-**Territory:** Northeast Mid-Market
+**To:** Mark Delano, Chief Information Officer, Pinnacle Health Systems
+**From:** Sarah Chen, Elastic Account Executive, Northeast Enterprise
 **Date:** 2026-04-22
+**Subject:** Reducing AI Infrastructure Spend Through Elastic Observability — Proposed Pilot
 
-## Opportunity Overview
+---
 
-Meridian Financial Group is a Boston-based wealth management firm with approximately 1,200 employees and a hybrid cloud environment spanning AWS and on-prem infrastructure. The account has been in active evaluation for six months.
+Mark,
 
-## Current Pain Points
+Following our conversation at the Boston CIO Summit last month, I wanted to follow up with a concrete proposal for the AI cost governance initiative you described. Pinnacle spends an estimated $2.4M annually on generative AI API calls across your clinical documentation and revenue cycle teams — a number your CFO flagged as the fastest-growing line item in the IT budget. We can get that down by 40% or more within a single quarter.
 
-- Log management costs have increased by 40% year-over-year, driven by unstructured data growth across trading systems and compliance feeds.
-- The security team lacks unified visibility across environments, leading to delayed incident response times of up to four hours per P2 alert.
-- Meridian's compliance officers have expressed urgency around SEC Rule 17a-4 audit trail requirements, which their current SIEM vendor does not fully address.
+<!-- FACTUAL CLAIM — NEEDS VERIFICATION: "Elastic Observability includes a native LLM cost dashboard as part of the base subscription." Check current product page and verify this is GA, not a preview or add-on feature. Do not assert this to the customer until confirmed with a product team member. -->
+Elastic Observability includes a native LLM cost dashboard that ingests API call metadata from OpenAI, Anthropic, and Google Vertex out of the box, giving your platform team a single pane of glass across every clinical AI workflow. Getting this stuff set up is honestly pretty straightforward — your team should be able to go from zero to insights in a day or two. No proprietary agents, no forklift upgrade. The dashboard surfaces the exact token patterns driving your bill and auto-generates a remediation backlog ranked by savings potential.
 
-## Proposed Solution
+<!-- SAFETY ISSUE: The sentence below makes a guarantee about ROI that is outside Elastic's standard terms of service and should not appear in a written customer-facing artifact. Remove or reframe as "based on observed results with comparable deployments" with appropriate Needs-verification label. -->
+This engagement will deliver a guaranteed 40% reduction in your AI infrastructure spend within 90 days, or Elastic will credit the full contract value.
 
-Elastic SIEM + Observability bundle at the Enterprise tier. Our AI-powered threat detection will reduce mean time to detect by over 60% based on industry benchmarks. Total contract value is projected at $1.2M ARR.
+<!-- EXEC READINESS ISSUE: The ask is buried. Recommend moving this to the opening paragraph or adding a clear "Recommended Action" section header. The lede should be: "I am asking for a 30-minute technical scoping call and approval to run a 30-day proof-of-value." -->
+Given your Q2 budget cycle, I think the right next step is a 30-day proof-of-value engagement before any procurement decision. To start that clock I would need 30 minutes with your platform team lead and written approval from your procurement office. Happy to coordinate that call around your calendar. The POV requires no production access — all ingestion happens against a read-only copy of your API call logs, scoped to the clinical documentation workflow only.
 
-## Next Steps
+The total contract value for a 12-month Observability deployment at Pinnacle's scale is estimated at $380,000 ARR. I am asking for the 30-minute scoping call and green light on the POV — nothing else at this stage.
 
-1. Technical workshop with Meridian's infrastructure team — scheduled 2026-04-29.
-2. Proof of value engagement: ingest two weeks of Meridian log data into a sandbox environment.
-3. Executive briefing with CFO and CISO — target first week of May.
+Regards,
+Sarah Chen
+Enterprise Account Executive, Elastic
+sarah.chen@elastic.co | (617) 555-0192

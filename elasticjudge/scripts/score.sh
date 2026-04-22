@@ -100,7 +100,7 @@ HTTP_STATUS="$(
   curl -sS -o "$VERDICT_PATH" -w '%{http_code}' \
     -X POST "${ENDPOINT}?mode=score" \
     -H "Content-Type: application/json" \
-    "${AUTH_HEADER[@]}" \
+    "${AUTH_HEADER[@]+"${AUTH_HEADER[@]}"}" \
     --data-binary "@${PAYLOAD_PATH}"
 )"
 

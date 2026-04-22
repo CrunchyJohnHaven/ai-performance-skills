@@ -56,7 +56,7 @@ HTTP_STATUS="$(
   curl -sS -o "$CRITIQUES_PATH" -w '%{http_code}' \
     -X POST "${ENDPOINT}?explain=1" \
     -H "Content-Type: application/json" \
-    "${AUTH_HEADER[@]}" \
+    "${AUTH_HEADER[@]+"${AUTH_HEADER[@]}"}" \
     --data-binary "@${PAYLOAD_PATH}"
 )"
 
