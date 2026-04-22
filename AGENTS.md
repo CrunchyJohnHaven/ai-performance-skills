@@ -32,12 +32,13 @@ Run this checklist before every push:
 
 1. Update the skill files that changed.
 2. If `SKILL.md` changed, regenerate or validate `agents/openai.yaml`.
-3. Run `bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh`.
-4. Re-read `README.md` and make sure install, update, and share instructions still match the scripts.
-5. Confirm the share-back path is still opt-in and aggregate-only.
-6. Run `git status` and verify the diff only contains intended public skill files.
-7. Commit with a clear message.
-8. Push to `origin/main`.
+3. Run `bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh`.
+4. Run `shellcheck -S warning {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh`.
+5. Re-read `README.md` and make sure install, update, and share instructions still match the scripts.
+6. Confirm the share-back path is still opt-in and aggregate-only.
+7. Run `git status` and verify the diff only contains intended public skill files.
+8. Commit with a clear message.
+9. Push to `origin/main`.
 
 ## Push workflow
 
@@ -45,7 +46,8 @@ Standard publish flow:
 
 ```bash
 git status
-bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh
+bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh
+shellcheck -S warning {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh
 make check
 git add .
 git commit -m "Update AI Performance skill"
@@ -61,6 +63,18 @@ npx @sapperjohn/kostai --help
 ```
 
 This confirms command names, flags, and subcommands match what the published CLI actually exposes. Do not document flags or subcommands that are absent from `--help` output.
+
+The current published version is **kostai v0.5.1**. Commands that exist as of this version:
+
+- `init` — initialize a new KostAI project
+- `scan` — scan for AI cost data in the current workspace
+- `report` — generate a cost report
+- `export` — export report data (markdown, HTML, JSON)
+- `doctor` — diagnose configuration and environment issues
+- `compare` — compare two scan results or time ranges
+- `evidence` — manage the evidence store
+- `compress` — compress evidence or report artifacts
+- `dashboard` — launch the local dashboard UI
 
 ## Share-back posture
 

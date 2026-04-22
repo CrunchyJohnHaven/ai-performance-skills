@@ -65,12 +65,33 @@ else
   fi
 fi
 
-# 2. evidence/brain/STATE.json exists (CRITICAL)
+# 2. evidence/brain/STATE.json exists and is valid JSON (CRITICAL)
 STATE="$WORKSPACE/evidence/brain/STATE.json"
-if [[ -f "$STATE" ]]; then
-  pass "evidence/brain/STATE.json exists"
-else
+if [[ ! -f "$STATE" ]]; then
   fail "evidence/brain/STATE.json not found — no tick has run yet"
+else
+  STATE_VALID="unknown"
+  if command -v python3 >/dev/null 2>&1; then
+    if python3 -c "import json,sys; json.load(sys.stdin)" < "$STATE" 2>/dev/null; then
+      STATE_VALID="ok"
+    else
+      STATE_VALID="invalid"
+    fi
+  elif command -v jq >/dev/null 2>&1; then
+    if jq empty "$STATE" 2>/dev/null; then
+      STATE_VALID="ok"
+    else
+      STATE_VALID="invalid"
+    fi
+  else
+    STATE_VALID="skipped"
+  fi
+  case "$STATE_VALID" in
+    ok)      pass "evidence/brain/STATE.json exists and is valid JSON" ;;
+    invalid) fail "evidence/brain/STATE.json exists but contains invalid JSON" ;;
+    skipped) pass "evidence/brain/STATE.json exists — JSON validation skipped (python3/jq unavailable)" ;;
+    *)       pass "evidence/brain/STATE.json exists" ;;
+  esac
 fi
 
 # ════════════════════════════════════════════════════════════════════════════

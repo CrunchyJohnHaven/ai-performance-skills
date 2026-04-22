@@ -84,22 +84,89 @@ else
   record "kostai scan exit 0" "FAIL"
 fi
 
+# ── check 5: scripts/demo.sh invocable ──────────────────────────────────────
+echo
+echo -e "${BOLD}Check 5: scripts/demo.sh (smoke invocation)${RESET}"
+SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DEMO_SH="$SKILL_DIR/scripts/demo.sh"
+if [[ -x "$DEMO_SH" ]]; then
+  DEMO_OUTPUT=$(bash "$DEMO_SH" 2>&1) || true
+  if [[ -n "$DEMO_OUTPUT" ]]; then
+    pass "demo.sh ran and produced output"
+    info "$DEMO_OUTPUT"
+    record "scripts/demo.sh invocable" "PASS"
+  else
+    warn "demo.sh ran but produced no output"
+    record "scripts/demo.sh invocable" "WARN"
+  fi
+else
+  fail "scripts/demo.sh not found or not executable at $DEMO_SH"
+  record "scripts/demo.sh invocable" "FAIL"
+fi
+
+# ── check 6: scripts/proof.sh --help exits 0 ────────────────────────────────
+echo
+echo -e "${BOLD}Check 6: scripts/proof.sh --help${RESET}"
+PROOF_SH="$SKILL_DIR/scripts/proof.sh"
+if [[ -x "$PROOF_SH" ]]; then
+  PROOF_OUTPUT=$(bash "$PROOF_SH" --help 2>&1)
+  PROOF_EXIT=$?
+  if [[ $PROOF_EXIT -eq 0 ]]; then
+    pass "proof.sh --help exited 0"
+    info "$PROOF_OUTPUT"
+    record "scripts/proof.sh --help" "PASS"
+  else
+    fail "proof.sh --help exited $PROOF_EXIT"
+    info "$PROOF_OUTPUT"
+    record "scripts/proof.sh --help" "FAIL"
+  fi
+else
+  fail "scripts/proof.sh not found or not executable at $PROOF_SH"
+  record "scripts/proof.sh --help" "FAIL"
+fi
+
+# ── check 7: scripts/feedback.sh --help exits 0 ─────────────────────────────
+echo
+echo -e "${BOLD}Check 7: scripts/feedback.sh --help${RESET}"
+FEEDBACK_SH="$SKILL_DIR/scripts/feedback.sh"
+if [[ -x "$FEEDBACK_SH" ]]; then
+  FEEDBACK_OUTPUT=$(bash "$FEEDBACK_SH" --help 2>&1)
+  FEEDBACK_EXIT=$?
+  if [[ $FEEDBACK_EXIT -eq 0 ]]; then
+    pass "feedback.sh --help exited 0"
+    info "$FEEDBACK_OUTPUT"
+    record "scripts/feedback.sh --help" "PASS"
+  else
+    fail "feedback.sh --help exited $FEEDBACK_EXIT"
+    info "$FEEDBACK_OUTPUT"
+    record "scripts/feedback.sh --help" "FAIL"
+  fi
+else
+  fail "scripts/feedback.sh not found or not executable at $FEEDBACK_SH"
+  record "scripts/feedback.sh --help" "FAIL"
+fi
+
 # ── summary ──────────────────────────────────────────────────────────────────
 echo
 echo -e "${BOLD}────────────────────────────────────────────────────${RESET}"
 echo -e "${BOLD}Smoke-test summary${RESET}"
 echo -e "${BOLD}────────────────────────────────────────────────────${RESET}"
 
+N_PASS_TOTAL=0
+N_TOTAL=${#CHECK_NAMES[@]}
+
 for i in "${!CHECK_NAMES[@]}"; do
   name="${CHECK_NAMES[$i]}"
   result="${CHECK_RESULTS[$i]}"
   case "$result" in
-    PASS) echo -e "  ${GREEN}PASS${RESET}  $name" ;;
+    PASS) echo -e "  ${GREEN}PASS${RESET}  $name"; N_PASS_TOTAL=$((N_PASS_TOTAL + 1)) ;;
     WARN) echo -e "  ${YELLOW}WARN${RESET}  $name" ;;
     FAIL) echo -e "  ${RED}FAIL${RESET}  $name" ;;
   esac
 done
 
+echo -e "${BOLD}────────────────────────────────────────────────────${RESET}"
+echo -e "${BOLD}${N_PASS_TOTAL}/${N_TOTAL} checks passed${RESET}"
 echo -e "${BOLD}────────────────────────────────────────────────────${RESET}"
 
 if [[ $CRITICAL_FAILURE -eq 0 ]]; then
