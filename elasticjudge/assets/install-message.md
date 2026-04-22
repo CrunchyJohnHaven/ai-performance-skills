@@ -11,12 +11,18 @@ Copy the block between the fences and paste into Claude Code or Codex as a singl
 ```
 I'd like to grade this deliverable before I send it.
 
+NOTE: This skill submits the artifact text to the ElasticJudge cloud API.
+You need a valid ELASTICJUDGE_API_KEY set in your shell environment before
+running step 2. Confirm you have one, or check the free-tier quota at
+https://elasticjudge.com/ before proceeding.
+
 Use the Quality Judge skill to do the following, in order:
 1. Confirm the artifact I want graded. Default to the most recent file under
    deliverables/ or docs/ if I do not specify one.
 2. Run `scripts/judge.sh --audience pre-send --date $(date +%Y-%m-%d) <path>`
-   to submit the artifact to the ElasticJudge cloud API and write the verdict
-   plus markdown summary under deliverables/pre-send-<date>/.
+   to submit the artifact to the ElasticJudge cloud API (requires
+   ELASTICJUDGE_API_KEY) and write the verdict plus markdown summary under
+   deliverables/pre-send-<date>/.
 3. Show me the markdown verdict inline (JUDGE.md).
 4. If the verdict is `needs-revision`, run
    `scripts/explain.sh deliverables/pre-send-<date>/verdict.json` and surface
@@ -37,7 +43,8 @@ Claude Code auto-discovers skills from three locations. Pick one:
 ### Option A — Drop into user skills directory
 
 ```bash
-cp -r /path/to/elasticjudge/skills/elasticjudge ~/.claude/skills/elasticjudge
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
+cp -r ai-performance-skills/skills/elasticjudge ~/.claude/skills/elasticjudge
 ```
 
 Claude Code will pick up the skill on next session start.

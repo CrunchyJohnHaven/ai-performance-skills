@@ -141,24 +141,28 @@ Agent metadata (`agents/`):
 
 ## Quick reference
 
+All paths below are relative to the workspace root (the repo you cloned or the directory you ran `scripts/install.sh` from).
+
+`bin/brain` is the local CLI installed by `scripts/install.sh`. It does not exist until that script has run successfully.
+
 ```bash
 # Full workflow (from the target repo's root)
-scripts/install.sh                  # bootstrap brain substrate into this workspace
-scripts/scan.sh                     # list installed brains + status
+scripts/install.sh                  # bootstrap brain substrate — writes bin/brain + evidence/brain/
+scripts/scan.sh                     # list installed brains + status (reads evidence/brain/brains.json)
 scripts/ask.sh "<question>"         # route an expert question and return a synthesized answer
-bin/brain tick                      # one iteration (refresh closets, recompute BIV)
-scripts/health.sh                   # PASS/FAIL per brain
+bin/brain tick                      # one iteration (refresh closets, recompute BIV) — requires bin/brain
+scripts/health.sh                   # PASS/FAIL per brain (local STATE.json; add --remote for MCP check)
 
 # Agent-to-agent managed install (opt-in)
 scripts/provision.sh "<stack description>"   # quote → confirm → provision via MCP
 
-# Introspection
+# Introspection (all require bin/brain — run scripts/install.sh first)
 bin/brain status                    # last tick + registry rollup
 bin/brain registry --json           # machine-readable brain list
 bin/brain --help                    # full CLI surface
 
 # Skill lifecycle
-scripts/update.sh                   # refresh installed skill files
+scripts/update.sh                   # refresh installed skill files from latest npm package
 ```
 
 ## Pricing note

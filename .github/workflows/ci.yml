@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint cost-optimization scripts
+        run: bash -n cost-optimization/scripts/*.sh
+
+      - name: Lint brainofbrains scripts
+        run: bash -n brainofbrains/scripts/*.sh
+
+      - name: Lint elasticjudge scripts
+        run: bash -n elasticjudge/scripts/*.sh
+
+  validate-skill-frontmatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check SKILL.md frontmatter
+        run: |
+          failed=0
+          for skill_md in */SKILL.md; do
+            if ! grep -q '^name:' "$skill_md"; then
+              echo "MISSING 'name:' in $skill_md"
+              failed=1
+            fi
+            if ! grep -q '^description:' "$skill_md"; then
+              echo "MISSING 'description:' in $skill_md"
+              failed=1
+            fi
+          done
+          if [ "$failed" -eq 1 ]; then
+            echo "One or more SKILL.md files are missing required frontmatter fields."
+            exit 1
+          fi
+          echo "All SKILL.md files pass frontmatter validation."

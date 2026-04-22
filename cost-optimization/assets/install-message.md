@@ -12,20 +12,19 @@ Copy the block between the fences and paste into Claude Code or Codex as a singl
 I'd like to see how much I could save on my AI bill.
 
 Use the AI Performance skill to do the following, in order:
-1. Run `scripts/install.sh` to write ai-cost.config.json and apply safe starter
-   patches (Anthropic prompt cache, prose compressor, expensive-model gate) in
-   this repo. No code other than config should change.
-2. Run `scripts/demo.sh` to seed the ten-question before/after workload so
-   there is real ledger data. This is deterministic — the numbers will be
-   stable across runs.
-3. Run `scripts/proof.sh --audience demo --date $(date +%Y-%m-%d)` to emit a
+1. Run `scripts/demo.sh` to write ai-cost.config.json, apply safe starter
+   patches (Anthropic prompt cache, prose compressor, expensive-model gate),
+   and seed the ten-question before/after workload so there is real ledger
+   data. No code other than config should change. The demo workload is
+   deterministic — the numbers will be stable across runs.
+2. Run `kostai report --audience demo --date $(date +%Y-%m-%d)` to emit a
    one-page proof-of-savings artifact (markdown + HTML + JSON) under
    `deliverables/demo-<date>/`.
-4. Show me the markdown proof inline.
-5. Tell me three concrete next steps I can take to lock in the savings on my
+3. Show me the markdown proof inline.
+4. Tell me three concrete next steps I can take to lock in the savings on my
    real workload, starting with `.kostai/optimizations.md` after running
    `scripts/optimize.sh`.
-6. Optionally run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)` to prepare a local aggregate feedback packet I can choose to share back with the rollout team. Do not send anything automatically.
+5. Optionally run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)` to prepare a local aggregate feedback packet I can choose to share back with the rollout team. Do not send anything automatically.
 
 Do not edit source code outside of ai-cost.config.json and .kostai/ unless I
 explicitly approve each edit. Do not install an MCP server. Do not send any
@@ -39,7 +38,8 @@ Claude Code auto-discovers skills from three locations. Pick one:
 ### Option A — Drop into user skills directory
 
 ```bash
-cp -r /path/to/kostai/skills/cost-optimization ~/.claude/skills/cost-optimization
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
+cp -r ai-performance-skills/skills/cost-optimization ~/.claude/skills/cost-optimization
 ```
 
 Claude Code will pick up the skill on next session start.

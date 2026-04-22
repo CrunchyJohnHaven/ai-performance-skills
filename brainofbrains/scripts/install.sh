@@ -14,9 +14,17 @@ WORKSPACE="$(pwd)"
 
 echo "[brainofbrains] bootstrapping brain substrate into $WORKSPACE"
 
+# Idempotency check: skip install if bin/brain already exists and is executable.
+if [[ -x "$WORKSPACE/bin/brain" ]]; then
+  echo "[brainofbrains] bin/brain already installed at $WORKSPACE/bin/brain — skipping install."
+  echo "  to force a refresh, remove bin/brain and re-run this script."
+  exit 0
+fi
+
 if command -v curl >/dev/null 2>&1; then
   if curl -fsSL --max-time 20 -o /dev/null -I "$REMOTE_INSTALL_URL" 2>/dev/null; then
     echo "[brainofbrains] using remote installer: $REMOTE_INSTALL_URL"
+    # WARNING: This runs a remote install script. Review at https://brainofbrains.ai/install before running.
     curl -fsSL "$REMOTE_INSTALL_URL" | bash -s -- "$@"
   else
     echo "[brainofbrains] remote installer unreachable; falling back to npm package"

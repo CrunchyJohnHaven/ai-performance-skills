@@ -12,19 +12,68 @@ PKG="${ELASTICJUDGE_PKG:-elastic-judge}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-if ! command -v npm >/dev/null 2>&1; then
-  echo "error: npm not found. install Node.js (>=18) and try again." >&2
+# Detect available package manager: npm is canonical; bun/pnpm/yarn are accepted.
+# If none are present, print a manual fallback and exit cleanly.
+PKG_MGR=""
+if command -v npm >/dev/null 2>&1; then
+  PKG_MGR="npm"
+elif command -v bun >/dev/null 2>&1; then
+  PKG_MGR="bun"
+elif command -v pnpm >/dev/null 2>&1; then
+  PKG_MGR="pnpm"
+elif command -v yarn >/dev/null 2>&1; then
+  PKG_MGR="yarn"
+fi
+
+if [[ -z "$PKG_MGR" ]]; then
+  echo "error: no supported package manager found (npm / bun / pnpm / yarn)." >&2
+  echo "  install Node.js (>=18) and npm, then re-run this script." >&2
+  echo "  manual alternative: copy the skill files directly from a release tarball." >&2
+  echo "    https://elasticjudge.com/ — see 'Manual install' in the docs." >&2
   exit 1
 fi
 
-echo "[elasticjudge] refreshing $PKG"
-npm install -g "${PKG}@latest" || {
-  echo "[elasticjudge] global install failed; the package may not be published yet." >&2
-  echo "  override with: ELASTICJUDGE_PKG=<scope/name> scripts/update.sh" >&2
-  exit 1
-}
+echo "[elasticjudge] refreshing $PKG via $PKG_MGR"
 
-GLOBAL_ROOT="$(npm root -g)"
+case "$PKG_MGR" in
+  npm)
+    npm install -g "${PKG}@latest" || {
+      echo "[elasticjudge] global install failed; the package may not be published yet." >&2
+      echo "  override with: ELASTICJUDGE_PKG=<scope/name> scripts/update.sh" >&2
+      echo "  manual alternative: https://elasticjudge.com/ — see 'Manual install'." >&2
+      exit 1
+    }
+    GLOBAL_ROOT="$(npm root -g)"
+    ;;
+  bun)
+    bun install --global "${PKG}@latest" || {
+      echo "[elasticjudge] bun global install failed; the package may not be published yet." >&2
+      echo "  fallback: install Node.js + npm and re-run, or set ELASTICJUDGE_PKG." >&2
+      exit 1
+    }
+    GLOBAL_ROOT="$(bun pm ls --global 2>/dev/null | awk '/node_modules/{print $1}' | head -1)"
+    if [[ -z "$GLOBAL_ROOT" ]]; then
+      GLOBAL_ROOT="$(bun --print 'require("os").homedir()' 2>/dev/null)/.bun/install/global/node_modules"
+    fi
+    ;;
+  pnpm)
+    pnpm add --global "${PKG}@latest" || {
+      echo "[elasticjudge] pnpm global install failed; the package may not be published yet." >&2
+      echo "  fallback: install npm and re-run, or set ELASTICJUDGE_PKG." >&2
+      exit 1
+    }
+    GLOBAL_ROOT="$(pnpm root --global)"
+    ;;
+  yarn)
+    yarn global add "${PKG}@latest" || {
+      echo "[elasticjudge] yarn global install failed; the package may not be published yet." >&2
+      echo "  fallback: install npm and re-run, or set ELASTICJUDGE_PKG." >&2
+      exit 1
+    }
+    GLOBAL_ROOT="$(yarn global dir)/node_modules"
+    ;;
+esac
+
 SOURCE_DIR="$GLOBAL_ROOT/$PKG/skills/elasticjudge"
 
 if [[ ! -d "$SOURCE_DIR" ]]; then

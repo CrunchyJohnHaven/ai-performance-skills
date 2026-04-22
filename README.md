@@ -87,7 +87,7 @@ Pick the one you want. Each block is copy-paste ready.
 
 ```bash
 # Clone directly into your Claude skills directory
-git clone git@github.com:CrunchyJohnHaven/cost-optimization-skill.git /tmp/aips
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 cp -R /tmp/aips/cost-optimization ~/.claude/skills/cost-optimization
 ```
 
@@ -101,6 +101,8 @@ scripts/optimize.sh
 scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
 ```
 
+> **Note:** `scripts/install.sh` bootstraps the environment. The underlying CLI command it wraps is `npx @sapperjohn/kostai init`.
+
 Alternative install via npm:
 
 ```bash
@@ -112,7 +114,7 @@ ln -s "$(npm root -g)/@sapperjohn/kostai/skills/cost-optimization" \
 ### brainofbrains
 
 ```bash
-git clone git@github.com:CrunchyJohnHaven/cost-optimization-skill.git /tmp/aips
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 cp -R /tmp/aips/brainofbrains ~/.claude/skills/brainofbrains
 ```
 
@@ -125,7 +127,7 @@ npx -y brainofbrains scan
 ### elasticjudge
 
 ```bash
-git clone git@github.com:CrunchyJohnHaven/cost-optimization-skill.git /tmp/aips
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 cp -R /tmp/aips/elasticjudge ~/.claude/skills/elasticjudge
 ```
 
@@ -139,7 +141,7 @@ npx elastic-judge packet ./examples/sample-slide.json
 ### All three at once
 
 ```bash
-git clone git@github.com:CrunchyJohnHaven/cost-optimization-skill.git /tmp/aips
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 for s in cost-optimization brainofbrains elasticjudge; do
   cp -R /tmp/aips/$s ~/.claude/skills/$s
 done
@@ -266,16 +268,9 @@ PRs welcome for any of the three skills. Ground rules:
 
 ---
 
-## Repo name — recommendation
+## Repo name
 
-The current repo name is `cost-optimization-skill`. That name now understates what's in the repo. Two candidates:
-
-- **`ai-performance-skills`** — matches the user-facing catalog label (`AI Performance`) of the cost-optimization skill and reads clearly to a CIO or head of productivity. Pro: on-strategy with the employee-benefit framing. Con: slightly narrower than "all AI-hygiene skills"; may feel like cost-only to someone who doesn't know the suite.
-- **`claude-skills-suite`** — accurate, ecosystem-visible, and SEO-friendly for anyone browsing Claude skills on GitHub. Pro: instantly legible as "a bundle of skills for Claude." Con: generic; other people will eventually ship repos with the same or similar name, and it doesn't carry the "AI Performance" label that the cost-optimization skill already uses.
-
-**Recommendation: rename to `ai-performance-skills`.** It keeps the "AI Performance" label at the repo level, which puts the CIO-visible framing (employee benefit, performance, measurable savings) in the URL itself. The current `cost-optimization-skill` name will 301-redirect on GitHub after rename, so existing clones keep working.
-
-This README is written to work under either name — it does not hardcode the repo URL in the main install commands. Only the `git clone` examples reference the current URL, and those are trivially swapped post-rename.
+This repo was renamed from `cost-optimization-skill` to `ai-performance-skills` on 2026-04-22. GitHub automatically redirects the old URL, so existing clones keep working.
 
 ---
 

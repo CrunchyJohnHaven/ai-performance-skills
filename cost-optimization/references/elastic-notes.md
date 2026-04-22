@@ -95,7 +95,7 @@ Opt-in posture:
 The skill is working when:
 
 1. An employee installs it and sees their `.ai-cost-data/` ledger populate within a day of normal Claude Code use
-2. Running `kostai proof` produces a one-pager showing non-zero measured savings
+2. Running `kostai report` produces a one-pager showing non-zero measured savings
 3. The employee can hand that one-pager to a manager without a walkthrough
 4. The employee can optionally generate a `FEEDBACK.md` packet without exposing prompt bodies
 5. Adoption grows through word-of-mouth rather than mandate

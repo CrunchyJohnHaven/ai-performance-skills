@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 # Emit a one-page proof of savings from the shadow-mode ledger.
-# Produces markdown on stdout, plus optional HTML and JSON deliverables.
+# Produces a markdown report via `kostai report`.
 # Usage:
 #   scripts/proof.sh                                    # markdown to stdout
 #   scripts/proof.sh --audience adnan-cio --date 2026-04-22
-#   scripts/proof.sh --rate 0.10 --last 30d             # pass-through flags
+#   scripts/proof.sh --last 30d                         # pass-through flags
 #
-# Any unrecognized flags are forwarded to `kostai proof`.
+# Recognized flags:
+#   --audience <name>   write output to deliverables/<name>-<date>/PROOF.md
+#   --date <YYYY-MM-DD> date suffix for the deliverables folder (default: today)
+#   --last <period>     time window forwarded to `kostai report` (e.g. 7d, 30d)
+#
+# Any unrecognized flags are forwarded to `kostai report`.
 
 set -euo pipefail
 
@@ -44,17 +49,13 @@ if [[ -n "$AUDIENCE" ]]; then
   mkdir -p "$DELIV_DIR"
 
   echo "[cost-optimization] writing proof to $DELIV_DIR"
-  npx --yes @sapperjohn/kostai proof \
-    --html "$DELIV_DIR/PROOF.html" \
-    --json "$DELIV_DIR/proof.json" \
+  npx --yes @sapperjohn/kostai report \
     "${EXTRA_ARGS[@]}" \
     > "$DELIV_DIR/PROOF.md"
 
   echo
-  echo "[cost-optimization] proof artifacts:"
+  echo "[cost-optimization] proof artifact:"
   echo "  $DELIV_DIR/PROOF.md"
-  echo "  $DELIV_DIR/PROOF.html"
-  echo "  $DELIV_DIR/proof.json"
 else
-  npx --yes @sapperjohn/kostai proof "${EXTRA_ARGS[@]}"
+  npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]}"
 fi

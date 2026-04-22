@@ -36,7 +36,7 @@ Execute steps in order. Each step is a single CLI call wrapped by a script in `s
 
 ### 1. Install
 
-Run `scripts/install.sh` (or `npx @sapperjohn/kostai install` directly). This one-click bootstrap writes `ai-cost.config.json`, applies safe starter patches (Anthropic prompt caching, prose compression, expensive-model gate), and refreshes the savings plan. Idempotent — re-running is safe.
+Run `scripts/install.sh` (or `npx @sapperjohn/kostai init` directly). This one-click bootstrap writes `ai-cost.config.json`, applies safe starter patches (Anthropic prompt caching, prose compression, expensive-model gate), and refreshes the savings plan. Idempotent — re-running is safe.
 
 The install step never exfiltrates code or prompts. Capture mode defaults to `metadata_only` (hashes and token counts, no body). The user can opt into `redacted_body` or `full_body` for local debugging by editing `ai-cost.config.json`.
 
@@ -120,7 +120,7 @@ Tasks that stay on the frontier because they must: OCR-heavy multimodal, novel r
 
 If a step fails, the CLI emits structured errors. Report the error to the user verbatim, check `docs/BUG_LEDGER.md` for known issues, and fall back to:
 - `npx kostai doctor` — diagnoses config and prerequisites
-- `npx kostai capabilities` — lists every implemented technique
+- `npx kostai scan` — lists detected local runtimes and LLM call sites
 - `npx kostai --help` — full CLI surface
 
 Never fabricate savings numbers. If the ledger is empty (new install), say so and run the demo step to seed data. If the shadow-mode comparisons show negative savings, surface that — do not suppress.
@@ -128,7 +128,7 @@ Never fabricate savings numbers. If the ledger is empty (new install), say so an
 ## Bundled resources
 
 Scripts (`scripts/`):
-- `install.sh` — one-click bootstrap (wraps `kostai install`)
+- `install.sh` — one-click bootstrap (wraps `kostai init`)
 - `scan.sh` — detect local runtimes and LLM call sites
 - `optimize.sh` — emit `.kostai/optimizations.md` plan
 - `proof.sh` — emit CIO-grade proof one-pager (md + html + json)
@@ -152,23 +152,21 @@ Agent metadata (`agents/`):
 
 ```bash
 # Full workflow (from the target repo's root)
-npx @sapperjohn/kostai install     # one-click bootstrap
-npx kostai scan                    # detect local runtimes + call sites
-npx kostai optimize                # write .kostai/optimizations.md
-npx kostai proof --html docs/PROOF.html   # emit one-pager after real data lands
-npx kostai proof --json docs/proof.json   # machine-readable proof payload
-npx kostai open                    # open the local dashboard
+npx @sapperjohn/kostai init        # one-click bootstrap
+npx kostai scan                    # detect local runtimes + call sites (also generates optimization plan)
+npx kostai report --html docs/PROOF.html   # emit one-pager after real data lands
+npx kostai report --json docs/proof.json   # machine-readable proof payload
+npx kostai dashboard               # open the local dashboard
 
 # Skill lifecycle helpers
 scripts/feedback.sh --audience elastic-pilot     # local, opt-in share packet
 scripts/update.sh                                # refresh installed skill files
 
 # Introspection
-npx kostai capabilities            # list every technique
 npx kostai doctor                  # diagnose config and prerequisites
-npx kostai --help                  # full surface
+npx kostai --help                  # full CLI surface
 ```
 
 ## Pass-through pricing note
 
-If the user asks "what does this cost me?" — the CLI is free and local. If the user asks "what would a managed version cost?" — default pricing is 10% of measured savings, configurable via `--rate` on the `proof` command. The proof artifact renders the pass-through math so an employee can justify an enterprise rollout to their CIO without hand-waving.
+If the user asks "what does this cost me?" — the CLI is free and local. If the user asks "what would a managed version cost?" — default pricing is 10% of measured savings, configurable via `--rate` on the `report` command. The proof artifact renders the pass-through math so an employee can justify an enterprise rollout to their CIO without hand-waving.

@@ -40,7 +40,8 @@ Claude Code auto-discovers skills from three locations. Pick one:
 ### Option A — Drop into user skills directory
 
 ```bash
-cp -r /path/to/brainofbrains/skills/brainofbrains ~/.claude/skills/brainofbrains
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
+cp -r ai-performance-skills/skills/brainofbrains ~/.claude/skills/brainofbrains
 ```
 
 Claude Code will pick up the skill on next session start.

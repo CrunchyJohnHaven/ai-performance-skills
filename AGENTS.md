@@ -32,7 +32,7 @@ Run this checklist before every push:
 
 1. Update the skill files that changed.
 2. If `SKILL.md` changed, regenerate or validate `agents/openai.yaml`.
-3. Run `bash -n scripts/*.sh`.
+3. Run `bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh`.
 4. Re-read `README.md` and make sure install, update, and share instructions still match the scripts.
 5. Confirm the share-back path is still opt-in and aggregate-only.
 6. Run `git status` and verify the diff only contains intended public skill files.
@@ -45,11 +45,22 @@ Standard publish flow:
 
 ```bash
 git status
-bash -n scripts/*.sh
+bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh
+make check
 git add .
 git commit -m "Update AI Performance skill"
 git push origin main
 ```
+
+## Command verification
+
+Before updating any SKILL.md or script, verify commands against the live CLI with:
+
+```bash
+npx @sapperjohn/kostai --help
+```
+
+This confirms command names, flags, and subcommands match what the published CLI actually exposes. Do not document flags or subcommands that are absent from `--help` output.
 
 ## Share-back posture
 

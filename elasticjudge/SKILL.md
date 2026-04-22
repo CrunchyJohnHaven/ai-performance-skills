@@ -135,18 +135,25 @@ Agent metadata (`agents/`):
 
 ## Quick reference
 
+> **API availability note:** the judge API is cloud-hosted at `https://elasticjudge.com/`.
+> All calls below require the site to be live. If the endpoint is not yet published,
+> every script will exit with an HTTP error and a hint. Check `https://elasticjudge.com/`
+> for current status before filing a bug against the skill itself.
+> Override the base URL with `ELASTICJUDGE_URL=<url>` if you have a staging endpoint.
+
 ```bash
 # Full workflow (from the target repo's root)
-scripts/judge.sh docs/MEMO.md                          # full verdict, markdown + JSON
-scripts/judge.sh --audience adnan-cio --date 2026-04-22 docs/MEMO.md
-scripts/judge.sh --text "Elastic is the world's leading..."  # inline string
+scripts/judge.sh docs/MEMO.md                          # full verdict; writes deliverables/judge-run-<today>/JUDGE.md + verdict.json
+scripts/judge.sh --audience adnan-cio --date 2026-04-22 docs/MEMO.md   # named deliverables folder
+scripts/judge.sh --text "Elastic is the world's leading..."             # inline string
 
 # Lighter variants
-scripts/score.sh docs/MEMO.md                          # numeric scores only (CI use)
-scripts/explain.sh deliverables/judge-run-2026-04-22/verdict.json  # line-level critiques
+scripts/score.sh docs/MEMO.md                          # numeric scores only, printed to stdout (CI use)
+scripts/score.sh --out scores.json docs/MEMO.md        # also write scores to a file
+scripts/explain.sh deliverables/judge-run-2026-04-22/verdict.json  # line-level critiques; writes critiques.json alongside
 
 # Lifecycle
-scripts/update.sh                                      # refresh installed skill files
+scripts/update.sh                                      # refresh installed skill files (npm/bun/pnpm/yarn)
 ```
 
 ## Pass-through pricing note

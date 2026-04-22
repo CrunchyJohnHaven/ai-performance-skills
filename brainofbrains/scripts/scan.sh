@@ -11,8 +11,14 @@ REGISTRY="$WORKSPACE/evidence/brain/brains.json"
 STATE="$WORKSPACE/evidence/brain/STATE.json"
 
 if [[ ! -f "$REGISTRY" ]]; then
+  # Registry missing — check whether bin/brain is present as a fallback hint.
+  if [[ -x "$WORKSPACE/bin/brain" ]]; then
+    echo "[brainofbrains] registry not found; attempting to regenerate via bin/brain"
+    "$WORKSPACE/bin/brain" registry "$@" || true
+    exit 0
+  fi
   echo "error: brain registry not found at $REGISTRY" >&2
-  echo "  run scripts/install.sh first." >&2
+  echo "  run scripts/install.sh first to bootstrap the brain substrate." >&2
   exit 1
 fi
 
@@ -24,7 +30,7 @@ if [[ -x "$WORKSPACE/bin/brain" ]]; then
   exit 0
 fi
 
-echo "[brainofbrains] bin/brain not found; falling back to registry JSON dump"
+echo "[brainofbrains] bin/brain not found — run scripts/install.sh to enable full scan; falling back to registry JSON dump"
 if command -v jq >/dev/null 2>&1; then
   jq '.summary as $s | "total=\($s.total) inBand=\($s.inBand) breach=\($s.breach) awaiting=\($s.awaitingData) unwired=\($s.unwired)"' "$REGISTRY"
   jq -r '.brains[] | "  \(.name | tostring)\t\(.role)\tvalue=\(.value // "—")\t\(.status)"' "$REGISTRY"
