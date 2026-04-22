@@ -56,16 +56,16 @@ If the workspace is a Claude Code plugin, drop the folder under `skills/` in the
 ### Option C — Install the npm package (ships the skill)
 
 ```bash
-npm install -g elastic-judge
+npm install -g @sapperjohn/kostai
 # Then link the skill folder from the package into ~/.claude/skills/
-ln -s "$(npm prefix -g)/lib/node_modules/elastic-judge/skills/elasticjudge" \
+ln -s "$(npm prefix -g)/lib/node_modules/@sapperjohn/kostai/skills/elasticjudge" \
       ~/.claude/skills/elasticjudge
 ```
 
 If the package name is different in the field (scoped publisher, renamed slug), override via the environment:
 
 ```bash
-ELASTICJUDGE_PKG=@scope/elastic-judge scripts/update.sh
+ELASTICJUDGE_PKG=@sapperjohn/kostai scripts/update.sh
 ```
 
 ## For Elastic Agent Builder

@@ -26,7 +26,7 @@ Three channels, same skill folder:
 
 1. **npm package** — the ElasticJudge publisher (see https://github.com/CrunchyJohnHaven/ElasticJudge) can ship this skill folder under `skills/elasticjudge/`. Employees symlink into `~/.claude/skills/elasticjudge/` or drop the folder there directly.
 2. **Agent Builder catalog** — publish the skill folder to the internal catalog. Employees install via whatever UX the catalog exposes for skill install.
-3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/cost-optimization-skill alongside the other two skills.
+3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/ai-performance-skills alongside the other two skills.
 
 All three channels pull from the same source of truth: `skills/elasticjudge/`.
 
@@ -70,7 +70,7 @@ Source: Adnan CIO meeting 2026-04-22. Adnan endorsed the thesis. These are the c
 - **Short description:** Evaluates AI-generated output for factual correctness, Elastic accuracy, brand voice, and exec-readiness — catches AI slop before it lands in front of a human.
 - **Trigger phrases:** "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "fit-for-CIO review", "brand voice check", "elasticjudge", "run the judge", "evaluate this artifact", "is this exec-ready"
 - **Repo path:** `skills/elasticjudge/`
-- **Install method:** catalog install (Agent Builder) or `npm install -g kostai` with skill symlink; see `skills/elasticjudge/INSTALL.md`
+- **Install method:** catalog install (Agent Builder) or `npm install -g @sapperjohn/kostai` with skill symlink; see `skills/elasticjudge/INSTALL.md`
 - **Network egress:** one POST per artifact to https://elasticjudge.com/ — no background calls, no telemetry
 
 ## Update path

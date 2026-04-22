@@ -22,7 +22,7 @@ Three channels, same skill folder:
 
 1. **npm package** — `@sapperjohn/brainofbrains` may ship this skill under `skills/brainofbrains/` once published. Employees symlink into `~/.claude/skills/brainofbrains/` or drop the folder there directly.
 2. **Agent Builder catalog** — publish the skill folder to the internal catalog. Employees install via whatever UX the catalog exposes for skill install.
-3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/cost-optimization-skill alongside `AI Performance` and `Quality Judge`.
+3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/ai-performance-skills alongside `AI Performance` and `Quality Judge`.
 
 All three channels pull from the same source of truth: `skills/brainofbrains/`.
 

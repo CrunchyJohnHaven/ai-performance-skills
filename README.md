@@ -10,6 +10,16 @@ Three Claude skills that cut AI bills, orchestrate work across tools, and catch 
 
 ---
 
+## Skill quick-reference
+
+| Skill | When to use | Core command | Output |
+|-------|-------------|--------------|--------|
+| `cost-optimization` | Reduce AI API spend | `scripts/proof.sh` | `deliverables/*/PROOF.md` |
+| `brainofbrains` | Route expert questions | `scripts/ask.sh` | stdout answer with citations |
+| `elasticjudge` | Gate deliverables before sending | `scripts/judge.sh` | `deliverables/*/JUDGE.md` |
+
+---
+
 ## What this is
 
 This repository hosts three independent Claude skills that each solve one problem most AI-using teams eventually hit: cost runaway, workflow fragmentation, and unreviewed AI output. Each skill is self-contained and can be installed on its own. Together they form the employee-side stack for working with Claude (or any frontier model) without the bill, the chaos, or the slop.
@@ -324,6 +334,31 @@ If you're operating an internal skills catalog, the drop-in pattern is the same 
 ## License
 
 MIT. See [LICENSE](./LICENSE). Every skill in this repo is MIT; any third-party bundle (e.g. npm `@sapperjohn/kostai`) carries its own license, called out in the relevant skill's `SKILL.md`.
+
+---
+
+## Troubleshooting
+
+**Skill not activating after install**
+Skills load at session start. Restart your Claude Code session after running `make install-all` or `bash scripts/install-all.sh`.
+
+**`bash: EXTRA_ARGS[@]: unbound variable`**
+You are on macOS with the system bash 3.2, which does not support named arrays. This is fixed in v0.3.0. Update with:
+```bash
+bash scripts/update.sh   # or: make update-all
+```
+
+**`npx: command not found`**
+Install Node.js 18 or later. All scripts that invoke `@sapperjohn/kostai` require `npx` on `$PATH`.
+
+**`kostai: command not found`**
+Same root cause as above — the scripts call `npx --yes @sapperjohn/kostai` and need Node.js 18+. Install Node from [nodejs.org](https://nodejs.org/) or via your package manager.
+
+**`curl: command not found`**
+`brainofbrains/scripts/provision.sh` requires `curl`. Install it:
+- macOS: `brew install curl`
+- Debian/Ubuntu: `sudo apt-get install curl`
+- RHEL/Fedora: `sudo dnf install curl`
 
 ---
 

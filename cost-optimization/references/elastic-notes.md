@@ -23,7 +23,7 @@ Three channels, same skill folder:
 
 1. **npm package** — `@sapperjohn/kostai` ships this skill under `skills/cost-optimization/`. Employees symlink into `~/.claude/skills/cost-optimization/` or drop the folder there directly.
 2. **Agent Builder catalog** — publish the skill folder to the internal catalog. Employees install via whatever UX the catalog exposes for skill install.
-3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/cost-optimization-skill.
+3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/ai-performance-skills.
 
 All three channels pull from the same source of truth: `skills/cost-optimization/`.
 

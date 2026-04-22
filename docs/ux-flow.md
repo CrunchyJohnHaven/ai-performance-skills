@@ -17,9 +17,9 @@ Claude responds: "I'll run the AI Performance skill to scan your workspace and i
 Claude runs `scripts/scan.sh`. Output lists detected local runtimes (Ollama, LM Studio) and source files containing LLM call sites.
 User sees: a table of call sites with estimated token costs per call and which are candidates for local routing.
 
-**Step 3 — optimize**
-Claude runs `scripts/optimize.sh` and presents the top three patches: prompt caching, prose compression, and model downgrade for eligible calls.
-User sees: a diff for each patch. Claude applies one patch per commit so savings can be attributed per technique.
+**Step 3 — scan**
+Claude runs `scripts/scan.sh` and identifies the top optimization opportunities: prompt caching, prose compression, and model downgrade for eligible calls.
+User sees: a table of call sites with the recommended technique for each. Claude proposes one patch per opportunity for the user to review and approve before any change is applied.
 
 **Step 4 — proof**
 After at least one shadow-mode comparison has run, Claude runs `scripts/proof.sh`.

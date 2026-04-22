@@ -21,7 +21,7 @@ Use the AI Performance skill to do the following, in order:
    `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md`.
 3. Show me `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md` inline.
 4. Tell me three concrete next steps I can take based on the scan output from
-   `scripts/optimize.sh`.
+   `scripts/scan.sh`.
 5. Optionally run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)` to prepare a local aggregate feedback packet I can choose to share back with the rollout team. Do not send anything automatically.
 
 Do not edit source code outside of ai-cost.config.json and .kostai/ unless I
@@ -68,7 +68,7 @@ On first run the user sees:
 1. `ai-cost.config.json` written to their repo (capture mode `metadata_only`, router default rules, shadow-mode enabled)
 2. `.kostai/` directory with demo ledger seeded
 3. `deliverables/demo-<date>/PROOF.md` — the one-pager showing ~92% cost reduction on the ten-question demo workload
-4. A short summary of three next steps (typically: run `optimize`, review `.kostai/optimizations.md`, apply top-three patches)
+4. A short summary of three next steps (typically: run `scan`, review `.kostai/optimizations.md`, apply top-three patches)
 5. Optional: `deliverables/elastic-pilot-<date>/FEEDBACK.md` if `scripts/feedback.sh` is run
 
 Full runtime cost of the install: zero frontier-model calls. The install step is pure config + local scan.

@@ -88,7 +88,7 @@ Shadow mode is the reason `kostai report` can claim measured savings without han
 
 ## Waste detectors
 
-Eleven detectors in `src/core/score/*.ts` identify specific waste categories on every captured call: oversized system prompts, redundant history, verbose output preambles, language-specific verbosity, repeated image attachments, model overkill, downshift opportunities, DVP candidates, unbounded streams, and metadata-only oversized calls. The `optimize` command reads detector output to prioritize the plan.
+Eleven detectors in `src/core/score/*.ts` identify specific waste categories on every captured call: oversized system prompts, redundant history, verbose output preambles, language-specific verbosity, repeated image attachments, model overkill, downshift opportunities, DVP candidates, unbounded streams, and metadata-only oversized calls. The `scan` command reads detector output to prioritize the plan.
 
 ## How savings are attributed
 
