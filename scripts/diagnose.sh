@@ -12,7 +12,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-PASS=0; FAIL=0
+PASS=0; FAIL=0; SKIP=0
 
 run_check() {
   local label="$1"; shift
@@ -35,15 +35,25 @@ run_check() {
   fi
 }
 
+skip_check() {
+  local label="$1"; local reason="$2"
+  echo "  SKIP  $label ($reason)"
+  SKIP=$((SKIP + 1))
+}
+
 echo "[diagnose] cost-optimization"
 run_check "smoke-test" bash cost-optimization/scripts/smoke-test.sh
 
 echo "[diagnose] brainofbrains"
-run_check "doctor" bash brainofbrains/scripts/doctor.sh
+if [[ -x "$(pwd)/bin/brain" ]]; then
+  run_check "doctor" bash brainofbrains/scripts/doctor.sh
+else
+  skip_check "doctor" "bin/brain not installed — run brainofbrains/scripts/install.sh first"
+fi
 
 echo "[diagnose] elasticjudge"
 run_check "judge --help" bash elasticjudge/scripts/judge.sh --help
 
 echo
-echo "[diagnose] results: $PASS passed, $FAIL failed"
+echo "[diagnose] results: $PASS passed, $FAIL failed, $SKIP skipped"
 [[ $FAIL -eq 0 ]]
