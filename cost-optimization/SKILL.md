@@ -1,7 +1,8 @@
 ---
 name: cost-optimization
-description: This skill should be used when the user asks for "AI Performance", "reduce LLM cost", "lower my AI bill", "cost optimization", "save dollars on Claude Code", "cut Claude Code spend", "optimize my LLM calls", "route to cheaper models", "compress my prompts", "set up cost optimization", "install cost-optimization", "how much am I spending on Claude or Codex", "am I wasting tokens", "prove my LLM savings", or mentions Claude Code / Codex / Gemini CLI spend getting out of hand. Wraps the KostAI toolchain (npm `@sapperjohn/kostai`, CLI `ai-cost`) to scan the workspace, apply safe savings patches, route non-frontier work to local or cheaper models, and emit a one-page proof of savings plus an opt-in local feedback packet.
+description: Use when the user says "AI Performance", "reduce LLM cost", "lower my AI bill", "cut Claude Code spend", "optimize my LLM calls", "route to cheaper models", "am I wasting tokens", "prove my LLM savings", or mentions Claude Code / Codex / Gemini CLI spend getting out of hand. Runs the KostAI toolchain (`@sapperjohn/kostai`) to scan, optimize, and emit a proof-of-savings artifact.
 version: 0.2.0
+allowed-tools: Bash
 ---
 
 # AI Performance
@@ -139,6 +140,14 @@ Assets (`assets/`):
 
 Agent metadata (`agents/`):
 - `openai.yaml` — catalog-facing display name, short description, and default prompt metadata
+
+## Gotchas
+
+1. The CLI version matters — run `npx @sapperjohn/kostai --version` first. Commands differ between versions.
+2. `scripts/optimize.sh` outputs to stdout, not a file — pipe or redirect if you want to save the output.
+3. `scripts/proof.sh` requires prior data in `.ai-cost-data/` — run `scripts/demo.sh` first if the repo is fresh.
+4. The `--audience` flag on `proof.sh` and `feedback.sh` creates a `deliverables/` directory in the current working directory — run from the repo root.
+5. Do not trigger on cloud infrastructure cost questions (AWS bill, Kubernetes spend) — this skill only addresses LLM call cost in AI coding tools.
 
 ## Quick reference
 

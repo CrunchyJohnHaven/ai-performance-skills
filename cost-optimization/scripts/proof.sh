@@ -50,12 +50,12 @@ if [[ -n "$AUDIENCE" ]]; then
 
   echo "[cost-optimization] writing proof to $DELIV_DIR"
   npx --yes @sapperjohn/kostai report \
-    "${EXTRA_ARGS[@]}" \
+    "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}" \
     > "$DELIV_DIR/PROOF.md"
 
   echo
   echo "[cost-optimization] proof artifact:"
   echo "  $DELIV_DIR/PROOF.md"
 else
-  npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]}"
+  npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
 fi

@@ -48,6 +48,31 @@ jobs:
       - name: Check CHANGELOG exists
         run: test -f CHANGELOG.md
 
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+      - name: ShellCheck cost-optimization scripts
+        run: shellcheck -S warning cost-optimization/scripts/*.sh
+      - name: ShellCheck brainofbrains scripts
+        run: shellcheck -S warning brainofbrains/scripts/*.sh
+      - name: ShellCheck elasticjudge scripts
+        run: shellcheck -S warning elasticjudge/scripts/*.sh
+      - name: ShellCheck root scripts
+        run: shellcheck -S warning scripts/*.sh
+
+  pulser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run Pulser skill linter
+        run: npx --yes pulser-cli . --format json --no-anim --strict
+
   validate-examples:
     runs-on: ubuntu-latest
     steps:

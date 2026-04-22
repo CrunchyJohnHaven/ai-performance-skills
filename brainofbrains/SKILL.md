@@ -1,7 +1,8 @@
 ---
 name: brainofbrains
-description: This skill should be used when the user asks for "Brain Orchestration", "brain orchestration", "install brains", "brainofbrains", "BrainOfBrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "bootstrap brains into this workspace", "set up specialist brains", or mentions needing a synthesized answer from multiple expert views. Wraps the BrainOfBrains substrate (remote MCP at brainofbrains.ai/mcp, local `bin/brain` CLI, and the `brains.json` registry) to bootstrap specialist brains into the workspace, route expert questions to the right brain, run BIV tick loops, and return synthesized answers. No data egress without explicit opt-in. No MCP server installed by default.
+description: Use when the user says "Brain Orchestration", "install brains", "brainofbrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "set up specialist brains", or mentions needing a synthesized answer from multiple expert views. Bootstraps specialist brains into the workspace, routes expert questions to the right brain, and returns synthesized answers. No data egress without explicit opt-in.
 version: 0.1.0
+allowed-tools: Bash
 ---
 
 # Brain Orchestration
@@ -138,6 +139,14 @@ Assets (`assets/`):
 
 Agent metadata (`agents/`):
 - `openai.yaml` — catalog-facing display name, short description, and default prompt metadata
+
+## Gotchas
+
+1. `bin/brain` does not exist until `scripts/install.sh` has run successfully — check with `scripts/doctor.sh` first.
+2. Closets are rebuilt every tick — do not hand-edit `.aaak` files; the next tick overwrites manual changes.
+3. BIV scores in `breach` status mean thresholds were not met, not that the system is broken — run `scripts/health.sh` for the full picture.
+4. The remote MCP at `brainofbrains.ai/mcp` is only needed for the A2A provisioning flow — normal queries are fully local.
+5. Do not confuse with generic agent orchestration (LangChain, multi-agent frameworks) — this skill only addresses the BrainOfBrains specialist-brain substrate.
 
 ## Quick reference
 

@@ -1,7 +1,8 @@
 ---
 name: elasticjudge
-description: This skill should be used when the user asks to "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "evaluate this deliverable", "quality check this", "fit-for-CIO review", "brand voice check", "is this ready to send", "evaluate before I send it", "run this through the judge", "elasticjudge", or wants any AI-generated output (memo, deck, email, account plan, slide) graded for factual correctness, Elastic-domain accuracy, brand voice, exec-readiness, and safety before it lands in front of a human. Wraps the ElasticJudge cloud API (https://elasticjudge.com/) to return a structured verdict (pass / needs-revision / reject) plus per-axis scores and line-level critiques a calling agent can act on.
+description: Use when the user says "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "evaluate this deliverable", "quality check this", "fit-for-CIO review", "brand voice check", "is this ready to send", "run this through the judge", or "elasticjudge". Calls the ElasticJudge API to return a structured verdict (pass / needs-revision / reject) with per-axis scores and line-level critiques.
 version: 0.1.0
+allowed-tools: Bash
 ---
 
 # Quality Judge
@@ -132,6 +133,14 @@ Assets (`assets/`):
 
 Agent metadata (`agents/`):
 - `openai.yaml` — catalog-facing display name, short description, and default prompt metadata
+
+## Gotchas
+
+1. The ElasticJudge API at `https://elasticjudge.com/` must be reachable — if it returns non-200, the verdict is unavailable, not "pass".
+2. The judge grades text content only — export PPTX/DOCX to text before submitting; layout and visual formatting are not evaluated.
+3. Do not submit artifacts containing customer PII, unreleased pricing, or embargoed security material — the text is sent to a cloud API.
+4. The judge is deterministic — resubmitting the same text returns the same verdict. Fix the text, then resubmit.
+5. Do not trigger on code review, unit test pass/fail, or static analysis tasks — this skill only grades human-facing AI-generated prose.
 
 ## Quick reference
 

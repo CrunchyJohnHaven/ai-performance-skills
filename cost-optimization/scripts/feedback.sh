@@ -45,7 +45,7 @@ npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]}" \
 npx --yes @sapperjohn/kostai export \
   --format json \
   --output "$DELIV_DIR/feedback.json" \
-  "${EXTRA_ARGS[@]}"
+  "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
 
 FEEDBACK_JSON_PATH="$DELIV_DIR/feedback.json" \
 FEEDBACK_MD_PATH="$DELIV_DIR/FEEDBACK.md" \
