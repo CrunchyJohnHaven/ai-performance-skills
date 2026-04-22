@@ -3,7 +3,7 @@
 SKILLS_DIR := $(HOME)/.claude/skills
 SKILLS     := cost-optimization brainofbrains elasticjudge
 
-.PHONY: help install-all install-cost install-brains install-judge check clean lint smoke-test update-all
+.PHONY: help install-all install-cost install-brains install-judge check clean lint smoke-test update-all diagnose uninstall shellcheck
 
 help: ## Show this help message
 	@echo "AI Performance Skills — root-level tooling"
@@ -33,12 +33,12 @@ check: ## Syntax-check all scripts in all three skills (bash -n)
 	echo "Results: $$PASS passed, $$FAIL failed"; \
 	[ "$$FAIL" -eq 0 ]
 
-clean: ## Remove /tmp/aips scratch directory (prompts for confirmation)
-	@echo "WARNING: This will permanently delete /tmp/aips."
+clean: ## Remove generated deliverables/ directory (prompts for confirmation)
+	@echo "WARNING: This will permanently delete ./deliverables/."
 	@printf "Type 'yes' to confirm: "; read answer; \
 	if [ "$$answer" = "yes" ]; then \
-		rm -rf /tmp/aips; \
-		echo "Removed /tmp/aips."; \
+		rm -rf deliverables; \
+		echo "Removed deliverables/."; \
 	else \
 		echo "Aborted."; \
 	fi
@@ -70,8 +70,17 @@ install-judge: ## Copy only elasticjudge to ~/.claude/skills/
 
 lint: check ## Alias for check (syntax-check all scripts)
 
+diagnose: ## Run all three skill diagnostics and print a pass/fail summary
+	bash scripts/diagnose.sh
+
+shellcheck: ## Run ShellCheck -S warning on all scripts (requires shellcheck)
+	@find . -name "*.sh" | sort | xargs shellcheck -S warning
+
 smoke-test: ## Run the cost-optimization smoke test from repo root
 	bash cost-optimization/scripts/smoke-test.sh
+
+uninstall: ## Remove all skills from ~/.claude/skills/ (dry-run safe)
+	bash scripts/uninstall.sh
 
 update-all: ## Run update.sh for all three installed skills
 	@for skill in $(SKILLS); do \

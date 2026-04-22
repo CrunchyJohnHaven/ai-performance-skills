@@ -87,3 +87,5 @@ jobs:
         run: |
           ls examples/
           test -f examples/sample-memo.md
+          test -f examples/sample-proof.md
+          test -f examples/test-prompts.md
