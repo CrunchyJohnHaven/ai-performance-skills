@@ -10,7 +10,7 @@ The examples are intentionally mixed:
 - `sample-brain-answer.md` is a sample routed answer for `brainofbrains`
 - `test-prompts.md` is a quick trigger-phrase sheet
 
-Use the wrapper scripts from the repo root when you want to compare the samples with live behavior in your own workspace.
+Use the per-skill scripts in this repo when you want to compare the samples with live behavior in your own workspace.
 
 ## cost-optimization
 

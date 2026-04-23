@@ -12,7 +12,7 @@ The three-skill framing:
 - **brainofbrains (orchestration)** — coordinates multi-agent work
 - **elasticjudge (this skill)** — the shared quality evaluator across both
 
-The Quality Judge skill is cloud-based — not a local runtime. Its value is expert evaluation of AI-generated output against the Elastic business (and similar enterprise software businesses).
+The Quality Judge skill is intended to be cloud-hosted — not a local runtime. The local skill is the wrapper and orientation layer around that service. Verify the current endpoint and auth posture at https://elasticjudge.com/ before depending on the live API. Its value is expert evaluation of AI-generated output against the Elastic business (and similar enterprise software businesses).
 
 Framing for employees:
 
@@ -36,7 +36,7 @@ Zero runtime cost. When triggered:
 
 - Reads SKILL.md into Claude context once
 - May load a reference file on demand
-- Delegates to the ElasticJudge cloud API via shell scripts
+- Attempts to delegate to the ElasticJudge cloud API via shell scripts
 
 No always-on process. No background network calls other than the manually invoked curl. No MCP server. No surveillance surface. The skill's only network egress is the single POST to https://elasticjudge.com/ per submitted artifact.
 
@@ -109,7 +109,7 @@ Opt-in posture:
 - Do not claim unmeasured verdict reliability. Every reproducibility claim carries a Measured / Modeled / Needs verification label.
 - Do not use second-person or "you should" language in SKILL.md or references. Imperative form only.
 - Do not hard-code internal IPs or non-public URLs.
-- Do not reimplement the judge locally. The judge is cloud-based — `scripts/judge.sh` is a thin HTTP wrapper.
+- Do not reimplement the judge locally. The judge is intended to be cloud-hosted — `scripts/judge.sh` is a thin HTTP wrapper.
 
 ## Success signal
 

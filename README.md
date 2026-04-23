@@ -26,7 +26,7 @@ This repository hosts three independent skill folders that each solve one proble
 
 Every skill in this suite is:
 
-- **Local-first.** Nothing leaves your machine unless you explicitly share it.
+- **Local-first by default.** Most flows stay on your machine; cloud-backed paths such as ElasticJudge evaluation or an explicitly requested hosted BrainOfBrains provision flow call out their network egress before running.
 - **Opt-in MCP.** No telemetry, no surveillance server, no default-on data collection.
 - **Employee-owned.** The skills are built to make the individual employee more productive and more credible with their manager, not to give a central team a dashboard over their shoulder.
 - **Open source (MIT).** Fork it, audit it, ship it inside your own internal catalog.
@@ -50,8 +50,8 @@ Claude Code reads these folders directly from `~/.claude/skills/`. Codex, Gemini
 | Skill | Domain | What it does | One-line install |
 |---|---|---|---|
 | **cost-optimization** | Spend | Scans the repo, surfaces safe savings patches, routes non-frontier work cheaper, emits a proof-of-savings artifact | `copy cost-optimization/ -> ~/.claude/skills/` |
-| **brainofbrains** | Orchestration | Agent-to-agent distribution layer that watches local AI tools and routes tasks across a three-tier compute pipeline | `copy brainofbrains/ -> ~/.claude/skills/` |
-| **elasticjudge** | Quality | Judge-first evaluation kernel that scores AI-generated slides (and other artifacts) on content, formatting, and persona before a human sees them | `copy elasticjudge/ -> ~/.claude/skills/` |
+| **brainofbrains** | Orchestration | Local substrate and query layer for routing expert questions across a three-tier compute pipeline | `copy brainofbrains/ -> ~/.claude/skills/` |
+| **elasticjudge** | Quality | Judge-first evaluation kernel that scores exported artifact text for factual correctness, brand voice, and exec-readiness before a human sees it | `copy elasticjudge/ -> ~/.claude/skills/` |
 
 Full install commands are in [Install](#install). Each skill links to its own `SKILL.md` for the user-facing catalog description Claude actually consumes.
 
@@ -101,7 +101,7 @@ The thesis behind this packaging: the right entry point for AI cost / orchestrat
                       +-----------------------+
 ```
 
-Each skill is standalone. The arrows are conventions, not dependencies: nothing in the repo forces you to run them together. If you install only `elasticjudge`, it still judges slides. If you install only `cost-optimization`, it still prints a proof artifact. The composition is the point, but the independence is the guarantee.
+Each skill is standalone. The arrows are conventions, not dependencies: nothing in the repo forces you to run them together. If you install only `elasticjudge`, it still judges exported deliverable text. If you install only `cost-optimization`, it still prints a proof artifact. The composition is the point, but the independence is the guarantee.
 
 ---
 
@@ -109,27 +109,29 @@ Each skill is standalone. The arrows are conventions, not dependencies: nothing 
 
 Four levels of quality assurance are available, from fast syntax checks to full end-to-end integration.
 
-### `make check` — bash syntax for all scripts
+### `make check` — bash syntax for per-skill scripts
 
-Runs `bash -n` across every `.sh` file in all three skill directories. Fastest check; no network required.
+Runs `bash -n` across the shipped scripts in `cost-optimization/`, `brainofbrains/`, and `elasticjudge/`. Fastest check; no network required.
 
 ```bash
 make check
 ```
 
-Expected output: one `PASS <path>` line per script, then `Results: N passed, 0 failed`. Any syntax error prints the offending script and exits non-zero.
+Expected output: one `PASS <path>` line per skill script, then `Results: N passed, 0 failed`. Any syntax error prints the offending script and exits non-zero.
 
-### `npx pulser-cli . --no-anim` — skill linting (100/100 target)
+Root `scripts/*.sh` are still part of the maintainer validation surface; check them with `bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh` or `shellcheck -S warning ...` before pushing.
 
-Validates SKILL.md frontmatter, required sections, script references, and catalog metadata across all three skills. Target score is 100/100 — the CI gate runs with `--strict` and fails on any warning.
+### `npx --yes pulser-cli . --format json --no-anim --strict` — skill linting (CI-equivalent)
+
+Validates SKILL.md frontmatter, required sections, script references, and catalog metadata across all three skills. This is the exact CI gate; use the strict command locally so warnings do not pass on your machine and fail in GitHub Actions.
 
 ```bash
-npx --yes pulser-cli . --no-anim
+npx --yes pulser-cli . --format json --no-anim --strict
 ```
 
 Runs automatically in CI via the `pulser` job in `.github/workflows/ci.yml`.
 
-### `scripts/smoke-test.sh` — kostai integration from any repo
+### `cost-optimization/scripts/smoke-test.sh` — kostai integration from any repo
 
 Verifies the cost-optimization skill end-to-end from a directory that has an `ai-cost.config.json`. Safe to run against a real project or against a freshly initialized repo.
 
@@ -138,7 +140,7 @@ Verifies the cost-optimization skill end-to-end from a directory that has an `ai
 make smoke-test
 
 # Or from any repo that already has ai-cost.config.json:
-bash /path/to/aips/cost-optimization/scripts/smoke-test.sh
+bash /path/to/ai-performance-skills/cost-optimization/scripts/smoke-test.sh
 ```
 
 ### `scripts/test-integration.sh` — full integration test suite
@@ -205,7 +207,7 @@ Open a new Claude Code session after the installer finishes. If you prefer `make
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 mkdir -p ~/.claude/skills
-cp -R /tmp/aips/cost-optimization ~/.claude/skills/cost-optimization
+cp -R /tmp/aips/cost-optimization ~/.claude/skills/
 ```
 
 For `brainofbrains`:
@@ -213,7 +215,7 @@ For `brainofbrains`:
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 mkdir -p ~/.claude/skills
-cp -R /tmp/aips/brainofbrains ~/.claude/skills/brainofbrains
+cp -R /tmp/aips/brainofbrains ~/.claude/skills/
 ```
 
 For `elasticjudge`:
@@ -221,7 +223,7 @@ For `elasticjudge`:
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
 mkdir -p ~/.claude/skills
-cp -R /tmp/aips/elasticjudge ~/.claude/skills/elasticjudge
+cp -R /tmp/aips/elasticjudge ~/.claude/skills/
 ```
 
 If you are linking from a packaged build instead of this source repo, use the exported `skills/<name>/` path that package provides.

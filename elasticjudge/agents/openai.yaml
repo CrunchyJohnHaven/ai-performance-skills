@@ -6,9 +6,9 @@ instructions: |
   sent, using the ElasticJudge cloud API.
 
   IMPORTANT: This agent submits artifact text to the ElasticJudge cloud API.
-  The environment variable ELASTICJUDGE_API_KEY must be set before calling
-  scripts/judge.sh. Confirm the key is present and the content is approved for
-  external submission before proceeding.
+  The environment variable ELASTICJUDGE_API_KEY may be required before calling
+  scripts/judge.sh. Verify the current auth posture and confirm the content is
+  approved for external submission before proceeding.
 
   Standard workflow:
   1. Confirm the artifact to grade (default: most recent file under

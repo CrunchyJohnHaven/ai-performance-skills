@@ -24,8 +24,8 @@ Claude reads the scan output and identifies the top optimization opportunities: 
 User sees: a short list of recommended techniques plus the call sites they apply to. Any source-code edit is proposed for approval before it is applied.
 
 **Step 4 — proof**
-If the workspace already has ai-cost comparison data, Claude runs `~/.claude/skills/cost-optimization/scripts/proof.sh`.
-User sees: a `PROOF.md` under `deliverables/<audience>-<date>/` with Measured / Modeled / Needs verification labels. If the repo has no data yet, Claude explains that the first proof will be a baseline until real usage lands in `.ai-cost-data/`.
+If the workspace already has ai-cost comparison data, Claude runs `~/.claude/skills/cost-optimization/scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"`.
+User sees: a `PROOF.md` under `deliverables/demo-<date>/` with Measured / Modeled / Needs verification labels. If the repo has no data yet, Claude explains that the first proof will be a baseline until real usage lands in `.ai-cost-data/`.
 
 **Step 5 — share (optional)**
 User says "I want to share the results with my manager."

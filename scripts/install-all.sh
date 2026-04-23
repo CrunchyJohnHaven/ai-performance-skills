@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Install all three ai-performance-skills into ~/.claude/skills/
 #
-# Idempotent — safe to re-run. Existing installs are overwritten in-place.
+# Idempotent — safe to re-run. Existing installs are copied in-place; removed
+# upstream files may linger until manually cleaned.
 # Usage: bash scripts/install-all.sh [--dry-run]
 
 set -euo pipefail

@@ -11,14 +11,14 @@ This project is MIT-licensed and PRs are welcome for any of the three skills (co
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
 cd ai-performance-skills
 
-# Run the fast syntax check suite
+# Run the fast syntax check suite for per-skill scripts
 make check
 
 # Run the same syntax check via the lint alias
 make lint
 
-# Run the Pulser quality score (no animation output)
-npx pulser-cli . --no-anim
+# Run the CI-equivalent Pulser gate
+npx --yes pulser-cli . --format json --no-anim --strict
 ```
 
 ---
@@ -39,11 +39,11 @@ Work through all four steps before opening a PR:
    ```
    Fix any warnings before pushing. SC2086 / SC2046 (quoting) are the most common.
 
-3. **Confirm Pulser score is 100/100.**
+3. **Run the CI-equivalent Pulser gate.**
    ```bash
-   npx pulser-cli . --no-anim
+   npx --yes pulser-cli . --format json --no-anim --strict
    ```
-   A score below 100 blocks merge.
+   Treat any warning as blocking; CI runs the same strict command.
 
 4. **Run the smoke test** from the repo root or by pointing at the bundled script directly.
    ```bash
@@ -57,7 +57,7 @@ Work through all four steps before opening a PR:
 
 ## Adding a new skill
 
-Every skill added to this repo must follow the five rules from [AGENTS.md](./AGENTS.md):
+Every skill added to this repo must follow these five rules:
 
 1. **Self-contained.** The skill lives entirely inside its own directory (`skillname/`). No cross-skill imports. If you need cross-skill behavior, expose it as a documented contract in `SKILL.md`, not a hidden dependency.
 2. **No telemetry by default.** Do not add automatic background reporting, silent uploads, or recurring sends. Any share-back feature must be opt-in and triggered explicitly by the user (e.g. `scripts/feedback.sh`).
@@ -75,13 +75,20 @@ New skills also need:
 
 ## Updating CLI command references
 
-Before changing any command reference in a `SKILL.md`, script, or README, verify against the live CLI:
+Before changing any `cost-optimization` command reference in a `SKILL.md`, script, or README, verify against the live CLI:
 
 ```bash
 npx --yes @sapperjohn/kostai --help
 ```
 
 Only document flags and subcommands that appear in the `--help` output. Do not guess, do not document flags from memory, and do not copy flags from an older version without re-verifying. If a flag is absent from `--help`, it does not belong in any user-facing file in this repo.
+
+For `brainofbrains` and `elasticjudge`, verify against the shipped help surfaces instead:
+
+```bash
+bin/brain --help
+bash elasticjudge/scripts/judge.sh --help
+```
 
 ---
 

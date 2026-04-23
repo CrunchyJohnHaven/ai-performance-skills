@@ -17,15 +17,15 @@ Top Costly: code-review $0.57 (4 calls), doc-qa $0.39 (2 calls), plan $0.25 (2 c
 
 | Technique | Mechanism | Estimated monthly savings | Label |
 |---|---|---|---|
-| Prompt cache replay | Repeated system prompts served from Anthropic cache at ~90% discount | $18–$24 | Modeled |
-| Context compression | Prose compressor applied to memory files and long tool output | $11–$16 | Measured |
-| Local preprocess routing | Ollama (llama3.1:8b) drafts; frontier validates only | $8–$14 | Measured |
-| Expensive-model gate | claude-opus calls reclassified to sonnet where quality holds | $6–$9 | Modeled |
-| Tool-result trimming | Shell dump truncation before large bash outputs enter context | $3–$5 | Needs verification |
-| **Total (conservative)** | | **$46–$68 / month** | |
+| Prompt cache replay | Repeated system prompts served from Anthropic cache at ~90% discount | $1.9–$2.3 | Modeled |
+| Context compression | Prose compressor applied to memory files and long tool output | $1.1–$1.4 | Measured |
+| Local preprocess routing | Ollama (llama3.1:8b) drafts; frontier validates only | $0.9–$1.2 | Measured |
+| Expensive-model gate | claude-opus calls reclassified to sonnet where quality holds | $0.9–$1.0 | Modeled |
+| Tool-result trimming | Shell dump truncation before large bash outputs enter context | $0.4–$0.5 | Needs verification |
+| **Total (conservative)** | | **$5.2–$6.4 / month** | |
 
 Current spend trajectory (7-day extrapolated): **$8.40 / month**.
-Post-optimization projection: **$2.10–$3.20 / month** — a **62–75% reduction**.
+Post-optimization projection: **$2.00–$3.20 / month** — a **62–76% reduction**.
 
 All dollar figures are based on the API call log in `.ai-cost-data/comparisons.jsonl` for the period above.
 "Modeled" figures use the technique's median savings rate from the reference workload dataset.
@@ -35,7 +35,7 @@ All dollar figures are based on the API call log in `.ai-cost-data/comparisons.j
 
 ## Recommended next steps
 
-1. **Enable prompt caching** — run `scripts/install.sh` if you have not already; the bootstrap applies the Anthropic prompt-caching patch automatically. Expected impact: largest single lever for workloads with stable system prompts. (Estimated savings: $18–$24 / month — Modeled)
+1. **Enable prompt caching** — run `scripts/install.sh` if you have not already; the bootstrap initializes `ai-cost` locally. Then review `scripts/scan.sh` and `scripts/optimize.sh` output for prompt-caching and routing changes before applying them. Expected impact: largest single lever for workloads with stable system prompts. (Estimated savings: $1.9–$2.3 / month — Modeled)
 
 2. **Review recent comparison data for code-review calls** — `code-review` is your top cost category at $0.57 over 4 calls this week. Capture comparisons with your existing shadow-mode setup, then run `npx --yes @sapperjohn/kostai compare --last 14d` to review baseline-vs-optimized cost and quality before changing the default model for that task type.
 
@@ -43,7 +43,7 @@ All dollar figures are based on the API call log in `.ai-cost-data/comparisons.j
 
 4. **Install Ollama for local draft routing** — if your machine has 16 GB+ RAM, `llama3.1:8b` can handle first-draft tasks (summarization, short code scaffolding, doc-qa) before the frontier validates. Run `scripts/scan.sh` to check whether a local runtime is already detected.
 
-5. **Re-run proof after 14 days** — re-run `scripts/proof.sh --audience <your-name> --date <date>` after two weeks of shadow-mode comparisons. At that point all figures should move from "Modeled" or "Needs verification" to "Measured" so you can share the one-pager with a manager or CIO.
+5. **Re-run proof after 14 days** — re-run `scripts/proof.sh --audience <your-name> --date <date>` after two weeks of shadow-mode comparisons. At that point figures with sufficient comparison evidence can move from "Modeled" or "Needs verification" to "Measured"; keep the rest labeled until the evidence exists.
 
 ---
 

@@ -15,9 +15,9 @@ This emits:
 
 - `deliverables/<audience>-<date>/JUDGE.md` — human-readable markdown summary
 - `deliverables/<audience>-<date>/verdict.json` — structured payload with per-axis scores
-- `deliverables/<audience>-<date>/critiques.json` (when `--explain` is passed or when the verdict is `needs-revision` / `reject`) — line-level critiques
+- `deliverables/<audience>-<date>/critiques.json` — line-level critiques written later when `scripts/explain.sh deliverables/<audience>-<date>/verdict.json` is run
 
-Store outputs under `deliverables/<audience>-<topic>-<date>/` — the repo convention for exec artifacts.
+Store outputs under `deliverables/<audience>-<date>/` — that is the folder shape the bundled scripts write today.
 
 ## What the verdict contains
 

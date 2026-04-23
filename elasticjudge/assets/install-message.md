@@ -12,18 +12,16 @@ Copy the block between the fences and paste into Claude Code or Codex as a singl
 I'd like to grade this deliverable before I send it.
 
 NOTE: This skill submits the artifact text to the ElasticJudge cloud API.
-You need a valid ELASTICJUDGE_API_KEY set in your shell environment before
-running step 2. Confirm you have one, or check the free-tier quota at
-https://elasticjudge.com/ before proceeding. Also verify the current endpoint
-and auth requirements there before relying on the live service.
+You may need a valid ELASTICJUDGE_API_KEY set in your shell environment before
+running step 2. Verify the current endpoint and auth requirements at
+https://elasticjudge.com/ before relying on the live service.
 
 Use the Quality Judge skill to do the following, in order:
 1. Confirm the artifact I want graded. Default to the most recent file under
    deliverables/ or docs/ if I do not specify one.
 2. Run `scripts/judge.sh --audience pre-send --date $(date +%Y-%m-%d) <path>`
-   to submit the artifact to the ElasticJudge cloud API (requires
-   ELASTICJUDGE_API_KEY) and write the verdict plus markdown summary under
-   deliverables/pre-send-<date>/.
+   to submit the artifact to the ElasticJudge cloud API and write the verdict
+   plus markdown summary under deliverables/pre-send-<date>/.
 3. Show me the markdown verdict inline (JUDGE.md).
 4. If the verdict is `needs-revision`, run
    `scripts/explain.sh deliverables/pre-send-<date>/verdict.json` and surface
@@ -78,7 +76,7 @@ The ElasticJudge cloud API may require a bearer token. Set it once in the shell 
 export ELASTICJUDGE_API_KEY="<token-from-elasticjudge.com>"
 ```
 
-The scripts pick up the variable automatically. If no key is set, the scripts still attempt the call — the API may allow a free tier or a small daily quota. Confirm the public pricing and auth posture at https://elasticjudge.com/.
+The scripts pick up the variable automatically. If no key is set, the scripts still attempt the call. Whether unauthenticated or quota-limited access is allowed is controlled by the live service, so confirm the current pricing and auth posture at https://elasticjudge.com/.
 
 ## What to expect
 
@@ -86,7 +84,7 @@ On first run the user sees:
 
 1. `deliverables/pre-send-<date>/JUDGE.md` — markdown verdict summary with axis scores and line-level critiques (when applicable)
 2. `deliverables/pre-send-<date>/verdict.json` — structured payload a downstream agent can reason over
-3. `deliverables/pre-send-<date>/critiques.json` — line-level critiques (only on `needs-revision` or `reject` verdicts, or when `scripts/explain.sh` is run)
+3. `deliverables/pre-send-<date>/critiques.json` — line-level critiques written when `scripts/explain.sh` is run
 4. A short inline summary: verdict, each axis score 0-5, and the one-sentence reasoning
 
 Full runtime cost of the install: zero frontier-model calls. The judge call itself costs whatever https://elasticjudge.com/ charges per evaluation — see the live pricing page.
