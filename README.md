@@ -280,6 +280,8 @@ make check
 bash scripts/install-all.sh
 ```
 
+Re-running `bash scripts/install-all.sh` refreshes files in place, but it does not prune skill files that were removed upstream. For a clean reinstall, preview with `make uninstall-dry-run` and then run `make uninstall` before copying the refreshed skills back in.
+
 If you installed a package-backed copy under `~/.claude/skills/`, use the per-skill updater that lives inside the installed folder:
 
 ```bash

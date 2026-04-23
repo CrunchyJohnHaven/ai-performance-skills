@@ -86,11 +86,11 @@ Run `scripts/update.sh` when the skill was installed from npm or copied into a l
 Every brain registered in `brains.json` after install. The stock template seeds:
 - a substrate brain (BIV — Brain Information Velocity, the master composite)
 - specialist brains per stakeholder (human-brain-per-stakeholder pattern)
-- specialist brains per product (one per product line the stack_description names)
+- any additional specialist or product brains the installed substrate exposes
 - a `LocalLeverage` brain (local-vs-frontier share, quality retention, dollars avoided)
 - a `HumanSignal` brain ((signals × quality) / engagement_min)
 
-New brains are added through the underlying installer or managed provision flow, not by hand-editing the substrate files. Do not hand-edit the substrate.
+The installed brain set is service-defined. Use `scripts/scan.sh` or `evidence/brain/brains.json` as the source of truth instead of assuming a fixed topology. New brains are added through the underlying installer or managed provision flow, not by hand-editing the substrate files. Do not hand-edit the substrate.
 
 ## Which questions this covers
 

@@ -76,7 +76,7 @@ When a revision is applied, log the before/after pair. Over time the paired log 
 ### 5. Update the skill (optional)
 
 Run `scripts/update.sh` when the skill was installed from npm or copied into a local skills directory and a refresh is needed. The update path:
-- refreshes the globally installed judge-adjacent tooling if present
+- refreshes the configured ElasticJudge package when one is installed globally
 - preserves symlink installs automatically
 - refreshes copied skill folders when they live outside a git worktree
 - avoids mutating a checked-out repo skill folder unless the operator chooses to re-copy manually
@@ -146,7 +146,8 @@ Agent metadata (`agents/`):
 ## Quick reference
 
 > **API availability note:** the judge API is cloud-hosted at `https://elasticjudge.com/`.
-> All calls below require the site to be live. If the endpoint is not yet published,
+> All calls below require a reachable endpoint and any required auth.
+> If the service is unavailable, the base URL is wrong, or the request is rejected,
 > every script will exit with an HTTP error and a hint. Check `https://elasticjudge.com/`
 > for current status before filing a bug against the skill itself.
 > Override the base URL with `ELASTICJUDGE_URL=<url>` if you have a staging endpoint.

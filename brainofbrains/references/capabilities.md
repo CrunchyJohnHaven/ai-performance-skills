@@ -77,7 +77,7 @@ Specialist brains are template-instantiated. Each has a fixed shape:
 - `formula` — the math that produces the brain's value from telemetry
 - `thresholdLabel` — human-readable health gate
 - `statePath` — where the brain's STATE file lives
-- `watcherResult` — optional cross-reference to an external watcher
+- `watcherResult` — optional extra status field when the registry includes one
 
 Stock templates:
 
@@ -88,7 +88,7 @@ Stock templates:
 - **HumanSignal** — `(signals × quality) / engagement_min`; rewards dense human feedback over long, low-value threads
 - **RevenueVelocity** — `MRR × install_success / John-minutes-per-install`; tracks the A2A economics
 
-A new specialist brain is added by extending the `stack_description` passed to the local installer or the managed provision flow. The compiler generates the STATE file, the tick-script entry, and the closet slot. Do not hand-write these.
+The installed brain set is service-defined. Managed provision uses `stack_description`; local installs inherit whatever substrate layout the installer ships. Use `scripts/scan.sh` or `evidence/brain/brains.json` as the source of truth, and do not hand-write STATE or registry entries.
 
 ## The `brains.json` registry
 

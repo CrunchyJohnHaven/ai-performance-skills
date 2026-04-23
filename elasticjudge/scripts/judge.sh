@@ -134,7 +134,8 @@ if [[ "$HTTP_STATUS" != "200" ]]; then
   fi
   echo "" >&2
   echo "hint: the ElasticJudge cloud API lives at ${BASE_URL}." >&2
-  echo "  If the site is not yet live, this call will fail until the operator publishes it." >&2
+  echo "  If the site is unavailable, the base URL is wrong, or auth is missing," >&2
+  echo "  this call will fail until the endpoint is reachable." >&2
   echo "  Override the base URL with: ELASTICJUDGE_URL=<url> $0 ..." >&2
   echo "  See https://elasticjudge.com/ for status and documentation." >&2
   exit 1

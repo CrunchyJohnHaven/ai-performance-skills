@@ -70,7 +70,7 @@ install-judge: ## Copy only elasticjudge to ~/.claude/skills/
 
 lint: check ## Alias for check (per-skill bash syntax check)
 
-diagnose: ## Run all three skill diagnostics and print a pass/fail summary
+diagnose: ## Run smoke-test (Node/network), optional bin/brain doctor, and judge --help summary
 	bash scripts/diagnose.sh
 
 shellcheck: ## Run ShellCheck -S warning on shipped skill and root scripts
@@ -85,7 +85,7 @@ uninstall: ## Remove all skills from ~/.claude/skills/
 uninstall-dry-run: ## Preview which installed skills would be removed
 	bash scripts/uninstall.sh --dry-run
 
-update-all: ## Run update.sh for all three installed skills
+update-all: ## Run published-package updaters for installed skills under ~/.claude/skills/
 	@for skill in $(SKILLS); do \
 		target="$(SKILLS_DIR)/$$skill"; \
 		if [ -f "$$target/scripts/update.sh" ]; then \

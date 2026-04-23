@@ -38,7 +38,7 @@ Zero runtime cost. When triggered:
 - May load a reference file on demand
 - Attempts to delegate to the ElasticJudge cloud API via shell scripts
 
-No always-on process. No background network calls other than the manually invoked curl. No MCP server. No surveillance surface. The skill's only network egress is the single POST to https://elasticjudge.com/ per submitted artifact.
+No always-on process. No background network calls. No MCP server. No surveillance surface. The default judge flow sends one POST to https://elasticjudge.com/ per submitted artifact; `scripts/explain.sh` may send a follow-on request with prior verdict data, and `scripts/update.sh` contacts package registries only when the operator explicitly runs it.
 
 ## What an employee sees on first invocation
 
@@ -71,7 +71,7 @@ Source: Adnan CIO meeting 2026-04-22. Adnan endorsed the thesis. These are the c
 - **Trigger phrases:** "judge this", "grade this deck", "is this Elastic-accurate", "check for AI slop", "fit-for-CIO review", "brand voice check", "elasticjudge", "run the judge", "evaluate this artifact", "is this exec-ready"
 - **Repo path:** source repo `elasticjudge/`; packaged builds may export `skills/elasticjudge/`
 - **Install method:** catalog install (Agent Builder), source-repo copy, or package-backed install if the publisher ships one
-- **Network egress:** one POST per artifact to https://elasticjudge.com/ — no background calls, no telemetry
+- **Network egress:** user-invoked judge/explain requests to https://elasticjudge.com/ plus optional package-registry calls during `scripts/update.sh` — no background calls, no telemetry
 
 ## Update path
 
@@ -104,7 +104,7 @@ Opt-in posture:
 
 - Do not install an MCP server by default.
 - Do not frame the skill as "the company is grading your output."
-- Do not request telemetry back to a central dashboard in v1. Local-first; the only network egress is the per-artifact POST to https://elasticjudge.com/.
+- Do not request telemetry back to a central dashboard in v1. Local-first; network egress is limited to user-invoked judge/explain calls plus optional update traffic.
 - Do not add any "internal only" slides to any exec-facing artifact.
 - Do not claim unmeasured verdict reliability. Every reproducibility claim carries a Measured / Modeled / Needs verification label.
 - Do not use second-person or "you should" language in SKILL.md or references. Imperative form only.
@@ -118,7 +118,7 @@ The skill is working when:
 1. An employee installs it and runs the judge on a real memo within a day of install
 2. The verdict artifact lands under `deliverables/` with axis scores the employee trusts enough to act on
 3. The employee revises an artifact in response to a `needs-revision` verdict and ships the revised version
-4. A reviewer can follow the reproducibility stub and re-run the same call
+4. A reviewer can follow the reproducibility stub, recover the original artifact or payload, and re-run the same call
 5. Adoption grows through word-of-mouth rather than mandate
 
 ## Pairing with the other two skills
@@ -139,6 +139,6 @@ This section exists to answer the employee's first objection. Lead with this fra
 
 **Does not report to management.** The local verdict artifacts land under `deliverables/<audience>-<date>/` on the employee's machine (`JUDGE.md` plus `verdict.json`, and `critiques.json` when `scripts/explain.sh` is run). The skill never POSTs the verdict to a manager dashboard, a Slack channel, a ticketing system, or any other management surface. Sharing the verdict upward is a voluntary decision made by the employee, not a default behavior of the skill.
 
-**Grading stays with the employee.** The score, the rationale, and the revision decision belong to the employee who ran the judge. No aggregate scoring, no leaderboard, no per-employee quality tracking in v1. The only network egress is the per-artifact POST to https://elasticjudge.com/ — nothing else leaves the local machine.
+**Grading stays with the employee.** The score, the rationale, and the revision decision belong to the employee who ran the judge. No aggregate scoring, no leaderboard, no per-employee quality tracking in v1. Network egress is limited to the user-invoked judge/explain calls and any optional update traffic the employee chooses to run.
 
 **Does not run unless manually invoked.** There is no background process, no file-watcher, no hook that triggers the judge automatically on save or commit. The employee runs `scripts/judge.sh path/to/artifact.md` explicitly, once, per artifact they choose to evaluate.

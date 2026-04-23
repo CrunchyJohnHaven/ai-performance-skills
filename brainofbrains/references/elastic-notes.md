@@ -32,9 +32,9 @@ Zero runtime cost. When triggered:
 
 - Reads SKILL.md into Claude context once
 - May load a reference file on demand
-- Delegates all action to `bin/brain` via shell scripts, or to the remote MCP only for the opt-in provisioning flow
+- Delegates all action to `bin/brain` via shell scripts, or to the remote MCP only for opt-in provisioning and explicit remote health checks
 
-No always-on process. No background network calls. No local MCP server. No surveillance surface. Brains run entirely on the employee's machine after install; the remote MCP at `brainofbrains.ai/mcp` is only touched if the employee explicitly runs `scripts/provision.sh`.
+No always-on process. No background network calls. No local MCP server. No surveillance surface. Brains run entirely on the employee's machine after install; the remote MCP at `brainofbrains.ai/mcp` is only touched if the employee explicitly runs `scripts/provision.sh` or `scripts/health.sh --remote`.
 
 ## What an employee sees on first invocation
 
@@ -53,7 +53,7 @@ Do not start with mechanism explanations. Do not start with BIV formula math. Le
 - **Version:** 0.1.0
 - **Trigger phrases** (from SKILL.md description frontmatter): "Brain Orchestration", "brain orchestration", "install brains", "brainofbrains", "BrainOfBrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "bootstrap brains into this workspace", "set up specialist brains"
 - **Repo path:** source repo `brainofbrains/`; packaged builds may export `skills/brainofbrains/`
-- **MCP default:** OFF. No local MCP server is installed by default. The remote MCP at `brainofbrains.ai/mcp` is only contacted if the employee explicitly runs `scripts/provision.sh`. This is non-negotiable for catalog publication — a default-on MCP is a blocker.
+- **MCP default:** OFF. No local MCP server is installed by default. The remote MCP at `brainofbrains.ai/mcp` is only contacted if the employee explicitly runs `scripts/provision.sh` or `scripts/health.sh --remote`. This is non-negotiable for catalog publication — a default-on MCP is a blocker.
 
 ## Employee-benefit framing
 

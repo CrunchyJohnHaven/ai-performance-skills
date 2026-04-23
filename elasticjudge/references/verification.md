@@ -26,15 +26,15 @@ Every verdict file renders the same blocks in order:
 1. **Verdict** — `pass` / `needs-revision` / `reject` with one-sentence reasoning
 2. **Axis scores** — five lines, each axis 0-5 with the descriptor language from `evaluation-axes.md`
 3. **Line-level critiques** — specific sentences or blocks flagged with a reason code
-4. **Reproducibility stub** — the exact curl command and the SHA-256 of the submitted body so any reviewer can re-run the call
+4. **Reproducibility stub** — the curl shape, endpoint, and SHA-256 of the submitted body so a reviewer can reconstruct the call when the original artifact or saved payload is still available
 
-The reproducibility stub is what turns a judge run into a Measured-label claim, but only after the current endpoint and auth requirements are verified against the live API. If the stub is missing, the verdict is Modeled at best.
+The reproducibility stub is what turns a judge run into a Measured-label claim, but only after the current endpoint and auth requirements are verified against the live API and the original input remains recoverable. If the stub is missing, the payload is gone, or the endpoint posture has changed, the verdict is Modeled at best.
 
 ## Required labels
 
 When quoting a judge verdict in an artifact going to an exec, every numeric or axis claim must carry one of three labels:
 
-- **Measured** — value came from a verdict the reviewer can reproduce by re-running the same curl call against the same input
+- **Measured** — value came from a verdict the reviewer can reproduce by re-running the same curl call against the same input or a separately saved equivalent payload
 - **Modeled** — value extrapolated from a sample of verdicts (e.g., "our decks typically score 4/5 on brand voice across the last N runs")
 - **Needs verification** — value depends on a claim the judge itself has not validated (e.g., "assume the judge's rubric maps 1:1 to the customer's reviewer criteria")
 
@@ -54,7 +54,7 @@ Do not open with rubric detail. The reviewer wants to know whether the artifact 
 
 Point at three evidence surfaces:
 
-1. **Reproducibility target** — the same input should return the same verdict once the current endpoint and auth requirements are confirmed. If a reviewer doubts a verdict, re-run the curl call with the reproducibility stub and confirm the axis scores match. If they do not, surface that to the API operator at https://elasticjudge.com/; do not hide the drift.
+1. **Reproducibility target** — the same input should return the same verdict once the current endpoint and auth requirements are confirmed. If a reviewer doubts a verdict, recover the original artifact or payload, re-run the curl call from the reproducibility stub, and confirm the axis scores match. If they do not, surface that to the API operator at https://elasticjudge.com/; do not hide the drift.
 2. **Per-axis breakdown** — a verdict is not a single opinion; it is five axis scores. A reviewer can ignore the summary verdict and reason about the axis they care about.
 3. **Line-level critiques** — the `explain` surface returns specific sentences with reason codes. A reviewer can inspect whether the judge's line-level reasoning holds, independent of the axis score.
 
@@ -80,17 +80,17 @@ The judge API sees the text submitted to it. Before submitting, confirm the arti
 
 The skill does not auto-screen for these categories. The calling user owns the submission decision. When in doubt, excerpt the artifact — submit only the paragraphs that need grading.
 
-Local footprint: the verdict JSON is written under `deliverables/<audience>-<date>/` and nowhere else. The skill does not append to a central log and does not send background telemetry.
+Local footprint: the verdict artifacts are written under `deliverables/<audience>-<date>/` and nowhere else. The skill does not append to a central log and does not send background telemetry. Network egress stays user-invoked: `scripts/judge.sh` submits the artifact body, and `scripts/explain.sh` may submit prior verdict data if the user asks for line-level critique.
 
 ## Refresh cadence
 
 A judge verdict is a snapshot against the API's current rubric. When the API version changes, older verdicts should be treated as Modeled until re-run. Re-run before any high-stakes send rather than reusing a stale verdict.
 
-Version the verdict filename by date (`JUDGE-2026-04-22.md`) so prior versions are preserved for audit.
+Preserve prior runs by keeping the existing date-scoped folder convention (`deliverables/<audience>-<date>/`). If multiple judge passes must coexist for the same audience and day, copy or rename the folder explicitly rather than assuming the bundled scripts create dated filenames.
 
 ## Reproducibility example
 
-A Measured-label claim from a judge run should be reproducible in a single command once the operator has confirmed the live endpoint:
+A Measured-label claim from a judge run should be reproducible in a single command once the operator has confirmed the live endpoint and the original payload has been retained:
 
 ```bash
 curl -sS -X POST "https://elasticjudge.com/v1/evaluate" \
@@ -99,7 +99,7 @@ curl -sS -X POST "https://elasticjudge.com/v1/evaluate" \
   -d @path/to/payload.json
 ```
 
-The endpoint path (`/v1/evaluate`) is an educated guess based on common REST conventions and is marked NEEDS-VERIFICATION — confirm against the live API docs at https://elasticjudge.com/ before publishing the stub in a CIO artifact. When the operator publishes the canonical path, update `scripts/judge.sh` and this file in the same commit so the reproducibility stub never drifts from the actual call.
+The bundled wrappers currently target `/v1/evaluate`. Confirm the live endpoint and auth posture at https://elasticjudge.com/ before publishing the stub in a CIO artifact. When the operator changes the canonical path, update `scripts/judge.sh`, `scripts/score.sh`, and this file in the same commit so the reproducibility stub never drifts from the actual call.
 
 ## Defending a verdict under scrutiny
 

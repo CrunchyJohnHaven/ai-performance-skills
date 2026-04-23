@@ -8,7 +8,7 @@
 #   scripts/score.sh --text "Elastic is the world's leading..."
 #
 # Writes nothing to disk by default; prints the scores JSON to stdout.
-# Pass --out <path> to also write the scores JSON to a file.
+# Pass --out <path> to also write the same reduced scores JSON to a file.
 
 set -euo pipefail
 
@@ -52,7 +52,8 @@ fi
 
 PAYLOAD_PATH="$(mktemp -t elasticjudge-payload.XXXXXX.json)"
 VERDICT_PATH="$(mktemp -t elasticjudge-verdict.XXXXXX.json)"
-trap 'rm -f "$PAYLOAD_PATH" "$VERDICT_PATH"' EXIT
+SCORES_PATH="$(mktemp -t elasticjudge-scores.XXXXXX.json)"
+trap 'rm -f "$PAYLOAD_PATH" "$VERDICT_PATH" "$SCORES_PATH"' EXIT
 
 if [[ -n "$ARTIFACT_PATH" ]]; then
   if [[ ! -f "$ARTIFACT_PATH" ]]; then
@@ -112,14 +113,15 @@ if [[ "$HTTP_STATUS" != "200" ]]; then
   fi
   echo "" >&2
   echo "hint: the ElasticJudge cloud API lives at ${BASE_URL}." >&2
-  echo "  If the site is not yet live, this call will fail until the operator publishes it." >&2
+  echo "  If the site is unavailable, the base URL is wrong, or auth is missing," >&2
+  echo "  this call will fail until the endpoint is reachable." >&2
   echo "  Override the base URL with: ELASTICJUDGE_URL=<url> $0 ..." >&2
   echo "  See https://elasticjudge.com/ for status and documentation." >&2
   exit 1
 fi
 
 ELASTICJUDGE_VERDICT_JSON="$VERDICT_PATH" \
-node <<'EOF'
+node <<'EOF' > "$SCORES_PATH"
 const fs = require("node:fs");
 const report = JSON.parse(fs.readFileSync(process.env.ELASTICJUDGE_VERDICT_JSON, "utf8"));
 const axes = report.axes || {};
@@ -137,6 +139,8 @@ out.verdict = report.verdict || null;
 process.stdout.write(JSON.stringify(out) + "\n");
 EOF
 
+cat "$SCORES_PATH"
+
 if [[ -n "$OUT_PATH" ]]; then
-  cp "$VERDICT_PATH" "$OUT_PATH"
+  cp "$SCORES_PATH" "$OUT_PATH"
 fi

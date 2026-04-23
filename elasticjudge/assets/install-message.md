@@ -91,7 +91,7 @@ Full runtime cost of the install: zero frontier-model calls. The judge call itse
 
 ## Safety posture recap
 
-- The judge API sees the text submitted to it. Nothing else leaves the machine.
+- The default judge flow sends the submitted artifact text to the judge API. `scripts/explain.sh` may send prior verdict data, and `scripts/update.sh` contacts package registries if used.
 - No MCP server is installed by default.
 - No background telemetry.
 - The judge is read-only on the artifact; revisions are surfaced as suggestions the calling agent chooses to apply.
