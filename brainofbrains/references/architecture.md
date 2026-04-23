@@ -8,15 +8,15 @@ BrainOfBrains is A2A *distribution*, not A2A *software*. The product — a self-
 
 ## v0.1 surface
 
-Three agent-callable MCP tools live at `https://brainofbrains.ai/mcp`:
+The public wrapper currently targets three hosted surfaces under `https://brainofbrains.ai/mcp`:
 
 | Tool | Purpose | Input | Output |
 | --- | --- | --- | --- |
-| `quote(stack_description)` | price an install | free-text or structured stack description | quote object with price, included brains, included specialist templates |
-| `provision(payment_token, stack_spec)` | run the install | payment token from the payment rail + concrete stack_spec | signed tarball URL + install ID + `install.sh` URL |
-| `health_check(install_id)` | confirm an install is alive | install ID returned by provision | latest STATE snapshot + per-brain status + last-tick timestamp |
+| `quote(stack_description)` | price an install | free-text stack description | service-defined quote response |
+| provision endpoint | run the managed install | the same `stack_description`, with an optional payment token header | service-defined provision response plus next-step install instructions |
+| `health_check(install_id)` | confirm an install is alive | install ID returned by provision | latest hosted health response for that install |
 
-The MCP tools are the only always-on surface the product exposes. There is no web dashboard to log into, no background process on the customer's machine calling home, no telemetry pipe. A customer who never touches the MCP again after install gets a fully functional local substrate.
+The hosted endpoints are the only always-on surface the product exposes. There is no web dashboard to log into, no background process on the customer's machine calling home, and no default telemetry pipe. A customer who never touches the hosted path again after install still gets a functional local substrate.
 
 ## Payment rail
 
@@ -27,14 +27,7 @@ Either way, `provision` returns the same artifact: a signed tarball and an `inst
 
 ## Delivery
 
-`provision` emits:
-
-1. A signed tarball containing the compiled brain substrate for the customer's stack spec
-2. An `install.sh` that verifies the signature, lays down files, and triggers the first tick
-3. Optional launchd / systemd unit files for always-on tick cadence
-4. An install ID that the customer's agent can later pass to `health_check`
-
-The customer's agent verifies the signature, runs `install.sh`, and observes the first BIV tick within 5 minutes. If `health_check` does not see a BIV emission within 10 minutes, the payment rail auto-refunds. That refund margin is the forcing function on install reliability — see "The tradeoff" below.
+The current public wrapper assumes `provision` returns service-defined install instructions. Depending on the hosted implementation, that may be a tarball URL, an install script URL, or a manual handoff page. `scripts/provision.sh` prints the raw response and asks the operator to follow the returned instructions.
 
 ## Infrastructure
 
@@ -57,11 +50,11 @@ This means **do not build the A2A layer first**. Build the deterministic install
 The current dependency chain to unlock A2A:
 
 1. Install script that runs cleanly on a fresh machine with no John intervention
-2. `stack_description` → `stack_spec` compiler (schema: `{projects, cost_levers, thresholds, specialist_brains}` → generates STATE files, tick scripts, closet slots)
+2. `stack_description` compiler path solid enough that the hosted service can turn it into the install-specific state, tick scripts, and closet slots it needs
 3. External health check that can prove the install worked (implemented as the `health_check` MCP tool — reads the install's `STATE.json`)
 4. x402 integration on the Cloudflare Worker (Cloudflare has a template; this is trivial once 1–3 are solid)
 
-This skill assumes 1 and 3 are in place (the installer ships and `bin/brain status` emits STATE). 2 and 4 are the remaining engineering work that this skill should surface through `scripts/provision.sh` as "managed install (coming soon)" if the MCP endpoint is not yet live.
+This skill assumes the local installer works and that the hosted path is still an evolving surface. If the hosted endpoint is unavailable, `scripts/provision.sh` should fall back to the manual page instead of pretending a fuller managed flow exists.
 
 ## Local-only operation
 
@@ -82,14 +75,14 @@ Default-MCP reads as surveillance-adjacent inside large organizations. The reaso
 - some MCP integrations ingest filesystem state, terminal output, or keystrokes — the category reads as surveillance to a skeptical employee
 - employees who read "install the MCP server" as "my employer is watching me" opt out, permanently
 
-The BrainOfBrains install does not need a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is agent-callable for the buy-flow; after that, every brain operation happens through `bin/brain` on the local filesystem. Local MCP is available as an opt-in integration for users who want to call substrate queries from other MCP-aware agents, but the installer does not enable it and the skill does not suggest it by default.
+The BrainOfBrains install does not need a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is agent-callable for the buy-flow; after that, every brain operation happens through `bin/brain` on the local filesystem. If a local MCP surface is published later, treat it as opt-in; this bundle does not ship one today.
 
 ## Why A2A compounds
 
 Each customer added compounds engineering time in one direction only:
 
 - bugs in the install pipeline → fixed once, helps every future customer
-- new specialist-brain templates → shipped once, available to every future customer via stack_spec
+- new specialist-brain templates → shipped once, available to every future customer via the hosted install compiler
 - better closet compression → shipped once, reduces every future customer's context spend
 - better routing → shipped once, improves every future customer's synthesized-answer quality
 

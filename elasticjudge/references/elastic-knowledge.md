@@ -112,14 +112,14 @@ If the artifact must quote Elastic pricing, the judge will mark exec-readiness d
 
 ## Elastic 2025 brand
 
-Brand voice is the `brand_voice` axis. Canonical reference: `feedback_elastic_brand_2025.md` in John Bradley's project memory. The judge flags:
+Brand voice is the `brand_voice` axis. Use the bundled rubric plus current public Elastic brand materials as the canonical reference. If your team relies on a private brand source, treat that as maintainer-only context rather than installed-skill guidance. The judge flags:
 
 - invented palettes outside the official Elastic 2025 system ("navy/teal" drift)
 - typography substitutions (Arial, Georgia, Impact) in Elastic-facing material
 - logo misuse
 - tone drift: founder-y voice, outside-offer references, "the genius breakthrough" copy
 
-The authoritative Elastic 2025 Presentation Template is stored in John's Google Drive at `Cowork Space/12 Raw Materials/30 Templates/01 Elastic Presentation Template 2025.pdf` and is the source of truth for color and type. (NEEDS-VERIFICATION — any claim that an artifact matches "the 2025 brand" should be checked against that template, not paraphrased.)
+Any claim that an artifact matches "the Elastic 2025 brand" should be checked against the current public brand material your organization has approved, not paraphrased from memory.
 
 ## Official Elastic tone
 
@@ -152,7 +152,7 @@ Common positioning patterns the judge flags:
 - a recommendation that stops at analysis without naming the decision path
 - consultant shorthand that requires translation in the meeting (e.g., "license / platform overlap compression")
 
-See `feedback_ben_review_standard.md` in project memory for the full "why Elastic?" discipline.
+For the full "why Elastic?" discipline, rely on the bundled judge rubric plus the current public Elastic messaging your team has approved.
 
 ## Stakeholder-specific calibration
 

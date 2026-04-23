@@ -26,7 +26,7 @@ Do not trigger on unrelated cost questions (cloud bill, vendor contracts) — th
 
 ## What this skill does
 
-The skill delegates to the `ai-cost` (alias `kostai`) CLI, which implements 42 cost-reduction techniques across nine categories: model routing, context compression, waste detection, caching, shadow-mode A/B, local inference, batching and deliberation, budget governance, and observability. The CLI is the single source of truth; this skill orients Claude to invoke the right verbs in the right order.
+The skill delegates to the `ai-cost` (alias `kostai`) CLI, which provides routing, compression, caching, shadow-mode comparison, local inference, budget governance, and observability surfaces. The installed CLI plus the wrapper scripts in this skill are the public source of truth; this skill orients Claude to invoke the right verbs in the right order without copying stale command tables from memory.
 
 Distribution detail: the user-facing label is `AI Performance`. In this source repo the folder is `cost-optimization/`; packaged builds commonly nest the same folder under `skills/cost-optimization/`.
 
@@ -38,7 +38,7 @@ Execute steps in order. Each step is a single CLI call wrapped by a script in `s
 
 ### 1. Install
 
-Run `scripts/install.sh` (or `npx @sapperjohn/kostai init` directly). This one-click bootstrap writes `ai-cost.config.json` and initializes the local ai-cost workspace. Any later optimization patches are reviewed and applied manually. Idempotent — re-running is safe.
+Run `scripts/install.sh` (or `npx --yes @sapperjohn/kostai init` directly). This one-click bootstrap writes `ai-cost.config.json` and initializes the local ai-cost workspace. Any later optimization patches are reviewed and applied manually. Idempotent — re-running is safe.
 
 The install step never exfiltrates code or prompts. Capture mode defaults to `metadata_only` (hashes and token counts, no body). The user can opt into `redacted_body` or `full_body` for local debugging by editing `ai-cost.config.json`.
 
@@ -131,7 +131,7 @@ Scripts (`scripts/`):
 - `demo.sh` — walk a first-time user through init → scan → report for demos
 
 References (`references/`):
-- `capabilities.md` — full list of 42 techniques, grouped by category
+- `capabilities.md` — public capability overview and wrapper-backed command guidance
 - `savings-layers.md` — dedup, compression, routing, caching, arbitrage mechanics
 - `verification.md` — how to read the proof artifact and brief a CIO
 - `elastic-notes.md` — Elastic Agent Builder integration + 2026-04-22 CIO meeting commitments
@@ -144,7 +144,7 @@ Agent metadata (`agents/`):
 
 ## Gotchas
 
-1. The CLI version matters — run `npx @sapperjohn/kostai --version` first. Commands differ between versions.
+1. The CLI version matters — run `npx --yes @sapperjohn/kostai --version` first. Commands differ between versions.
 2. `scripts/optimize.sh` outputs to stdout, not a file — pipe or redirect if you want to save the output.
 3. `scripts/proof.sh` requires prior data in `.ai-cost-data/` — fresh repos will show a baseline until real usage or comparisons exist.
 4. The `--audience` flag on `proof.sh` and `feedback.sh` creates a `deliverables/` directory in the current working directory — run from the repo root.
@@ -154,21 +154,20 @@ Agent metadata (`agents/`):
 
 ```bash
 # Full workflow (from the target repo's root)
-npx @sapperjohn/kostai init        # one-click bootstrap
-npx --yes @sapperjohn/kostai scan                    # detect local runtimes + call sites (also generates optimization plan)
-npx --yes @sapperjohn/kostai report --html docs/PROOF.html   # emit one-pager after real data lands
-npx --yes @sapperjohn/kostai report --json docs/proof.json   # machine-readable proof payload
-npx --yes @sapperjohn/kostai dashboard               # open the local dashboard
+scripts/install.sh                                 # one-click bootstrap
+scripts/scan.sh                                    # detect local runtimes + call sites
+scripts/proof.sh --audience demo --date 2026-04-22 # write deliverables/demo-2026-04-22/PROOF.md
+npx --yes @sapperjohn/kostai dashboard             # open the local dashboard
 
 # Skill lifecycle helpers
 scripts/feedback.sh --audience elastic-pilot     # local, opt-in share packet
 scripts/update.sh                                # refresh installed skill files
 
 # Introspection
-npx --yes @sapperjohn/kostai doctor                  # diagnose config and prerequisites
-npx --yes @sapperjohn/kostai --help                  # full CLI surface
+npx --yes @sapperjohn/kostai doctor              # diagnose config and prerequisites
+npx --yes @sapperjohn/kostai --help              # full CLI surface
 ```
 
 ## Pass-through pricing note
 
-If the user asks "what does this cost me?" — the CLI is free and local. If the user asks "what would a managed version cost?" — default pricing is 10% of measured savings, configurable via `--rate` on the `report` command. The proof artifact renders the pass-through math so an employee can justify an enterprise rollout to their CIO without hand-waving.
+If the user asks "what does this cost me?" — the CLI is free and local. If the user asks "what would a managed version cost?" — use the pricing frame rendered by the installed proof/report surface when it is available. Do not hard-code a rate or flag from memory.

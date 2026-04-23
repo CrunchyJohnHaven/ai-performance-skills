@@ -2,9 +2,9 @@
 # Agent-to-agent provisioning flow for a managed BrainOfBrains install.
 # Steps:
 #   1. POST stack_description to the remote MCP `quote` tool
-#   2. Print the returned price and spec; wait for confirmation
-#   3. POST payment_token + stack_spec to the remote MCP `provision` tool
-#   4. Download signed tarball + install.sh
+#   2. Print the returned response; wait for confirmation
+#   3. POST stack_description to the remote `provision` endpoint (optional payment token header)
+#   4. Follow the service-defined install instructions returned by the response
 #
 # Opt-in only. The free install path (scripts/install.sh) remains available
 # and does not require this flow. If no MCP client is available, prints the

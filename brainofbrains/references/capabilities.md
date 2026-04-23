@@ -88,7 +88,7 @@ Stock templates:
 - **HumanSignal** — `(signals × quality) / engagement_min`; rewards dense human feedback over long, low-value threads
 - **RevenueVelocity** — `MRR × install_success / John-minutes-per-install`; tracks the A2A economics
 
-A new specialist brain is added by extending the stack_description passed to `provision(stack_spec)` or to the local installer. The compiler generates the STATE file, the tick-script entry, and the closet slot. Do not hand-write these.
+A new specialist brain is added by extending the `stack_description` passed to the local installer or the managed provision flow. The compiler generates the STATE file, the tick-script entry, and the closet slot. Do not hand-write these.
 
 ## The `brains.json` registry
 

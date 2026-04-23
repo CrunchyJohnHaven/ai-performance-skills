@@ -38,7 +38,7 @@ When quoting a judge verdict in an artifact going to an exec, every numeric or a
 - **Modeled** — value extrapolated from a sample of verdicts (e.g., "our decks typically score 4/5 on brand voice across the last N runs")
 - **Needs verification** — value depends on a claim the judge itself has not validated (e.g., "assume the judge's rubric maps 1:1 to the customer's reviewer criteria")
 
-This is the same discipline as `feedback_exec_pitch_discipline.md` in project memory. Unlabeled claims in a CIO-facing artifact are a discipline break.
+This is the same labeling discipline used throughout this repo. Unlabeled claims in a CIO-facing artifact are a discipline break.
 
 ## What to say when briefing a stakeholder
 

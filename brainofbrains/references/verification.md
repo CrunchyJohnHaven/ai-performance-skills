@@ -12,7 +12,7 @@ Three tiers of verification, in increasing depth. Run them in order; stop when t
 scripts/health.sh
 ```
 
-This is the fastest check. The script reads `evidence/brain/STATE.json` and `evidence/brain/brains.json` locally — no network call, no external dependency. It emits per-brain PASS/FAIL and the BIV headline. If a brain shows `breach` or `unwired`, the substrate is alive but that brain needs attention. If the script cannot find `STATE.json`, the install did not complete; run `scripts/install.sh` and then `bin/brain tick` to seed the state.
+This is the fastest check. The script reads local substrate files — no network call, no external dependency — and emits a status snapshot plus per-brain labels. If a brain shows `breach` or `unwired`, the substrate is alive but that brain needs attention. If the script cannot find `STATE.json`, install may have completed but no tick has run yet; run `bin/brain tick` to seed the state.
 
 **Tier (b) — Live query test via `scripts/ask.sh`**
 
@@ -36,27 +36,23 @@ After an install has run and at least one tick has landed, run:
 
 ```bash
 # From the workspace root
-scripts/health.sh                           # local PASS/FAIL per brain
-scripts/health.sh --remote                  # include remote health_check MCP call
-bin/brain status                            # headline metrics + last tick + registry rollup
-bin/brain registry --json > evidence/brain/registry-snapshot.json
+scripts/health.sh                  # local status snapshot + per-brain labels
+scripts/health.sh --remote         # include the hosted health_check call too
+bin/brain status                   # headline metrics + last tick + registry rollup
+cat evidence/brain/brains.json     # raw registry snapshot
 ```
 
-Flags:
-- `--remote` — calls the `health_check(install_id)` MCP tool in addition to reading local STATE; use only when proving reliability to a buyer
-- `--json` — emit machine-readable output for piping into other tools
-
-Store any exec-facing snapshot under `deliverables/<audience>-<topic>-<date>/` — that is the repo convention and it keeps `~/Downloads/` clear.
+If you need an exec-facing artifact, curate the relevant output into your own deliverables folder. The bundled helper scripts themselves do not create one.
 
 ## What a healthy snapshot contains
 
-Every health snapshot should render the same five blocks in order:
+Every health snapshot should surface the same core fields:
 
-1. **Headline** — BIV score out of 100, delta vs previous tick, last-tick timestamp
-2. **Registry rollup** — total brains, in-band / breach / awaiting-data / unwired counts
-3. **Per-brain status** — each brain's name, role, value, threshold, status
-4. **Tick telemetry** — signal density, closet rebuild flag, regression fixture R@K
-5. **Interpretation** — short natural-language notes the tick loop appended
+1. **Headline** — BIV score, delta vs previous tick, last-tick timestamp
+2. **Registry rollup** — total brains plus in-band / breach / awaiting-data / unwired counts
+3. **Per-brain status** — each brain's name, role, value, threshold, and current label
+4. **Local freshness** — whether `STATE.json` exists and whether the last tick is recent
+5. **Optional remote confirmation** — hosted `health_check` output when `--remote` is used
 
 A brain in `breach` or `unwired` status is not a failure mode — it is a signal that the brain's underlying threshold or data source needs attention. The snapshot reports it faithfully; the operator decides whether to act.
 
@@ -68,7 +64,7 @@ Every numeric claim in any output sent to a stakeholder must carry one of three 
 - **Modeled** — value extrapolated from a sample (for example, projected weekly BIV trajectory from a 24-hour window)
 - **Needs verification** — value depends on a number the user supplied but the substrate has not validated (for example, "assume 40 customers installed" when the registry has not been polled)
 
-This labeling is not optional. Unlabeled numbers in a stakeholder-facing artifact are a fireable-level discipline break. See `feedback_exec_pitch_discipline.md` in project memory and the `cost-optimization` skill's `verification.md` for the canonical wording.
+This labeling is not optional. Unlabeled numbers in a stakeholder-facing artifact are a discipline break. Use the same rule consistently across this repo.
 
 Brain-metric examples:
 
@@ -110,7 +106,7 @@ BIV captures quality as one of its five factors via `retrievalQuality`. A BIV dr
 
 Point at what the substrate does and does not do:
 
-- **Local operation** — every tick, query, and closet rebuild runs on the local machine. Nothing leaves the machine unless the user explicitly calls the remote `health_check` MCP.
+- **Local operation after bootstrap** — every tick, query, and closet rebuild runs on the local machine. The install wrapper may contact the installer URL or package registry, and nothing else leaves the machine unless the user explicitly calls the remote `health_check` path.
 - **No background telemetry** — the default install does not emit any telemetry to any central service. There is no "phone home" in the tick loop.
 - **No local MCP server** — the default install does not stand up a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is only touched for the buy-flow.
 - **No data ingestion without opt-in** — the closet builder reads commits, meeting transcripts, KB artifacts, and explicit messages. It does not read the user's screen, browser history, or keystrokes.
@@ -128,7 +124,7 @@ If the loop is dead, restart with `bin/brain tick` (manual) or restart the launc
 
 ## Refresh cadence for stakeholder-facing snapshots
 
-Re-run `scripts/health.sh` immediately before any stakeholder-facing briefing. Do not reuse a stale snapshot — the substrate is a living system and the numbers will have moved. Date-stamp the artifact filename under `deliverables/<audience>-<topic>-<date>/` and cite the timestamp in the briefing so the stakeholder can see how fresh the data is.
+Re-run `scripts/health.sh` immediately before any stakeholder-facing briefing. Do not reuse a stale snapshot — the substrate is a living system and the numbers will have moved. Cite the timestamp in the briefing so the stakeholder can see how fresh the data is.
 
 ## What to say to a CIO
 

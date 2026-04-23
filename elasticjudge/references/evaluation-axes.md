@@ -103,7 +103,7 @@ The judge is pedantic on:
 
 ## Axis 3 — Brand voice
 
-Scores adherence to the Elastic 2025 brand guide: colors, typography, tone. See `feedback_elastic_brand_2025.md` in project memory for the canonical palette and type system.
+Scores adherence to the Elastic 2025 brand guide: colors, typography, tone. Use the bundled rubric plus the current public brand material your organization has approved; do not rely on private-memory references from this repo.
 
 | Score | Descriptor |
 | --- | --- |
@@ -148,7 +148,7 @@ Scores whether the artifact is ready for a senior reviewer (CIO, VP, or equivale
 | 3 | Acceptable labeling; some hand-waving; recommendation implicit |
 | 2 | Multiple unlabeled numbers, ask is too big, or recommendation missing |
 | 1 | No labeling discipline, founder-y voice, "reassign us" / "fund a new product line" ask |
-| 0 | Would embarrass the sender in front of the target exec; violates the ban list from `feedback_exec_pitch_discipline.md` |
+| 0 | Would embarrass the sender in front of the target exec; violates the bundled ban list and basic exec-readiness discipline |
 
 The judge weighs specifically:
 - **labels on numbers** — Measured / Modeled / Needs-verification on every quantitative claim

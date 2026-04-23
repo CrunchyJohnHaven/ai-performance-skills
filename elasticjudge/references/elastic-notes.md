@@ -137,7 +137,7 @@ This section exists to answer the employee's first objection. Lead with this fra
 
 **Does not store prompt bodies locally.** The artifact submitted to https://elasticjudge.com/ is handled according to the API operator's live data-retention policy. The skill itself performs no additional body storage beyond the local verdict artifacts it writes.
 
-**Does not report to management.** The verdict JSON lands under `deliverables/<audience>-<date>/JUDGE.md` on the employee's local machine. The skill never POSTs the verdict to a manager dashboard, a Slack channel, a ticketing system, or any other management surface. Sharing the verdict upward is a voluntary decision made by the employee, not a default behavior of the skill.
+**Does not report to management.** The local verdict artifacts land under `deliverables/<audience>-<date>/` on the employee's machine (`JUDGE.md` plus `verdict.json`, and `critiques.json` when `scripts/explain.sh` is run). The skill never POSTs the verdict to a manager dashboard, a Slack channel, a ticketing system, or any other management surface. Sharing the verdict upward is a voluntary decision made by the employee, not a default behavior of the skill.
 
 **Grading stays with the employee.** The score, the rationale, and the revision decision belong to the employee who ran the judge. No aggregate scoring, no leaderboard, no per-employee quality tracking in v1. The only network egress is the per-artifact POST to https://elasticjudge.com/ — nothing else leaves the local machine.
 

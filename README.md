@@ -308,7 +308,7 @@ If you want to see the output shape before installing, start with:
 
 Wraps the `@sapperjohn/kostai` / `ai-cost` toolchain. It scans a repo for LLM call sites, surfaces safe savings patches (Anthropic prompt caching, prose compression, expensive-model gating), routes non-frontier work to cheaper or local models, and emits a manager-friendly proof artifact under `deliverables/<audience>-<date>/`.
 
-42 cost-reduction techniques live in the underlying CLI across nine categories: model routing, context compression, waste detection, caching, shadow-mode A/B, local inference, batching, budget governance, and observability. The skill's job is to point Claude at the right verbs in the right order.
+The underlying CLI handles routing, compression, caching, shadow-mode comparison, local inference, budget governance, and observability. The skill's job is to point Claude at the right verbs in the right order.
 
 Reference-workload target: 60–92% input-token reduction with a one-page receipt an employee can show their manager or CIO. Every numeric claim carries a **Measured / Modeled / Needs verification** label — no bullshit claims leave the artifact.
 
@@ -316,24 +316,19 @@ Companion landing page: [kostai.app](https://kostai.app/).
 
 ### brainofbrains — orchestration layer
 
-A small, quiet helper that watches a developer's AI tools (Claude, ChatGPT, Gemini) and routes work through the three-tier compute pipeline: cached data → open-source / local models → frontier models. It deduplicates, compresses, and picks the cheapest model that still clears quality.
+A local substrate and query layer for specialist-brain workflows. It bootstraps `bin/brain`, keeps closets and registry state in `evidence/brain/`, and routes expert questions through the three-tier compute pipeline when the user explicitly asks.
 
-The user experience: a weekly plain-English email showing savings achieved. The developer-facing artifact: a skill Claude can invoke to see what's cached, what's been routed, and what's still flowing to frontier.
+The developer-facing artifact: a skill Claude can invoke to install the substrate, scan the registry, run a tick, check health, and ask routed questions against local closets.
 
 Companion landing page: [brainofbrains.ai](https://brainofbrains.ai/).
 
 ### elasticjudge — quality kernel
 
-A judge-first evaluation kernel. The central design bet:
+A judge-first evaluation kernel for exported artifact text. The central design bet:
 
-> Do not start by building a machine that makes good PowerPoints. Start by building a machine that can reliably tell whether a slide is good.
+> Do not start by building a machine that makes good deliverables. Start by building a machine that can reliably tell whether the text is good.
 
-Two independent lanes score every artifact:
-
-1. **Content lane** reads the slide like a skeptical enterprise buyer, sentence by sentence: what are we trying to say, how is this additive, could this be said better, where will the customer get confused.
-2. **Formatting lane** treats the slide as an image: is hierarchy obvious in under five seconds, does the layout feel intentional, is spacing consistent.
-
-A synthesizer merges lane verdicts into one **pass / needs-revision / reject** decision. Once the judge is stable, generation becomes an optimization loop against it.
+The current public wrapper submits text to the hosted judge and returns one **pass / needs-revision / reject** decision with per-axis scores and critiques. For decks or docs, export the text first before using the bundled scripts.
 
 Companion landing page: [elasticjudge.com](https://elasticjudge.com/).
 

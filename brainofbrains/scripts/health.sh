@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Prove the brains installed in this workspace are alive.
 # By default, reads local evidence/brain/STATE.json and evidence/brain/brains.json
-# and prints PASS/FAIL per brain plus the last-tick timestamp.
+# and prints a local status snapshot plus per-brain labels and the last-tick timestamp.
 # Pass --remote to additionally call the health_check MCP tool using the
 # install ID recorded in evidence/brain/install.json.
 

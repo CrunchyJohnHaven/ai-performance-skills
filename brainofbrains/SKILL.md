@@ -29,7 +29,7 @@ Do not trigger on unrelated orchestration questions (workflow engines, generic m
 The skill delegates to two surfaces and does not reimplement either:
 
 1. **Local** — the `bin/brain` CLI (ships inside the target workspace after install). Handles queries, tick loops, closet rebuilds, BIV metric emission, and brain-to-brain claims. All state stays on the machine.
-2. **Remote** — the BrainOfBrains MCP at `brainofbrains.ai/mcp` with three agent-callable tools: `quote(stack_description)`, `provision(payment_token, stack_spec)`, `health_check(install_id)`. Remote is opt-in and only touched for the A2A install flow.
+2. **Remote** — the optional hosted BrainOfBrains endpoints under `brainofbrains.ai`. The bundled wrapper targets a quote step that takes `stack_description`, a provision step that reuses that same `stack_description` plus an optional payment token header, and a `health_check(install_id)` path. Remote is opt-in and only touched for managed install or explicit remote health checks.
 
 Distribution detail: the user-facing label is `Brain Orchestration`. In this source repo the folder is `brainofbrains/`; packaged builds commonly nest the same folder under `skills/brainofbrains/`. The skill is one of three shipped in the public repo at https://github.com/CrunchyJohnHaven/ai-performance-skills.
 
@@ -41,9 +41,9 @@ Execute steps in order. Each step is a single call wrapped by a script in `scrip
 
 ### 1. Install
 
-Run `scripts/install.sh` to bootstrap the brain substrate into the current workspace. The script prefers `curl -fsSL https://brainofbrains.ai/install | bash` and falls back to `npx --yes @sapperjohn/brainofbrains install` if the remote installer is unreachable. The installer writes `bin/brain`, `evidence/brain/` (with seeded `STATE.json`, `brains.json`, and initial `closet-*.aaak` files), and a `scripts/brain/` dispatcher set. Idempotent — re-running refreshes files in place and never deletes user data.
+Run `scripts/install.sh` to bootstrap the brain substrate into the current workspace. The script prefers `curl -fsSL https://brainofbrains.ai/install | bash` and falls back to `npx --yes @sapperjohn/brainofbrains install` if the remote installer is unreachable. The installer writes `bin/brain`, `evidence/brain/brains.json`, and the initial closet set. The first `STATE.json` arrives after `bin/brain tick`. If `bin/brain` already exists, the wrapper exits as a safe no-op; use `scripts/update.sh` or an explicit remove-and-reinstall when you actually want a refresh.
 
-The install step never exfiltrates code or prompts. Closets stay local. No MCP server is installed. The only outbound request is the install script download itself.
+The install wrapper may contact the hosted installer URL or the package registry, but it does not upload workspace data or stand up a local MCP server. Closets stay local.
 
 ### 2. Scan
 
@@ -57,19 +57,19 @@ The router picks which specialist brain(s) answer based on the question's routin
 
 ### 4. Tick (optional, background)
 
-Run `bin/brain tick` directly (or wire it to a launchd plist — the installer offers to set this up) to run one always-on iteration. Each tick refreshes closets, recomputes BIV, checks thresholds, and writes a new `STATE.json` snapshot. The landing-page promise of "a plain-English email each week" is powered by the aggregate of these ticks; the tick loop is the engine behind every subsequent query.
+Run `bin/brain tick` directly (or wire it to a launchd plist — the installer offers to set this up) to run one always-on iteration. Each tick refreshes closets, recomputes BIV, checks thresholds, and writes a new `STATE.json` snapshot. The tick loop is the freshness engine behind later scan, query, and health calls.
 
 This step is optional for one-shot use. A workspace that is only asked questions occasionally can skip always-on ticks and run `bin/brain tick` on demand before a query.
 
 ### 5. Verify
 
-Run `scripts/health.sh` to prove the brains are alive. By default it reads the local `STATE.json` and `brains.json` and prints PASS/FAIL per brain along with the last-tick timestamp. Add `--remote` only if you explicitly want to call the hosted `health_check(install_id)` endpoint. Any brain in `breach` or `unwired` prints the remediation hint from the registry.
+Run `scripts/health.sh` to prove the brains are alive. By default it prints a local status snapshot (via `bin/brain status` when available) plus per-brain labels such as `in-band`, `breach`, `awaiting-data`, and `unwired`. Add `--remote` only if you explicitly want to call the hosted `health_check(install_id)` endpoint.
 
 See `references/verification.md` for how to label numeric claims (Measured / Modeled / Needs verification) when reporting status to a stakeholder.
 
 ### 6. Provision (optional, A2A)
 
-Run `scripts/provision.sh` to kick off the agent-to-agent provisioning flow for a managed install when the hosted MCP is available. The script tries the remote `quote(stack_description)` flow, prints the returned price and spec, waits for confirmation, then calls `provision(payment_token, stack_spec)` and emits a signed install tarball plus install.sh. If the hosted path is unavailable, the script falls back to the manual page it prints. Payment is x402 (agent-native HTTP 402) by default with a Stripe Checkout fallback.
+Run `scripts/provision.sh` to kick off the managed install flow when the hosted path is available. The script posts `stack_description` to the quote endpoint, prints the returned response, waits for confirmation, then posts the same `stack_description` to the provision endpoint with an optional payment token header. The hosted service determines the exact response format and follow-on install instructions. If the hosted path is unavailable, the script falls back to the manual page it prints.
 
 This step is opt-in. The free install path (step 1) remains fully functional. Provision is only invoked when an agent-to-agent purchase flow is explicitly requested.
 
@@ -90,7 +90,7 @@ Every brain registered in `brains.json` after install. The stock template seeds:
 - a `LocalLeverage` brain (local-vs-frontier share, quality retention, dollars avoided)
 - a `HumanSignal` brain ((signals × quality) / engagement_min)
 
-New brains are added by extending the stack_description and re-running install. The compiler generates the matching STATE file, tick script, and closet entry. Do not hand-edit the substrate — use the compiler.
+New brains are added through the underlying installer or managed provision flow, not by hand-editing the substrate files. Do not hand-edit the substrate.
 
 ## Which questions this covers
 
@@ -104,7 +104,7 @@ Questions that do not benefit: generic world knowledge, novel reasoning unrelate
 
 ## Safety and data posture
 
-- No data leaves the machine unless the user explicitly enables a remote endpoint. Closets, STATE files, and query results all stay local.
+- Normal query, tick, and local health flows stay on the machine. The install wrapper may contact the installer URL or package registry, and remote provision or remote health calls only happen when the user explicitly requests them.
 - No secrets are persisted in closets. The closet builder redacts known secret patterns before write; the redactor is a TABOO path and gates every closet rebuild.
 - No MCP server is installed by default. The remote MCP at `brainofbrains.ai/mcp` is agent-callable but nothing in the default install runs a local MCP process. Default-MCP reads as surveillance-adjacent in large orgs; default is off.
 - No background telemetry is sent to a central service. Ticks are local. Health checks only call the remote MCP if the user explicitly runs `scripts/health.sh --remote`.
@@ -126,12 +126,12 @@ Scripts (`scripts/`):
 - `scan.sh` — list discovered brains, specialist types, last-tick timestamps
 - `ask.sh` — the primary "ask the expert" verb (wraps `bin/brain query`)
 - `provision.sh` — agent-to-agent provisioning flow via the remote MCP
-- `health.sh` — PASS/FAIL per brain (remote MCP or local STATE fallback)
+- `health.sh` — local status snapshot plus per-brain labels (with optional remote health check)
 - `update.sh` — refresh the shipped skill from the latest npm package
 
 References (`references/`):
 - `capabilities.md` — L0/L1/L2 layers, BIV tick loops, closet (AAAK) format, specialist-brain templates
-- `architecture.md` — A2A distribution, x402 payment, signed-tarball delivery, local-only operation posture
+- `architecture.md` — managed-install posture, payment concepts, and current wrapper behavior
 - `verification.md` — how to prove the brains are working; Measured / Modeled / Needs verification labeling
 - `elastic-notes.md` — Elastic Agent Builder catalog metadata, no-MCP-default posture, employee-benefit framing
 
@@ -161,7 +161,7 @@ scripts/install.sh                  # bootstrap brain substrate — writes bin/b
 scripts/scan.sh                     # list installed brains + status (reads evidence/brain/brains.json)
 scripts/ask.sh "<question>"         # route an expert question and return a synthesized answer
 bin/brain tick                      # one iteration (refresh closets, recompute BIV) — requires bin/brain
-scripts/health.sh                   # PASS/FAIL per brain (local STATE.json; add --remote for MCP check)
+scripts/health.sh                   # local status snapshot + per-brain labels (add --remote for hosted check)
 
 # Agent-to-agent managed install (opt-in)
 scripts/provision.sh "<stack description>"   # quote → confirm → provision via MCP

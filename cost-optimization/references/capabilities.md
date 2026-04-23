@@ -1,18 +1,18 @@
 # Capabilities
 
-KostAI currently implements 42 cost-reduction techniques across nine categories. The canonical inventory lives in `src/capabilities/registry.ts` and is rendered by the CLI.
+KostAI exposes multiple cost-reduction techniques across routing, compression, caching, shadow-mode comparison, local inference, budget governance, and observability. The installed CLI plus the wrapper scripts in this skill are the public source of truth.
 
 ## How to read the current list
 
-Never paraphrase this list from memory — it drifts. The authoritative capability inventory is in `src/capabilities/registry.ts`. To inspect it:
+Never paraphrase this list from memory — it drifts. Inspect the public surfaces on the target machine:
 
 ```bash
-npx --yes @sapperjohn/kostai scan                   # detect active capabilities and local runtimes
-npx --yes @sapperjohn/kostai doctor                 # check which capabilities are enabled in this project
-npx --yes @sapperjohn/kostai --help                 # full CLI surface
+scripts/scan.sh                             # detect local runtimes and candidate savings levers
+npx --yes @sapperjohn/kostai doctor         # diagnose config and prerequisites
+npx --yes @sapperjohn/kostai --help         # full CLI surface for the installed version
 ```
 
-The scan output groups every detected opportunity by category and tells the user how to invoke it (flag, config key, wrapper call, or automatic).
+The scan output groups detected opportunities by category and tells the user how to invoke them (wrapper script, CLI flag, config key, or automatic behavior). If you are maintaining the upstream product repo rather than using an installed skill, inspect the source-tree registry there too.
 
 ## Categories
 
@@ -50,43 +50,20 @@ Every capability carries a status tag:
 - `experimental` — behind a feature flag; do not recommend to external users without verification
 
 Do not surface `experimental` capabilities in a CIO-facing artifact or customer proof. Filter by running:
+Check the installed CLI or scan output on the target machine before making a stakeholder-facing claim about availability.
 
-```bash
-npx --yes @sapperjohn/kostai report --json | jq '.capabilities[] | select(.status == "ga")'
-```
+## Maintainer note
 
-## Adding a new capability
+If you are editing the upstream product repo, keep the capability registry aligned with the detectors that feed it. Installed-skill users can ignore the source-tree internals.
 
-See the header comment in `src/capabilities/registry.ts` for invariants. In short: kebab-case stable ID, source file path, one-line description, category, invoke mode, status. If a new waste-category constant is added under `src/core/score/*.ts`, add the matching capability row at the same time so the feature list never drifts from the detectors.
+## Wrapper-backed command surface
 
-## Available CLI Commands (v0.5.1)
+This skill bundle relies on a small stable wrapper surface:
 
-Verified from `npx --yes @sapperjohn/kostai --help` on 2026-04-22. Use this list as the authoritative CLI surface — do not invent commands not shown here.
+- `scripts/install.sh` — wraps `kostai init`
+- `scripts/scan.sh` — wraps `kostai scan`
+- `scripts/proof.sh` — wraps `kostai report`
+- `scripts/feedback.sh` — builds share-ready output from the local proof data
+- `scripts/update.sh` — refreshes the installed skill bundle from the published package
 
-| Command | Description |
-| --- | --- |
-| `init` | Initialize ai-cost configuration in the current project |
-| `connect` | Auto-stamp `ai-cost.config.json`, generate bridge token, detect Tailscale peers |
-| `dashboard` | Start the local ai-cost dashboard |
-| `report` | Print a markdown summary report (replaces any prior `proof` command) |
-| `export` | Export event data |
-| `doctor` | Check ai-cost configuration and prerequisites |
-| `reset` | Clear all stored event data |
-| `ingest` | Pull token usage from Claude Code, Codex, and Ollama into the event store |
-| `agent` | Stream token usage from this host to a central kostai bridge |
-| `scan` | Detect local LLM runtimes and LLM usage in the current repo |
-| `mcp` | Start the ai-cost MCP server (JSON-RPC over stdio) |
-| `proxy` | Start an OpenAI-compatible HTTP proxy that observes, routes, or shadows |
-| `bridge` | Run / inspect the cross-machine MCP bridge (HTTP + SSE with bearer auth) |
-| `queue` | Inspect or drive the 24-hour task queue (escalate / delegate / handoff) |
-| `compare` | Summarize shadow-mode comparisons (baseline vs. optimized) |
-| `evidence` | Reproducible evidence harness: benchmarks, receipts, reports, verification |
-| `compress` | Compress a markdown / text file in place (backs up original as `FILE.original.md`) |
-| `help` | Display help for a command |
-
-**Commands that do NOT exist in v0.5.1** (do not reference these):
-- `proof` — replaced by `report`
-- `optimize` — use `scan` to detect optimization candidates
-- `install` — use `init` to initialize a project
-- `open` — use `dashboard` to launch the local UI
-- `capabilities` — documented in source (`src/capabilities/registry.ts`); not a CLI command in v0.5.1
+Before documenting any additional subcommand or flag, verify it against `npx --yes @sapperjohn/kostai --help` on the target machine instead of copying an old command table.

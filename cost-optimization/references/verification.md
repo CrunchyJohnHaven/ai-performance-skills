@@ -8,16 +8,18 @@ After real workload data has landed in `.ai-cost-data/events.jsonl` and shadow-m
 
 ```bash
 # From the target workspace root
-npx --yes @sapperjohn/kostai report --html deliverables/<audience>-<YYYY-MM-DD>/PROOF.html
-npx --yes @sapperjohn/kostai report --json deliverables/<audience>-<YYYY-MM-DD>/proof.json
-npx --yes @sapperjohn/kostai report > deliverables/<audience>-<YYYY-MM-DD>/PROOF.md
+scripts/proof.sh --audience <audience> --date <YYYY-MM-DD>
+
+# Or, if you only want stdout:
+scripts/proof.sh --last 30d
 ```
 
-Flags:
-- `--rate <decimal>` — pass-through SaaS pricing rate (default `0.10` = 10% of savings)
-- `--last <30d|90d|all>` — time window (default `all`)
+The wrapper recognizes:
+- `--audience <name>` — writes `deliverables/<audience>-<date>/PROOF.md`
+- `--date <YYYY-MM-DD>` — chooses the deliverables folder suffix
+- `--last <period>` — forwards the time window to `kostai report`
 
-Store outputs under `deliverables/<audience>-<topic>-<date>/` — that is the repo convention for exec artifacts and keeps `~/Downloads/` clear.
+Any other flags are forwarded to `kostai report`; verify them against the installed CLI before documenting them. If you omit `--audience`, the proof is printed to stdout instead of writing a file.
 
 ## What the proof contains
 
@@ -37,7 +39,7 @@ Every numeric claim in any output sent to an exec must carry one of three labels
 - **Modeled** — value extrapolated from a sample (e.g., projected annual savings from a 30-day window)
 - **Needs verification** — value depends on a number the user supplied but the system has not validated (e.g., "assume $40M annual Anthropic spend")
 
-This labeling is not optional. Unlabeled numbers in a CIO artifact are a fireable-level discipline break. See `feedback_exec_pitch_discipline.md` in project memory.
+This labeling is not optional. Unlabeled numbers in a CIO artifact are a discipline break. Use the same labeling rule consistently across this repo.
 
 ## What to say when briefing a stakeholder
 
@@ -55,7 +57,7 @@ Point at three evidence surfaces:
 
 1. **The ledger** — `.ai-cost-data/comparisons.jsonl` is append-only JSONL. Every row is a baseline/optimized pair with token counts, dollars, and quality score.
 2. **The dashboard** — `npx --yes @sapperjohn/kostai dashboard` shows the same data as a time-series. Non-technical reviewers can see the trend.
-3. **Re-run the proof** — `npx --yes @sapperjohn/kostai report` against the same local ledger and time window should regenerate the same totals and artifact sections on demand.
+3. **Re-run the proof** — `scripts/proof.sh --audience <audience> --date <date>` against the same local ledger and time window should regenerate the same totals and artifact sections on demand.
 
 If the ledger is empty (new install), say so plainly. `scripts/demo.sh` is useful for showing the artifact shape, but measured savings appear only after real usage or comparison data lands in `.ai-cost-data/`. Never invent numbers — the system will not let you, and a fabricated claim invalidates the whole artifact.
 
@@ -75,4 +77,4 @@ Nothing leaves the user's machine. No MCP server is installed by default. The pr
 
 ## Refresh cadence
 
-For ongoing pitches, re-run `npx --yes @sapperjohn/kostai report` after any run of meaningful workload volume (≥100 calls on recent work). Date-stamp the artifact filename. Do not reuse a stale proof — the ledger is cumulative and the numbers will have moved.
+For ongoing pitches, re-run `scripts/proof.sh --audience <audience> --date <date>` after any run of meaningful workload volume (≥100 calls on recent work). Do not reuse a stale proof — the ledger is cumulative and the numbers will have moved.

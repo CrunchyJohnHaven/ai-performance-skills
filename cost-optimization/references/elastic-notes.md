@@ -96,7 +96,7 @@ Outcome of the Adnan CIO meeting on 2026-04-22. These are binding commitments th
 
 - **Ship as Claude skill for Agent Builder catalog.** Do not create a new product line. Package as `AI Performance` in the existing skills catalog alongside Brain Orchestration and Quality Judge.
 - **Zero MCP default.** No MCP server is installed or enabled by default. MCP remains an opt-in integration. Default-off posture is non-negotiable for the enterprise rollout.
-- **10%-of-savings pricing.** The default pass-through rate for any managed offering is 10% of measured savings. The proof artifact renders the math so an employee can justify the rollout to their CIO without hand-waving. Rate is configurable via `--rate` on the `report` command.
+- **10%-of-savings pricing.** The default pass-through rate for any managed offering is 10% of measured savings. The proof artifact renders the math so an employee can justify the rollout to their CIO without hand-waving. Do not hard-code a CLI flag for that rate without re-checking the installed report surface.
 - **Employee-benefit framing leads.** Every employee-facing message leads with personal benefit — faster responses, measurable savings, cleaner context — not with company cost reduction. Company-surveillance framing causes opt-out.
 - **Measured / Modeled / Needs-verification label on every numeric claim.** No numeric claim appears in any stakeholder-facing output without one of these three labels. This applies to PROOF.md, FEEDBACK.md, slide decks, and any email or Slack message that contains a savings figure.
 

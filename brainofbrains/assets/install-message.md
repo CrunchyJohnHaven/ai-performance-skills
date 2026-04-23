@@ -13,14 +13,16 @@ I'd like to ask an expert brain about my work.
 
 Use the Brain Orchestration skill to do the following, in order:
 1. Run `scripts/install.sh` to bootstrap the BrainOfBrains substrate into this
-   workspace. It should populate `evidence/brain/` with a seeded
-   `brains.json` registry, initial closets, and a `bin/brain` CLI. No code
+   workspace. It should populate `evidence/brain/` with a `brains.json`
+   registry, initial closets, and a `bin/brain` CLI. No code
    outside of `evidence/brain/`, `bin/brain`, and `scripts/brain/` should
    change.
 2. Run `scripts/scan.sh` to list the brains that now live in this workspace.
    Show me each brain's name, role, and status.
 3. Run `bin/brain tick` once to produce a first `STATE.json` snapshot.
-4. Run `scripts/health.sh` to print PASS/FAIL per brain and the BIV headline.
+4. Run `scripts/health.sh` to print the local status snapshot, the BIV
+   headline, and each brain's current label (`in-band`, `breach`,
+   `awaiting-data`, or `unwired`).
    Use `--remote` only if I explicitly want the hosted health check too.
 5. Pick one question from my recent work (a stakeholder name, a product
    roadmap item, or a meeting follow-up), route it through
@@ -65,13 +67,13 @@ Published display name: `Brain Orchestration`
 
 On first run the user sees:
 
-1. `evidence/brain/` created in the repo with `STATE.json`, `brains.json`, and stock closets seeded
+1. `evidence/brain/` created in the repo with `brains.json` and stock closets seeded
 2. `bin/brain` CLI available as an executable in the workspace
 3. A `scan.sh` output listing substrate + specialist brains, each with a current status
-4. A first tick snapshot showing BIV score, last-tick timestamp, and per-brain health
+4. A first tick snapshot showing BIV score, last-tick timestamp, and `STATE.json`
 5. One synthesized answer to a real question from the user's work, with citations back to local closets
 
-Full runtime cost of the install: zero frontier-model calls. The install step is pure config + local scan + local tick. No local MCP server is started. No data leaves the machine.
+Full runtime cost of the install: zero frontier-model calls. The install path plus first local tick stay local after bootstrap; the wrapper may contact the installer URL or package registry, but it does not upload workspace data. No local MCP server is started.
 
 ## Optional — preview the managed install via agent-to-agent flow
 

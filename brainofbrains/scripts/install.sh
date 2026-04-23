@@ -2,9 +2,10 @@
 # Bootstrap the BrainOfBrains substrate into the current workspace.
 # Prefers the remote installer at https://brainofbrains.ai/install; falls back
 # to the npm package @sapperjohn/brainofbrains if the remote is unreachable.
-# Idempotent: re-running refreshes files in place and never deletes user data.
-# Never stands up a local MCP server. Never sends data off the machine other
-# than fetching the install script itself.
+# Idempotent: safe no-op when already installed. Refresh requires an explicit
+# remove-and-reinstall or a package-backed update path.
+# Never stands up a local MCP server. May contact the installer URL or package
+# registry, but does not upload workspace data.
 
 set -euo pipefail
 
@@ -52,4 +53,4 @@ echo "  registry:          $WORKSPACE/evidence/brain/brains.json"
 echo
 echo "  next: scripts/scan.sh                  — list installed brains + status"
 echo "  then: scripts/ask.sh \"<question>\"       — ask the right specialist brain"
-echo "  then: scripts/health.sh                — PASS/FAIL per brain"
+echo "  then: scripts/health.sh                — local status snapshot + per-brain labels"
