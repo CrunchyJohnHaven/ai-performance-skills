@@ -128,7 +128,7 @@ Scripts (`scripts/`):
 - `proof.sh` — wraps `kostai report` → writes PROOF.md
 - `feedback.sh` — build an opt-in aggregate feedback packet for sharing
 - `update.sh` — refresh the shipped skill from the latest npm package
-- `demo.sh` — seed deterministic before/after for demos
+- `demo.sh` — walk a first-time user through init → scan → report for demos
 
 References (`references/`):
 - `capabilities.md` — full list of 42 techniques, grouped by category

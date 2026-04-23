@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Seed a deterministic before/after workload for demo walkthroughs.
-# Runs init → scan → report to show the full workflow end-to-end.
+# Walk a first-time user through init → scan → report for demo walkthroughs.
+# Shows the full workflow end-to-end without claiming measured savings.
 # Use this for first-time-user demos or when the ledger is empty.
 
 set -euo pipefail

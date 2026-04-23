@@ -61,7 +61,7 @@ See the header comment in `src/capabilities/registry.ts` for invariants. In shor
 
 ## Available CLI Commands (v0.5.1)
 
-Verified from `npx @sapperjohn/kostai --help` on 2026-04-22. Use this list as the authoritative CLI surface — do not invent commands not shown here.
+Verified from `npx --yes @sapperjohn/kostai --help` on 2026-04-22. Use this list as the authoritative CLI surface — do not invent commands not shown here.
 
 | Command | Description |
 | --- | --- |

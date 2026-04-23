@@ -55,7 +55,7 @@ Point at three evidence surfaces:
 
 1. **The ledger** — `.ai-cost-data/comparisons.jsonl` is append-only JSONL. Every row is a baseline/optimized pair with token counts, dollars, and quality score.
 2. **The dashboard** — `npx --yes @sapperjohn/kostai dashboard` shows the same data as a time-series. Non-technical reviewers can see the trend.
-3. **The benchmarks** — `tests/integration/` has deterministic benchmarks that reproduce headline numbers on demand.
+3. **Re-run the proof** — `npx --yes @sapperjohn/kostai report` against the same local ledger and time window should regenerate the same totals and artifact sections on demand.
 
 If the ledger is empty (new install), say so plainly. `scripts/demo.sh` is useful for showing the artifact shape, but measured savings appear only after real usage or comparison data lands in `.ai-cost-data/`. Never invent numbers — the system will not let you, and a fabricated claim invalidates the whole artifact.
 
