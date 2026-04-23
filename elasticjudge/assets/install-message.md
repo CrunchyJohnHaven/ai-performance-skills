@@ -44,7 +44,7 @@ Claude Code auto-discovers skills from three locations. Pick one:
 
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
-cp -r ai-performance-skills/skills/elasticjudge ~/.claude/skills/elasticjudge
+cp -r ai-performance-skills/elasticjudge ~/.claude/skills/elasticjudge
 ```
 
 Claude Code will pick up the skill on next session start.
@@ -53,24 +53,19 @@ Claude Code will pick up the skill on next session start.
 
 If the workspace is a Claude Code plugin, drop the folder under `skills/` in the plugin directory. Auto-discovered.
 
-### Option C — Install the npm package (ships the skill)
+### Option C — Use a package-backed build (if your operator ships one)
 
-```bash
-npm install -g @sapperjohn/kostai
-# Then link the skill folder from the package into ~/.claude/skills/
-ln -s "$(npm prefix -g)/lib/node_modules/@sapperjohn/kostai/skills/elasticjudge" \
-      ~/.claude/skills/elasticjudge
-```
+Link the exported `skills/elasticjudge/` folder from that package into `~/.claude/skills/elasticjudge`.
 
 If the package name is different in the field (scoped publisher, renamed slug), override via the environment:
 
 ```bash
-ELASTICJUDGE_PKG=@sapperjohn/kostai scripts/update.sh
+ELASTICJUDGE_PKG=<package-name> scripts/update.sh
 ```
 
 ## For Elastic Agent Builder
 
-When publishing to the internal Agent Builder skills catalog, the folder is self-contained — ship `skills/elasticjudge/` as-is. No rename required; the frontmatter `name: elasticjudge` is the canonical identifier.
+When publishing from this source repo, ship `elasticjudge/` as-is. If you are publishing from a packaged build instead, use its exported `skills/elasticjudge/` folder. No rename required; the frontmatter `name: elasticjudge` is the canonical identifier.
 
 Published display name: `Quality Judge`
 

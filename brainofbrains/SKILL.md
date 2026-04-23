@@ -31,7 +31,7 @@ The skill delegates to two surfaces and does not reimplement either:
 1. **Local** — the `bin/brain` CLI (ships inside the target workspace after install). Handles queries, tick loops, closet rebuilds, BIV metric emission, and brain-to-brain claims. All state stays on the machine.
 2. **Remote** — the BrainOfBrains MCP at `brainofbrains.ai/mcp` with three agent-callable tools: `quote(stack_description)`, `provision(payment_token, stack_spec)`, `health_check(install_id)`. Remote is opt-in and only touched for the A2A install flow.
 
-Distribution detail: the user-facing label is `Brain Orchestration`. The repo path is `skills/brainofbrains/`. The skill is one of three shipped in the public repo at https://github.com/CrunchyJohnHaven/ai-performance-skills.
+Distribution detail: the user-facing label is `Brain Orchestration`. In this source repo the folder is `brainofbrains/`; packaged builds commonly nest the same folder under `skills/brainofbrains/`. The skill is one of three shipped in the public repo at https://github.com/CrunchyJohnHaven/ai-performance-skills.
 
 Substrate mechanics are in `references/capabilities.md`. A2A install and payment flow mechanics are in `references/architecture.md`. Verification discipline is in `references/verification.md`. Elastic-specific deployment notes are in `references/elastic-notes.md`.
 
@@ -63,7 +63,7 @@ This step is optional for one-shot use. A workspace that is only asked questions
 
 ### 5. Verify
 
-Run `scripts/health.sh` to prove the brains are alive. The script first tries the remote `health_check(install_id)` MCP tool if an install ID is recorded under `evidence/brain/install.json`; otherwise it reads the local `STATE.json` and `brains.json` and prints PASS/FAIL per brain along with the last-tick timestamp. Any brain in `breach` or `unwired` prints the remediation hint from the registry.
+Run `scripts/health.sh` to prove the brains are alive. By default it reads the local `STATE.json` and `brains.json` and prints PASS/FAIL per brain along with the last-tick timestamp. Add `--remote` only if you explicitly want to call the hosted `health_check(install_id)` endpoint. Any brain in `breach` or `unwired` prints the remediation hint from the registry.
 
 See `references/verification.md` for how to label numeric claims (Measured / Modeled / Needs verification) when reporting status to a stakeholder.
 
@@ -143,7 +143,7 @@ Agent metadata (`agents/`):
 
 ## Gotchas
 
-1. `bin/brain` does not exist until `scripts/install.sh` has run successfully — check with `scripts/health.sh` first.
+1. `bin/brain` does not exist until `scripts/install.sh` has run successfully — run the install step first, then use `scripts/health.sh` to verify the result.
 2. Closets are rebuilt every tick — do not hand-edit `.aaak` files; the next tick overwrites manual changes.
 3. BIV scores in `breach` status mean thresholds were not met, not that the system is broken — run `scripts/health.sh` for the full picture.
 4. The remote MCP at `brainofbrains.ai/mcp` is only needed for the A2A provisioning flow — normal queries are fully local.

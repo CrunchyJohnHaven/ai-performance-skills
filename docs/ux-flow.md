@@ -1,91 +1,93 @@
 # User Experience Flows
 
+These are Claude Code example flows. The same skill folders can be used in other local skill catalogs, but the interaction language below assumes Claude Code.
+
 ## First-time install (30 seconds)
 
 1. Open terminal in any repo
 2. Run: `bash <(curl -fsSL https://raw.githubusercontent.com/CrunchyJohnHaven/ai-performance-skills/main/scripts/install-all.sh)`
-3. Open Claude Code — skills appear immediately (no restart needed)
-4. Type: "lower my AI bill" — AI Performance skill activates
+3. Open a new Claude Code session if the skills do not appear immediately
+4. Type: "lower my AI bill" to trigger `AI Performance`
 
 ## Cost-optimization workflow (5 minutes)
 
 **Step 1 — trigger**
-User types "lower my AI bill" or "am I wasting tokens on Claude Code?" in any Claude Code session.
+User types "lower my AI bill" or "am I wasting tokens on Claude Code?" in a Claude Code session.
 Claude responds: "I'll run the AI Performance skill to scan your workspace and identify savings opportunities."
 
 **Step 2 — scan**
-Claude runs `scripts/scan.sh`. Output lists detected local runtimes (Ollama, LM Studio) and source files containing LLM call sites.
-User sees: a table of call sites with estimated token costs per call and which are candidates for local routing.
+Claude runs `scripts/scan.sh`.
+User sees: detected local runtimes, flagged LLM call sites, and the files most likely to benefit from cheaper routing or prompt cleanup.
 
-**Step 3 — scan**
-Claude runs `scripts/scan.sh` and identifies the top optimization opportunities: prompt caching, prose compression, and model downgrade for eligible calls.
-User sees: a table of call sites with the recommended technique for each. Claude proposes one patch per opportunity for the user to review and approve before any change is applied.
+**Step 3 — recommend**
+Claude reads the scan output and identifies the top optimization opportunities: prompt caching, prose compression, and model downgrade where quality can be preserved.
+User sees: a short list of recommended techniques plus the call sites they apply to. Any source-code edit is proposed for approval before it is applied.
 
 **Step 4 — proof**
-After at least one shadow-mode comparison has run, Claude runs `scripts/proof.sh`.
-User sees: a one-page `PROOF.md` under `deliverables/<audience>-<date>/` with measured savings, dollars saved, quality signal, and the 10%-pass-through pricing math. Every number is labeled Measured, Modeled, or Needs verification.
+If the workspace already has ai-cost comparison data, Claude runs `scripts/proof.sh`.
+User sees: a `PROOF.md` under `deliverables/<audience>-<date>/` with Measured / Modeled / Needs verification labels. If the repo has no data yet, Claude explains that the first proof will be a baseline until real usage lands in `.ai-cost-data/`.
 
 **Step 5 — share (optional)**
 User says "I want to share the results with my manager."
-Claude runs `scripts/feedback.sh --audience manager` and produces a `SLACK.md` snippet the user pastes into Slack or email. No data leaves the machine automatically.
+Claude runs `scripts/feedback.sh --audience manager` and produces `FEEDBACK.md`, `SLACK.md`, and `feedback.json` locally.
+User sees: paste-ready summary files. No data leaves the machine automatically.
 
 ## BrainOfBrains workflow (first-time setup)
 
 **Step 1 — trigger**
 User types "install brains into this workspace" or "ask the expert brain about Jesse's priorities."
-Claude responds: "I'll bootstrap the BrainOfBrains substrate. This writes `bin/brain` and seeds specialist brains locally — nothing leaves the machine."
+Claude responds: "I'll bootstrap the BrainOfBrains substrate locally and then route a question through it."
 
 **Step 2 — install**
-Claude runs `scripts/install.sh`. The installer writes `bin/brain`, creates `evidence/brain/` with a seeded `STATE.json`, `brains.json`, and initial `.aaak` closet files.
-User sees: a list of installed brains (substrate, specialist per stakeholder, product brains).
+Claude runs `scripts/install.sh`.
+User sees: `bin/brain` plus `evidence/brain/` created in the target workspace.
 
 **Step 3 — first tick**
 Claude runs `bin/brain tick` to populate closets and compute the initial BIV score.
-User sees: tick output with BIV score and per-brain status (in-band, breach, awaiting-data).
+User sees: tick output with BIV score and per-brain status (`in-band`, `breach`, `awaiting-data`).
 
 **Step 4 — first query**
 User types "what does Jesse care about this quarter?"
-Claude runs `scripts/ask.sh "what does Jesse care about this quarter?"` and returns a synthesized answer with closet citations.
+Claude runs `scripts/ask.sh "what does Jesse care about this quarter?"`.
 User sees: a plain-English answer and the L0/L1/L2 source layers it was drawn from.
 
 **Step 5 — verify**
-Claude runs `scripts/health.sh` and prints PASS/FAIL per brain with the last-tick timestamp.
-User sees: a health table. Any brain in breach shows a remediation hint.
+Claude runs `scripts/health.sh`.
+User sees: a local PASS/FAIL health table with the last-tick timestamp. Remote health checks are only used if the operator explicitly adds `--remote`.
 
 ## ElasticJudge workflow (grade a memo)
 
 **Step 1 — trigger**
 User types "judge this memo before I send it" or pastes a file path and says "is this Elastic-accurate?"
-Claude responds: "I'll submit this to ElasticJudge. The judge API sees the text you send it — confirm there is no customer PII or embargoed material in the file."
+Claude responds: "I'll submit this to ElasticJudge. Confirm the content is approved for external submission first."
 
 **Step 2 — submit**
-Claude runs `scripts/judge.sh docs/MEMO.md` (or `--text "<inline>"` for short strings).
-User sees: a progress indicator while the POST completes.
+Claude runs `scripts/judge.sh docs/MEMO.md` or `scripts/judge.sh --text "<inline>"`.
+User sees: a progress indicator while the request is sent to the ElasticJudge API.
 
 **Step 3 — verdict**
-Claude presents the verdict: `pass` / `needs-revision` / `reject`, the five per-axis scores (factual correctness, Elastic-domain accuracy, brand voice, exec-readiness, safety), and the one-sentence verdict reasoning.
-A full verdict and `JUDGE.md` are written to `deliverables/judge-run-<today>/`.
+Claude presents the verdict: `pass`, `needs-revision`, or `reject`, along with the five per-axis scores and the one-sentence reasoning.
+User sees: `deliverables/judge-run-<today>/JUDGE.md` plus `verdict.json`.
 
-**Step 4 — revise (if needs-revision)**
+**Step 4 — revise (if needed)**
 Claude runs `scripts/explain.sh deliverables/judge-run-<today>/verdict.json` to retrieve line-level critiques.
-User sees: specific sentences flagged with reason codes. Claude applies critiques one at a time and resubmits after each edit.
+User sees: specific sentences flagged with reason codes. Claude proposes one edit per critique for approval before resubmitting.
 
 **Step 5 — pass**
-Once every axis scores 3 or above and no safety flag fires, the verdict is `pass`.
+Once every axis clears the threshold and no safety flag fires, the verdict is `pass`.
 User sees: "Ready to send. JUDGE.md saved to `deliverables/judge-run-<today>/`."
 
 ## Verification: how to confirm skills are active
 
-After running `scripts/install-all.sh`, open a new Claude Code session (Cmd+N) so the skills are picked up.
+After running `scripts/install-all.sh`, open a new Claude Code session if the slash commands are not already visible.
 
-In the slash command picker, all three skills appear as:
+In the slash command picker, all three skills should appear:
+
 - `/cost-optimization`
 - `/brainofbrains`
 - `/elasticjudge`
 
-Run `/cost-optimization` directly (no trigger phrase needed) to confirm the skill loads and can call the CLI.
-
-If a skill does not appear in the picker, re-run the installer:
+If a skill does not appear, re-run the installer:
 
 ```bash
 bash scripts/install-all.sh

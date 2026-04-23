@@ -28,7 +28,7 @@ Do not trigger on unrelated cost questions (cloud bill, vendor contracts) — th
 
 The skill delegates to the `ai-cost` (alias `kostai`) CLI, which implements 42 cost-reduction techniques across nine categories: model routing, context compression, waste detection, caching, shadow-mode A/B, local inference, batching and deliberation, budget governance, and observability. The CLI is the single source of truth; this skill orients Claude to invoke the right verbs in the right order.
 
-Distribution detail: the user-facing label is `AI Performance`, while the current repo path remains `skills/cost-optimization/` for backward-compatible installs and package shipping.
+Distribution detail: the user-facing label is `AI Performance`. In this source repo the folder is `cost-optimization/`; packaged builds commonly nest the same folder under `skills/cost-optimization/`.
 
 Full capability inventory is in `references/capabilities.md`. Savings-layer mechanics are in `references/savings-layers.md`. The CIO-grade proof workflow is in `references/verification.md`. Elastic-specific deployment notes are in `references/elastic-notes.md`.
 
@@ -78,7 +78,7 @@ This is the intended v1 update path for employees before a richer catalog-manage
 
 ### 7. Demonstrate (optional)
 
-For first-time users or demo walkthroughs, run `scripts/demo.sh` to seed a deterministic before/after workload. The demo is a ten-question test that reproducibly shows a 92% savings swing (Measured on the reference hardware; Modeled for other workloads). Use this when the user says "show me a demo" or "run the KostAI demo".
+For first-time users or demo walkthroughs, run `scripts/demo.sh` to initialize the workspace and show the scan/report flow end-to-end. In a fresh repo this produces a zero-call baseline until real usage lands in `.ai-cost-data/`. Use this when the user says "show me a demo" or "show me the artifact shape."
 
 ## Which models this covers
 
@@ -113,11 +113,11 @@ Tasks that stay on the frontier because they must: OCR-heavy multimodal, novel r
 ## Escalation and fallback
 
 If a step fails, the CLI emits structured errors. Report the error to the user verbatim, check `docs/BUG_LEDGER.md` for known issues, and fall back to:
-- `npx kostai doctor` — diagnoses config and prerequisites
-- `npx kostai scan` — lists detected local runtimes and LLM call sites
-- `npx kostai --help` — full CLI surface
+- `npx --yes @sapperjohn/kostai doctor` — diagnoses config and prerequisites
+- `npx --yes @sapperjohn/kostai scan` — lists detected local runtimes and LLM call sites
+- `npx --yes @sapperjohn/kostai --help` — full CLI surface
 
-Never fabricate savings numbers. If the ledger is empty (new install), say so and run the demo step to seed data. If the shadow-mode comparisons show negative savings, surface that — do not suppress.
+Never fabricate savings numbers. If the ledger is empty (new install), say so and explain that measured savings appear after real usage lands in `.ai-cost-data/`. If the shadow-mode comparisons show negative savings, surface that — do not suppress.
 
 ## Bundled resources
 
@@ -146,7 +146,7 @@ Agent metadata (`agents/`):
 
 1. The CLI version matters — run `npx @sapperjohn/kostai --version` first. Commands differ between versions.
 2. `scripts/optimize.sh` outputs to stdout, not a file — pipe or redirect if you want to save the output.
-3. `scripts/proof.sh` requires prior data in `.ai-cost-data/` — run `scripts/demo.sh` first if the repo is fresh.
+3. `scripts/proof.sh` requires prior data in `.ai-cost-data/` — fresh repos will show a baseline until real usage or comparisons exist.
 4. The `--audience` flag on `proof.sh` and `feedback.sh` creates a `deliverables/` directory in the current working directory — run from the repo root.
 5. Do not trigger on cloud infrastructure cost questions (AWS bill, Kubernetes spend) — this skill only addresses LLM call cost in AI coding tools.
 
@@ -155,18 +155,18 @@ Agent metadata (`agents/`):
 ```bash
 # Full workflow (from the target repo's root)
 npx @sapperjohn/kostai init        # one-click bootstrap
-npx kostai scan                    # detect local runtimes + call sites (also generates optimization plan)
-npx kostai report --html docs/PROOF.html   # emit one-pager after real data lands
-npx kostai report --json docs/proof.json   # machine-readable proof payload
-npx kostai dashboard               # open the local dashboard
+npx --yes @sapperjohn/kostai scan                    # detect local runtimes + call sites (also generates optimization plan)
+npx --yes @sapperjohn/kostai report --html docs/PROOF.html   # emit one-pager after real data lands
+npx --yes @sapperjohn/kostai report --json docs/proof.json   # machine-readable proof payload
+npx --yes @sapperjohn/kostai dashboard               # open the local dashboard
 
 # Skill lifecycle helpers
 scripts/feedback.sh --audience elastic-pilot     # local, opt-in share packet
 scripts/update.sh                                # refresh installed skill files
 
 # Introspection
-npx kostai doctor                  # diagnose config and prerequisites
-npx kostai --help                  # full CLI surface
+npx --yes @sapperjohn/kostai doctor                  # diagnose config and prerequisites
+npx --yes @sapperjohn/kostai --help                  # full CLI surface
 ```
 
 ## Pass-through pricing note

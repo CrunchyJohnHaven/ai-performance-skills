@@ -1,12 +1,12 @@
-# AI Performance Skills — a three-skill open-source suite for Claude
+# AI Performance Skills — open-source workflow skills for Claude Code, Codex, and Gemini CLI
 
 ![CI](https://github.com/CrunchyJohnHaven/ai-performance-skills/actions/workflows/ci.yml/badge.svg)
 [![npm](https://img.shields.io/npm/v/@sapperjohn/kostai.svg)](https://www.npmjs.com/package/@sapperjohn/kostai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Quick start:** `bash scripts/install-all.sh` → restart Claude Code → `/cost-optimization`
+**Quick start:** `git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git && cd ai-performance-skills && bash scripts/install-all.sh` → open a new Claude Code session → ask `lower my AI bill`
 
-Three Claude skills that cut AI bills, orchestrate work across tools, and catch AI slop before it leaves the building — shipped together under one MIT license.
+Three local-first skills that cut AI bills, orchestrate work across tools, and catch AI slop before it leaves the building — shipped together under one MIT license.
 
 ---
 
@@ -22,7 +22,7 @@ Three Claude skills that cut AI bills, orchestrate work across tools, and catch 
 
 ## What this is
 
-This repository hosts three independent Claude skills that each solve one problem most AI-using teams eventually hit: cost runaway, workflow fragmentation, and unreviewed AI output. Each skill is self-contained and can be installed on its own. Together they form the employee-side stack for working with Claude (or any frontier model) without the bill, the chaos, or the slop.
+This repository hosts three independent skill folders that each solve one problem most AI-using teams eventually hit: cost runaway, workflow fragmentation, and unreviewed AI output. Each skill is self-contained and can be installed on its own. Together they form an employee-side stack for working with frontier models without the bill, the chaos, or the slop.
 
 Every skill in this suite is:
 
@@ -31,7 +31,17 @@ Every skill in this suite is:
 - **Employee-owned.** The skills are built to make the individual employee more productive and more credible with their manager, not to give a central team a dashboard over their shoulder.
 - **Open source (MIT).** Fork it, audit it, ship it inside your own internal catalog.
 
-If you are running Claude Code, Codex, or Gemini CLI today, all three skills drop into `~/.claude/skills/` and work immediately. Any internal skill catalog (Claude desktop, Agent Builder, or a self-hosted registry) can ingest these folders as-is.
+Claude Code reads these folders directly from `~/.claude/skills/`. Codex, Gemini CLI, and internal skill catalogs can ingest the same folders through their own local skill or catalog mechanisms.
+
+## Trust At A Glance
+
+| Posture | Default |
+|---|---|
+| Telemetry | None by default |
+| MCP | Opt-in only |
+| Data egress | Local-first; remote calls happen only when a user explicitly invokes a cloud-backed flow |
+| Share-back | Manual only |
+| License | MIT |
 
 ---
 
@@ -39,11 +49,11 @@ If you are running Claude Code, Codex, or Gemini CLI today, all three skills dro
 
 | Skill | Domain | What it does | One-line install |
 |---|---|---|---|
-| **cost-optimization** | Spend | Scans the repo, applies safe savings patches, routes non-frontier work cheaper, emits a proof-of-savings artifact | `git clone … ~/.claude/skills/cost-optimization` |
+| **cost-optimization** | Spend | Scans the repo, surfaces safe savings patches, routes non-frontier work cheaper, emits a proof-of-savings artifact | `git clone … ~/.claude/skills/cost-optimization` |
 | **brainofbrains** | Orchestration | Agent-to-agent distribution layer that watches local AI tools and routes tasks across a three-tier compute pipeline | `git clone … ~/.claude/skills/brainofbrains` |
 | **elasticjudge** | Quality | Judge-first evaluation kernel that scores AI-generated slides (and other artifacts) on content, formatting, and persona before a human sees them | `git clone … ~/.claude/skills/elasticjudge` |
 
-Full install commands are in [Install any one skill](#install-any-one-skill). Each skill links to its own `SKILL.md` for the user-facing catalog description Claude actually consumes.
+Full install commands are in [Install](#install). Each skill links to its own `SKILL.md` for the user-facing catalog description Claude actually consumes.
 
 - [cost-optimization/SKILL.md](./cost-optimization/SKILL.md)
 - [brainofbrains/SKILL.md](./brainofbrains/SKILL.md)
@@ -79,7 +89,7 @@ The thesis behind this packaging: the right entry point for AI cost / orchestrat
     |  cost-     |        | brainofbrains |       | elasticjudge  |
     |  optim.    |        |  (orch)       |       |  (quality)    |
     +------------+        +---------------+       +---------------+
-    scan + route          watch + dispatch         judge + revise
+    scan + route          watch + dispatch         judge + review
     proof artifact        three-tier pipeline      content/form/persona
           |                       |                       |
           +-----------------------+-----------------------+
@@ -121,7 +131,7 @@ Runs automatically in CI via the `pulser` job in `.github/workflows/ci.yml`.
 
 ### `scripts/smoke-test.sh` — kostai integration from any repo
 
-Verifies the cost-optimization skill end-to-end from a directory that has an `ai-cost.config.json`. Safe to run against a real project or against the seeded demo data.
+Verifies the cost-optimization skill end-to-end from a directory that has an `ai-cost.config.json`. Safe to run against a real project or against a freshly initialized repo.
 
 ```bash
 # From the repo root (uses the bundled smoke-test):
@@ -170,73 +180,123 @@ The CI badge at the top of this file links directly to the GitHub Actions runs:
 
 ---
 
-## Install any one skill
+## Install
 
-Pick the one you want. Each block is copy-paste ready.
+### Before you install
 
-### cost-optimization
+- Node.js `>=18`, `npm`, `git`, and `bash`
+- Claude Code reads `~/.claude/skills/` directly
+- Other local skill catalogs can ingest the same top-level folders from this repo
+- `curl` is only required for `brainofbrains/scripts/provision.sh`
+- This source repo stores skills at the top level: `cost-optimization/`, `brainofbrains/`, and `elasticjudge/`. Some packaged builds nest the same folders under `skills/<name>/`.
+
+### Install all three for Claude Code
 
 ```bash
-# Clone directly into your Claude skills directory
+git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
+cd ai-performance-skills
+bash scripts/install-all.sh
+```
+
+Open a new Claude Code session after the installer finishes. If you prefer `make`, `make install-all` performs the same local copy.
+
+### Install one skill from this source repo
+
+```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
+mkdir -p ~/.claude/skills
 cp -R /tmp/aips/cost-optimization ~/.claude/skills/cost-optimization
 ```
 
-Then ask Claude for `AI Performance`, or run the bootstrap flow manually:
-
-```bash
-cd ~/.claude/skills/cost-optimization
-scripts/install.sh
-scripts/scan.sh
-scripts/optimize.sh
-scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
-```
-
-> **Note:** `scripts/install.sh` bootstraps the environment. The underlying CLI command it wraps is `npx @sapperjohn/kostai init`.
-
-Alternative install via npm:
-
-```bash
-npm install -g @sapperjohn/kostai
-ln -s "$(npm root -g)/@sapperjohn/kostai/skills/cost-optimization" \
-      ~/.claude/skills/cost-optimization
-```
-
-### brainofbrains
+For `brainofbrains`:
 
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
+mkdir -p ~/.claude/skills
 cp -R /tmp/aips/brainofbrains ~/.claude/skills/brainofbrains
 ```
 
-Smoke-test:
-
-```bash
-npx -y brainofbrains scan
-```
-
-### elasticjudge
+For `elasticjudge`:
 
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
+mkdir -p ~/.claude/skills
 cp -R /tmp/aips/elasticjudge ~/.claude/skills/elasticjudge
 ```
 
-Generate a judge packet against a sample slide:
+If you are linking from a packaged build instead of this source repo, use the exported `skills/<name>/` path that package provides.
+
+### First run from the workspace you actually want to inspect
+
+Install adds the skills to your catalog. Run the scripts from the repo or workspace you want to operate on, not from `~/.claude/skills/`.
+
+For `cost-optimization`:
 
 ```bash
-cd ~/.claude/skills/elasticjudge
-npx elastic-judge packet ./examples/sample-slide.json
+cd /path/to/target-repo
+~/.claude/skills/cost-optimization/scripts/install.sh
+~/.claude/skills/cost-optimization/scripts/scan.sh
 ```
 
-### All three at once
+If the workspace already has ai-cost data, then run:
 
 ```bash
-git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git /tmp/aips
-for s in cost-optimization brainofbrains elasticjudge; do
-  cp -R /tmp/aips/$s ~/.claude/skills/$s
-done
+~/.claude/skills/cost-optimization/scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
 ```
+
+Expected result: `ai-cost.config.json` appears in the target repo, `scan.sh` lists detected runtimes and call sites, and `proof.sh` writes `deliverables/demo-<date>/PROOF.md` once real usage data exists.
+
+For `brainofbrains`:
+
+```bash
+cd /path/to/target-workspace
+~/.claude/skills/brainofbrains/scripts/install.sh
+~/.claude/skills/brainofbrains/scripts/scan.sh
+~/.claude/skills/brainofbrains/scripts/ask.sh "what changed this week?"
+```
+
+Expected result: the target workspace gains `bin/brain` plus `evidence/brain/`, `scan.sh` lists installed brains, and `ask.sh` returns a layered answer with citations.
+
+For `elasticjudge`:
+
+```bash
+cd /path/to/target-workspace
+export ELASTICJUDGE_API_KEY="<token-if-required>"
+~/.claude/skills/elasticjudge/scripts/judge.sh --audience pre-send --date "$(date +%Y-%m-%d)" docs/MEMO.md
+```
+
+Expected result: the workspace gains `deliverables/pre-send-<date>/JUDGE.md` plus `verdict.json`. The script exits non-zero on invocation or HTTP failure; the verdict itself is written into the artifact.
+
+### Update installed skills
+
+If you installed from this git checkout:
+
+```bash
+cd /path/to/ai-performance-skills
+git pull
+make check
+bash scripts/install-all.sh
+```
+
+If you installed a package-backed copy under `~/.claude/skills/`, use the per-skill updater that lives inside the installed folder:
+
+```bash
+~/.claude/skills/cost-optimization/scripts/update.sh
+~/.claude/skills/brainofbrains/scripts/update.sh
+ELASTICJUDGE_PKG=<package-name-if-needed> ~/.claude/skills/elasticjudge/scripts/update.sh
+```
+
+Open a new Claude Code session after updating so the refreshed skill definitions are loaded.
+
+### Example materials
+
+If you want to see the output shape before installing, start with:
+
+- [examples/sample-scan.md](./examples/sample-scan.md) — sample `cost-optimization` scan output
+- [examples/sample-brain-answer.md](./examples/sample-brain-answer.md) — sample `brainofbrains` answer with layered citations
+- [examples/sample-proof.md](./examples/sample-proof.md) — sample proof artifact format
+- [examples/sample-memo.md](./examples/sample-memo.md) — intentionally imperfect memo for `elasticjudge`
+- [examples/test-prompts.md](./examples/test-prompts.md) — trigger phrases for each skill
 
 ---
 
@@ -244,7 +304,7 @@ done
 
 ### cost-optimization — "AI Performance"
 
-Wraps the `@sapperjohn/kostai` / `ai-cost` toolchain. It scans a repo for LLM call sites, applies safe savings patches (Anthropic prompt caching, prose compression, expensive-model gating), routes non-frontier work to cheaper or local models, and emits a manager-friendly proof artifact under `deliverables/<audience>-<date>/`.
+Wraps the `@sapperjohn/kostai` / `ai-cost` toolchain. It scans a repo for LLM call sites, surfaces safe savings patches (Anthropic prompt caching, prose compression, expensive-model gating), routes non-frontier work to cheaper or local models, and emits a manager-friendly proof artifact under `deliverables/<audience>-<date>/`.
 
 42 cost-reduction techniques live in the underlying CLI across nine categories: model routing, context compression, waste detection, caching, shadow-mode A/B, local inference, batching, budget governance, and observability. The skill's job is to point Claude at the right verbs in the right order.
 
@@ -271,7 +331,7 @@ Two independent lanes score every artifact:
 1. **Content lane** reads the slide like a skeptical enterprise buyer, sentence by sentence: what are we trying to say, how is this additive, could this be said better, where will the customer get confused.
 2. **Formatting lane** treats the slide as an image: is hierarchy obvious in under five seconds, does the layout feel intentional, is spacing consistent.
 
-A synthesizer merges lane verdicts into one **approve / revise / rebuild** decision. Once the judge is stable, generation becomes an optimization loop against it.
+A synthesizer merges lane verdicts into one **pass / needs-revision / reject** decision. Once the judge is stable, generation becomes an optimization loop against it.
 
 Companion landing page: [elasticjudge.com](https://elasticjudge.com/).
 
@@ -286,6 +346,27 @@ This suite was packaged after a direct CIO ask: build it as a skill people can c
 3. **Aggregate-only share-back.** The optional feedback packet is aggregate metrics — savings totals, technique breakdown, optional free-form notes. It never auto-sends and never includes prompts or responses.
 
 The framing in every artifact leads with employee benefit: faster responses, cleaner context, measurable savings, better-looking slides. Central teams can still see aggregate adoption if the employee chooses to share, but the employee owns the share.
+
+---
+
+## Share results (optional)
+
+The only shipped share-back flow is manual. Nothing in this repo auto-sends anything to a central service.
+
+Run the feedback packet from the workspace you already instrumented:
+
+```bash
+cd /path/to/target-repo
+~/.claude/skills/cost-optimization/scripts/feedback.sh --audience manager --date "$(date +%Y-%m-%d)"
+```
+
+This creates local artifacts under `deliverables/<audience>-<date>/`:
+
+- `FEEDBACK.md` — human-readable summary
+- `SLACK.md` — short paste-ready summary
+- `feedback.json` — machine-readable companion artifact
+
+Review the files, then decide whether to paste or upload them anywhere. If you stop after generation, nothing leaves your machine.
 
 ---
 
@@ -345,7 +426,9 @@ Skills load at session start. Restart your Claude Code session after running `ma
 **`bash: EXTRA_ARGS[@]: unbound variable`**
 You are on macOS with the system bash 3.2, which does not support named arrays. This is fixed in v0.3.0. Update with:
 ```bash
-bash scripts/update.sh   # or: make update-all
+make update-all          # package-backed installs under ~/.claude/skills/
+# or refresh from this repo checkout:
+git pull && bash scripts/install-all.sh
 ```
 
 **`npx: command not found`**

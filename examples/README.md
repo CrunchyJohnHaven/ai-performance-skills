@@ -1,18 +1,53 @@
 # Examples
 
-This directory contains sample inputs you can run against the AI Performance Skills to see each one in action. The files here are intentionally imperfect — `sample-memo.md` is a fictional Elastic account plan that contains a vague unsourced benchmark claim ("over 60% based on industry benchmarks") and a minor brand voice issue (the phrase "AI-powered" without citing which Elastic product or capability). These subtle problems give `elasticjudge` something concrete to critique and let you see the judge return a meaningful `revise` verdict rather than a trivially clean `approve`.
+This directory contains sample inputs and sample outputs that show the shape of each skill without requiring a live install first.
 
-To run each skill against the sample, use the wrapper scripts from the repo root. For `elasticjudge`, point the judge at the sample memo directly:
+The examples are intentionally mixed:
+
+- `sample-memo.md` is an intentionally flawed input for `elasticjudge`
+- `sample-proof.md` is a sample proof artifact for `cost-optimization`
+- `sample-scan.md` is a sample repo scan for `cost-optimization`
+- `sample-brain-answer.md` is a sample routed answer for `brainofbrains`
+- `test-prompts.md` is a quick trigger-phrase sheet
+
+Use the wrapper scripts from the repo root when you want to compare the samples with live behavior in your own workspace.
+
+## cost-optimization
 
 ```bash
-# Judge the sample memo for content, formatting, and persona
-elasticjudge/scripts/judge.sh examples/sample-memo.md
-
-# Run the cost-optimization scan across the repo (no sample input required)
-cost-optimization/scripts/scan.sh
-
-# Generate a proof-of-savings report after scanning
-cost-optimization/scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
+cd /path/to/target-repo
+/path/to/ai-performance-skills/cost-optimization/scripts/scan.sh
 ```
 
-Each command writes its output to stdout and, where applicable, drops a structured artifact into `deliverables/`. The judge script exits non-zero on a `rebuild` verdict, so it can be wired into CI as a quality gate.
+Expected result: stdout shaped similarly to `sample-scan.md`, with detected runtimes, flagged call sites, and recommended savings levers.
+
+If the target repo already has ai-cost data:
+
+```bash
+cd /path/to/target-repo
+/path/to/ai-performance-skills/cost-optimization/scripts/proof.sh --audience demo --date "$(date +%Y-%m-%d)"
+```
+
+Expected result: `deliverables/demo-<date>/PROOF.md`, structurally similar to `sample-proof.md`. Fresh repos with no captured calls will show a zero-call baseline instead of measured savings.
+
+## brainofbrains
+
+```bash
+cd /path/to/target-workspace
+/path/to/ai-performance-skills/brainofbrains/scripts/install.sh
+/path/to/ai-performance-skills/brainofbrains/scripts/ask.sh "what changed this week?"
+```
+
+Expected result: `bin/brain` plus `evidence/brain/` appear in the target workspace, and the answer returned by `ask.sh` looks broadly like `sample-brain-answer.md`.
+
+## elasticjudge
+
+```bash
+cd /path/to/target-workspace
+export ELASTICJUDGE_API_KEY="<token-if-required>"
+/path/to/ai-performance-skills/elasticjudge/scripts/judge.sh examples/sample-memo.md
+```
+
+Expected result: `deliverables/judge-run-<date>/JUDGE.md` and `verdict.json`. The live verdict should use the repo's current vocabulary: `pass`, `needs-revision`, or `reject`.
+
+The judge script exits non-zero on invocation or HTTP failure. A non-`pass` verdict is still written to the output artifacts for review.
