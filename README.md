@@ -49,9 +49,9 @@ Claude Code reads these folders directly from `~/.claude/skills/`. Codex, Gemini
 
 | Skill | Domain | What it does | One-line install |
 |---|---|---|---|
-| **cost-optimization** | Spend | Scans the repo, surfaces safe savings patches, routes non-frontier work cheaper, emits a proof-of-savings artifact | `git clone … ~/.claude/skills/cost-optimization` |
-| **brainofbrains** | Orchestration | Agent-to-agent distribution layer that watches local AI tools and routes tasks across a three-tier compute pipeline | `git clone … ~/.claude/skills/brainofbrains` |
-| **elasticjudge** | Quality | Judge-first evaluation kernel that scores AI-generated slides (and other artifacts) on content, formatting, and persona before a human sees them | `git clone … ~/.claude/skills/elasticjudge` |
+| **cost-optimization** | Spend | Scans the repo, surfaces safe savings patches, routes non-frontier work cheaper, emits a proof-of-savings artifact | `copy cost-optimization/ -> ~/.claude/skills/` |
+| **brainofbrains** | Orchestration | Agent-to-agent distribution layer that watches local AI tools and routes tasks across a three-tier compute pipeline | `copy brainofbrains/ -> ~/.claude/skills/` |
+| **elasticjudge** | Quality | Judge-first evaluation kernel that scores AI-generated slides (and other artifacts) on content, formatting, and persona before a human sees them | `copy elasticjudge/ -> ~/.claude/skills/` |
 
 Full install commands are in [Install](#install). Each skill links to its own `SKILL.md` for the user-facing catalog description Claude actually consumes.
 

@@ -63,7 +63,7 @@ For outside contributors, use the same validation steps on a branch and open a P
 Before updating any SKILL.md or script, verify commands against the live CLI with:
 
 ```bash
-npx @sapperjohn/kostai --help
+npx --yes @sapperjohn/kostai --help
 ```
 
 This confirms command names, flags, and subcommands match what the published CLI actually exposes. Do not document flags or subcommands that are absent from `--help` output.
@@ -95,4 +95,4 @@ Not allowed:
 
 ## Source-of-truth note
 
-When this repo is maintained alongside the private `AICost` workspace, the skill bundle usually originates from `skills/cost-optimization/` there. When that upstream is unavailable, edit this repo directly and keep the structure stable.
+When this repo is maintained alongside the private `AICost` workspace, the public bundle usually originates from the corresponding folders under `skills/` there. When that upstream is unavailable, edit this repo directly and keep the structure stable.

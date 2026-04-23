@@ -78,7 +78,7 @@ New skills also need:
 Before changing any command reference in a `SKILL.md`, script, or README, verify against the live CLI:
 
 ```bash
-npx @sapperjohn/kostai --help
+npx --yes @sapperjohn/kostai --help
 ```
 
 Only document flags and subcommands that appear in the `--help` output. Do not guess, do not document flags from memory, and do not copy flags from an older version without re-verifying. If a flag is absent from `--help`, it does not belong in any user-facing file in this repo.
