@@ -11,10 +11,10 @@ This project is MIT-licensed and PRs are welcome for any of the three skills (co
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
 cd ai-performance-skills
 
-# Run the full check suite
+# Run the fast syntax check suite
 make check
 
-# Run the linter
+# Run the same syntax check via the lint alias
 make lint
 
 # Run the Pulser quality score (no animation output)
@@ -29,13 +29,13 @@ Work through all four steps before opening a PR:
 
 1. **Syntax-check every shell script.**
    ```bash
-   bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh
+   bash -n {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh
    ```
    Zero output means zero syntax errors.
 
 2. **Run ShellCheck.**
    ```bash
-   shellcheck {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh
+   shellcheck {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh
    ```
    Fix any warnings before pushing. SC2086 / SC2046 (quoting) are the most common.
 
@@ -45,11 +45,13 @@ Work through all four steps before opening a PR:
    ```
    A score below 100 blocks merge.
 
-4. **Run the smoke test** from a workspace that has `ai-cost.config.json` present.
+4. **Run the smoke test** from the repo root or by pointing at the bundled script directly.
    ```bash
-   scripts/smoke-test.sh
+   make smoke-test
+   # or:
+   bash cost-optimization/scripts/smoke-test.sh
    ```
-   The smoke test verifies the install, scan, optimize, and proof flows end-to-end. If you do not have a workspace with `ai-cost.config.json`, create a minimal one (`{}` is enough to bootstrap) before running.
+   The smoke test checks CLI availability, optional `ai-cost.config.json`, `doctor`, `scan`, `demo.sh`, and `--help` coverage for `proof.sh` and `feedback.sh`. It does not validate install, optimize, or proof end-to-end.
 
 ---
 
@@ -67,7 +69,7 @@ New skills also need:
 - A `SKILL.md` at `skillname/SKILL.md` (the catalog description Claude consumes)
 - A `scripts/` directory with at minimum `install.sh`
 - An entry in the root `README.md` skills table
-- A row in `CHANGELOG.md`
+- A `CHANGELOG.md` update when the change is user-visible or release-note-worthy
 
 ---
 

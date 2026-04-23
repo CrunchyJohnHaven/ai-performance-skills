@@ -7,11 +7,11 @@
 ## Checklist
 
 - [ ] `bash -n` passes on all modified scripts
-- [ ] ShellCheck clean (`shellcheck {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh`)
+- [ ] ShellCheck clean (`shellcheck {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh`)
 - [ ] Pulser 100/100 (`npx pulser-cli . --no-anim`)
-- [ ] Smoke test passes if `@sapperjohn/kostai` is installed (`scripts/smoke-test.sh`)
+- [ ] Smoke test passes if applicable (`make smoke-test` or `bash cost-optimization/scripts/smoke-test.sh`)
 - [ ] `SKILL.md` references updated if any scripts changed
-- [ ] `CHANGELOG.md` updated
+- [ ] `CHANGELOG.md` updated, or not needed is explained
 
 ---
 

@@ -14,7 +14,8 @@ I'd like to grade this deliverable before I send it.
 NOTE: This skill submits the artifact text to the ElasticJudge cloud API.
 You need a valid ELASTICJUDGE_API_KEY set in your shell environment before
 running step 2. Confirm you have one, or check the free-tier quota at
-https://elasticjudge.com/ before proceeding.
+https://elasticjudge.com/ before proceeding. Also verify the current endpoint
+and auth requirements there before relying on the live service.
 
 Use the Quality Judge skill to do the following, in order:
 1. Confirm the artifact I want graded. Default to the most recent file under

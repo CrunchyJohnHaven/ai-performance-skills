@@ -25,7 +25,7 @@ Three channels, same skill folder:
 2. **Agent Builder catalog** — publish the skill folder to the internal catalog. Employees install via whatever UX the catalog exposes for skill install.
 3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/ai-performance-skills.
 
-All three channels pull from the same source of truth: `skills/cost-optimization/`.
+In this source repo the folder is `cost-optimization/`; packaged builds commonly export the same folder as `skills/cost-optimization/`.
 
 ## Skill install footprint
 
@@ -52,7 +52,7 @@ Do not start with mechanism explanations. Do not start with the 42-technique inv
 - **Category:** Productivity / Developer Tools
 - **Short description:** Speeds up AI work, cuts LLM waste, and emits a proof-of-savings artifact suitable for manager or CIO review.
 - **Trigger phrases:** "AI Performance", "reduce my AI bill", "optimize LLM cost", "prove my Claude Code savings"
-- **Repo path:** `skills/cost-optimization/`
+- **Repo path:** source repo `cost-optimization/`; packaged builds may export `skills/cost-optimization/`
 
 ## Update path
 
@@ -120,16 +120,16 @@ Outcome of the Adnan CIO meeting on 2026-04-22. These are binding commitments th
   - "how much am I spending on Claude or Codex"
   - "am I wasting tokens"
   - "prove my LLM savings"
-- **One-sentence pitch:** Cut LLM spend on Claude Code, Codex, and Gemini CLI work by 60–92% without changing what you ask for, and emit a one-page proof artifact any manager or CIO can read.
-- **Repo path:** `skills/cost-optimization/`
+- **One-sentence pitch:** Cut LLM spend on Claude Code, Codex, and Gemini CLI work on sampled workloads without changing what you ask for, and emit a one-page proof artifact any manager or CIO can read.
+- **Repo path:** source repo `cost-optimization/`; packaged builds may export `skills/cost-optimization/`
 
 ## Elastic pilot rollout checklist
 
 Five steps for an employee participating in the internal pilot.
 
-1. **Install the skill.** Clone the repo or run `npm install -g @sapperjohn/kostai` and symlink `skills/cost-optimization/` into `~/.claude/skills/cost-optimization/`, or install via the Agent Builder catalog if it is already published there.
-2. **Run the demo in your repo.** From the root of any Claude Code workspace, run `scripts/demo.sh`. This seeds a deterministic before/after workload and shows a 92% savings swing (Measured on reference hardware; Modeled for other workloads). Takes roughly two minutes.
-3. **Review PROOF.md.** After at least one shadow-mode comparison has landed, run `scripts/proof.sh`. Open `deliverables/<audience>-<date>/PROOF.md`. Every number carries a Measured / Modeled / Needs-verification label. If the ledger is empty, rerun the demo first.
+1. **Install the skill.** Clone the repo or run `npm install -g @sapperjohn/kostai` and symlink the packaged `skills/cost-optimization/` folder into `~/.claude/skills/cost-optimization/`, or install via the Agent Builder catalog if it is already published there.
+2. **Run the demo in your repo.** From the root of any Claude Code workspace, run `scripts/demo.sh`. This shows the scan/report flow and the artifact shape end-to-end. Fresh repos still need real usage or comparison data before the proof shows measured savings.
+3. **Review PROOF.md.** After at least one shadow-mode comparison has landed, run `scripts/proof.sh`. Open `deliverables/<audience>-<date>/PROOF.md`. Every number carries a Measured / Modeled / Needs-verification label. If the ledger is empty, say so rather than inferring savings.
 4. **Optionally run scripts/feedback.sh.** This generates a privacy-safe local feedback packet — aggregate counts, savings totals, mechanism breakdown, optional note. Prompt and response bodies stay local. No data is sent automatically.
 5. **Share FEEDBACK.md with the pilot coordinator if you choose.** Paste or attach `deliverables/<audience>-<date>/FEEDBACK.md` to the pilot coordinator's Slack thread or email. This step is fully opt-in; skipping it does not affect your install or savings.
 

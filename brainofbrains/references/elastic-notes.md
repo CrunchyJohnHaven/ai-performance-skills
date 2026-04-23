@@ -24,7 +24,7 @@ Three channels, same skill folder:
 2. **Agent Builder catalog** — publish the skill folder to the internal catalog. Employees install via whatever UX the catalog exposes for skill install.
 3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/ai-performance-skills alongside `AI Performance` and `Quality Judge`.
 
-All three channels pull from the same source of truth: `skills/brainofbrains/`.
+In this source repo the folder is `brainofbrains/`; packaged builds may export the same folder as `skills/brainofbrains/`.
 
 ## Skill install footprint
 
@@ -52,7 +52,7 @@ Do not start with mechanism explanations. Do not start with BIV formula math. Le
 - **Short description:** Routes expert questions to specialist brains and returns synthesized answers — one question, one synthesized answer shaped by every specialist who already knows the relevant stakeholder, product, or codebase.
 - **Version:** 0.1.0
 - **Trigger phrases** (from SKILL.md description frontmatter): "Brain Orchestration", "brain orchestration", "install brains", "brainofbrains", "BrainOfBrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "bootstrap brains into this workspace", "set up specialist brains"
-- **Repo path:** `skills/brainofbrains/`
+- **Repo path:** source repo `brainofbrains/`; packaged builds may export `skills/brainofbrains/`
 - **MCP default:** OFF. No local MCP server is installed by default. The remote MCP at `brainofbrains.ai/mcp` is only contacted if the employee explicitly runs `scripts/provision.sh`. This is non-negotiable for catalog publication — a default-on MCP is a blocker.
 
 ## Employee-benefit framing
@@ -61,7 +61,7 @@ Use these bullets when explaining the skill to a skeptical Elastic employee — 
 
 - **Privacy is the default, not a policy promise.** Every tick, query, and closet rebuild runs entirely on your own machine. Nothing leaves unless you explicitly run the provisioning script. There is no phone-home, no background telemetry, and no local server listening for connections.
 - **No surveillance surface.** The skill reads commits, meeting transcripts, and KB artifacts that you point it at. It does not read your screen, browser history, keystrokes, or any file outside the paths you configure. The closet builder redacts known secret patterns before writing any closet.
-- **Opt-in remote, opt-out local.** The remote MCP at `brainofbrains.ai/mcp` is only touched if you run `scripts/provision.sh`. All other operations — queries, tick loops, BIV scoring, health checks — stay local. You can revoke remote access by removing the MCP config line; no data persists on the remote side.
+- **Opt-in remote, opt-out local.** The remote MCP at `brainofbrains.ai/mcp` is only touched if you run `scripts/provision.sh` or `scripts/health.sh --remote`. All other operations — queries, tick loops, BIV scoring, health checks — stay local. Stop invoking those remote paths or remove any manually added remote endpoint config to revert to fully local operation.
 - **What you personally gain:** ask one question and get a synthesized answer shaped by every specialist context you have already built — without opening a second tab, re-pasting background, or waiting for a colleague to respond. The longer you run the tick loop, the more relevant your synthesized answers become.
 
 ## 2026-04-22 commitments

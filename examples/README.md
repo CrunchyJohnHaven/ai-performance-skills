@@ -45,7 +45,7 @@ Expected result: `bin/brain` plus `evidence/brain/` appear in the target workspa
 ```bash
 cd /path/to/target-workspace
 export ELASTICJUDGE_API_KEY="<token-if-required>"
-/path/to/ai-performance-skills/elasticjudge/scripts/judge.sh examples/sample-memo.md
+/path/to/ai-performance-skills/elasticjudge/scripts/judge.sh /path/to/ai-performance-skills/examples/sample-memo.md
 ```
 
 Expected result: `deliverables/judge-run-<date>/JUDGE.md` and `verdict.json`. The live verdict should use the repo's current vocabulary: `pass`, `needs-revision`, or `reject`.

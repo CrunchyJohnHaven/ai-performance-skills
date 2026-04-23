@@ -8,9 +8,9 @@ After real workload data has landed in `.ai-cost-data/events.jsonl` and shadow-m
 
 ```bash
 # From the target workspace root
-npx kostai report --html deliverables/<audience>-<YYYY-MM-DD>/PROOF.html
-npx kostai report --json deliverables/<audience>-<YYYY-MM-DD>/proof.json
-npx kostai report > deliverables/<audience>-<YYYY-MM-DD>/PROOF.md
+npx --yes @sapperjohn/kostai report --html deliverables/<audience>-<YYYY-MM-DD>/PROOF.html
+npx --yes @sapperjohn/kostai report --json deliverables/<audience>-<YYYY-MM-DD>/proof.json
+npx --yes @sapperjohn/kostai report > deliverables/<audience>-<YYYY-MM-DD>/PROOF.md
 ```
 
 Flags:
@@ -43,7 +43,7 @@ This labeling is not optional. Unlabeled numbers in a CIO artifact are a fireabl
 
 Lead with the business state, not the file path:
 
-- "On a ten-question workload, we measured an 86% input-token reduction and a 92% cost reduction."
+- "On a reference workload, we measured an 86% input-token reduction and a 92% cost reduction."
 - "The pass-through math at 10% would price this at $Y per month for the same workload."
 - "Every savings claim is backed by a side-by-side shadow-mode comparison in `.ai-cost-data/comparisons.jsonl`."
 
@@ -54,10 +54,10 @@ Do not open with implementation detail. The CIO wants to know whether the saving
 Point at three evidence surfaces:
 
 1. **The ledger** — `.ai-cost-data/comparisons.jsonl` is append-only JSONL. Every row is a baseline/optimized pair with token counts, dollars, and quality score.
-2. **The dashboard** — `npx kostai dashboard` shows the same data as a time-series. Non-technical reviewers can see the trend.
+2. **The dashboard** — `npx --yes @sapperjohn/kostai dashboard` shows the same data as a time-series. Non-technical reviewers can see the trend.
 3. **The benchmarks** — `tests/integration/` has deterministic benchmarks that reproduce headline numbers on demand.
 
-If the ledger is empty (new install), say so and run `scripts/demo.sh` to seed deterministic demo data. Never invent numbers — the system will not let you, and a fabricated claim invalidates the whole artifact.
+If the ledger is empty (new install), say so plainly. `scripts/demo.sh` is useful for showing the artifact shape, but measured savings appear only after real usage or comparison data lands in `.ai-cost-data/`. Never invent numbers — the system will not let you, and a fabricated claim invalidates the whole artifact.
 
 ## Handling "what about quality?"
 
@@ -75,4 +75,4 @@ Nothing leaves the user's machine. No MCP server is installed by default. The pr
 
 ## Refresh cadence
 
-For ongoing pitches, re-run `kostai report` after any run of meaningful workload volume (≥100 calls on recent work). Date-stamp the artifact filename. Do not reuse a stale proof — the ledger is cumulative and the numbers will have moved.
+For ongoing pitches, re-run `npx --yes @sapperjohn/kostai report` after any run of meaningful workload volume (≥100 calls on recent work). Date-stamp the artifact filename. Do not reuse a stale proof — the ledger is cumulative and the numbers will have moved.

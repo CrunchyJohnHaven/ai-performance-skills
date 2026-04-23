@@ -28,7 +28,7 @@ Every verdict file renders the same blocks in order:
 3. **Line-level critiques** — specific sentences or blocks flagged with a reason code
 4. **Reproducibility stub** — the exact curl command and the SHA-256 of the submitted body so any reviewer can re-run the call
 
-The reproducibility stub is what turns a judge run into a Measured-label claim. If the stub is missing, the verdict is Modeled at best.
+The reproducibility stub is what turns a judge run into a Measured-label claim, but only after the current endpoint and auth requirements are verified against the live API. If the stub is missing, the verdict is Modeled at best.
 
 ## Required labels
 
@@ -54,7 +54,7 @@ Do not open with rubric detail. The reviewer wants to know whether the artifact 
 
 Point at three evidence surfaces:
 
-1. **Determinism** — the same input returns the same verdict. If a reviewer doubts a verdict, re-run the curl call with the reproducibility stub and confirm the axis scores match. If they do not, surface that to the API operator at https://elasticjudge.com/; do not hide the drift.
+1. **Reproducibility target** — the same input should return the same verdict once the current endpoint and auth requirements are confirmed. If a reviewer doubts a verdict, re-run the curl call with the reproducibility stub and confirm the axis scores match. If they do not, surface that to the API operator at https://elasticjudge.com/; do not hide the drift.
 2. **Per-axis breakdown** — a verdict is not a single opinion; it is five axis scores. A reviewer can ignore the summary verdict and reason about the axis they care about.
 3. **Line-level critiques** — the `explain` surface returns specific sentences with reason codes. A reviewer can inspect whether the judge's line-level reasoning holds, independent of the axis score.
 
@@ -90,7 +90,7 @@ Version the verdict filename by date (`JUDGE-2026-04-22.md`) so prior versions a
 
 ## Reproducibility example
 
-A Measured-label claim from a judge run should be reproducible in a single command:
+A Measured-label claim from a judge run should be reproducible in a single command once the operator has confirmed the live endpoint:
 
 ```bash
 curl -sS -X POST "https://elasticjudge.com/v1/evaluate" \
@@ -111,4 +111,4 @@ If a reviewer challenges a verdict:
 4. If the reason code is wrong (judge misread the claim), note it and surface to the API operator. Do not cover for the judge; the judge's value is partly in being a third-party evaluator.
 5. If the reason code is right but the reviewer still disagrees, the disagreement is between the reviewer and the rubric — not with the skill. Surface the rubric conflict and let the human decision-maker resolve it.
 
-Never fabricate confidence in a verdict. A Measured label on a reproducible verdict is strong evidence; anything weaker should not carry a Measured label.
+Never fabricate confidence in a verdict. A Measured label on a verified reproducible verdict is strong evidence; anything weaker should not carry a Measured label.

@@ -7,9 +7,9 @@ KostAI currently implements 42 cost-reduction techniques across nine categories.
 Never paraphrase this list from memory — it drifts. The authoritative capability inventory is in `src/capabilities/registry.ts`. To inspect it:
 
 ```bash
-npx kostai scan                   # detect active capabilities and local runtimes
-npx kostai doctor                 # check which capabilities are enabled in this project
-npx kostai --help                 # full CLI surface
+npx --yes @sapperjohn/kostai scan                   # detect active capabilities and local runtimes
+npx --yes @sapperjohn/kostai doctor                 # check which capabilities are enabled in this project
+npx --yes @sapperjohn/kostai --help                 # full CLI surface
 ```
 
 The scan output groups every detected opportunity by category and tells the user how to invoke it (flag, config key, wrapper call, or automatic).
@@ -52,7 +52,7 @@ Every capability carries a status tag:
 Do not surface `experimental` capabilities in a CIO-facing artifact or customer proof. Filter by running:
 
 ```bash
-npx kostai report --json | jq '.capabilities[] | select(.status == "ga")'
+npx --yes @sapperjohn/kostai report --json | jq '.capabilities[] | select(.status == "ga")'
 ```
 
 ## Adding a new capability

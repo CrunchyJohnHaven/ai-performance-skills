@@ -10,7 +10,7 @@ when_to_use: "Use when the active workspace has a Claude Code / Codex / Gemini C
 
 User-facing catalog label: `AI Performance`.
 
-Cut LLM spend on local-filesystem-heavy Claude Code, Codex, and Gemini CLI work without changing what the user asks for. Lead with better performance for the employee: faster responses, less waste, cleaner context, measurable savings. Target: 60–92% input-token reduction and a proof artifact an employee can show a manager or CIO.
+Cut LLM spend on local-filesystem-heavy Claude Code, Codex, and Gemini CLI work without changing what the user asks for. Lead with better performance for the employee: faster responses, less waste, cleaner context, measurable savings. Reference-workload target: 60–92% input-token reduction and a proof artifact an employee can show a manager or CIO.
 
 ## When to use
 
@@ -38,7 +38,7 @@ Execute steps in order. Each step is a single CLI call wrapped by a script in `s
 
 ### 1. Install
 
-Run `scripts/install.sh` (or `npx @sapperjohn/kostai init` directly). This one-click bootstrap writes `ai-cost.config.json`, applies safe starter patches (Anthropic prompt caching, prose compression, expensive-model gate), and refreshes the savings plan. Idempotent — re-running is safe.
+Run `scripts/install.sh` (or `npx @sapperjohn/kostai init` directly). This one-click bootstrap writes `ai-cost.config.json` and initializes the local ai-cost workspace. Any later optimization patches are reviewed and applied manually. Idempotent — re-running is safe.
 
 The install step never exfiltrates code or prompts. Capture mode defaults to `metadata_only` (hashes and token counts, no body). The user can opt into `redacted_body` or `full_body` for local debugging by editing `ai-cost.config.json`.
 

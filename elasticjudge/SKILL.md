@@ -26,7 +26,7 @@ Do not trigger on unrelated evaluation questions (code review, unit test pass/fa
 
 ## What this skill does
 
-The skill delegates to the ElasticJudge cloud API at `https://elasticjudge.com/`. The judge is cloud-hosted and non-local — this skill is an orientation layer that knows how to prepare input, call the endpoint, and interpret the response. It does not grade locally and does not attempt to replace the judge's domain knowledge.
+The skill delegates to the hosted ElasticJudge API at `https://elasticjudge.com/`. The judge is cloud-hosted and non-local — this skill is an orientation layer that knows how to prepare input, attempt the call, and interpret the response. It does not grade locally and does not attempt to replace the judge's domain knowledge. Verify the current endpoint and auth requirements at `https://elasticjudge.com/` before depending on the live API.
 
 The judge returns, for any submitted artifact:
 - a **verdict** — `pass` / `needs-revision` / `reject` with one-sentence reasoning
@@ -65,7 +65,7 @@ Read the verdict. The three outcomes:
 - **needs-revision** — fixable; one or more axes scored 2 or below, or a targeted line-level critique is surfaced
 - **reject** — do not ship; a safety flag fired, or factual correctness scored 0-1
 
-For `needs-revision`, run `scripts/explain.sh <verdict.json>` to retrieve line-level critiques with explicit reason codes. The calling agent can apply the critiques one-by-one and resubmit. The judge is deterministic on a given input — resubmitting the same text returns the same verdict.
+For `needs-revision`, run `scripts/explain.sh <verdict.json>` to retrieve line-level critiques with explicit reason codes. The calling agent can apply the critiques one-by-one and resubmit. Treat same-input reproducibility as the target behavior, but verify current endpoint behavior against the live API before relying on strict determinism in a stakeholder-facing claim.
 
 ### 4. Revise (calling-agent responsibility)
 
@@ -140,7 +140,7 @@ Agent metadata (`agents/`):
 1. The ElasticJudge API at `https://elasticjudge.com/` must be reachable — if it returns non-200, the verdict is unavailable, not "pass".
 2. The judge grades text content only — export PPTX/DOCX to text before submitting; layout and visual formatting are not evaluated.
 3. Do not submit artifacts containing customer PII, unreleased pricing, or embargoed security material — the text is sent to a cloud API.
-4. The judge is deterministic — resubmitting the same text returns the same verdict. Fix the text, then resubmit.
+4. Treat reproducibility as something to verify against the live endpoint, not as a contractual guarantee. Fix the text, then resubmit.
 5. Do not trigger on code review, unit test pass/fail, or static analysis tasks — this skill only grades human-facing AI-generated prose.
 
 ## Quick reference

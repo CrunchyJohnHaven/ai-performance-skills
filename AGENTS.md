@@ -4,15 +4,17 @@ Instructions for any agent updating or publishing this public skill repository.
 
 ## What this repo is
 
-This repo is the standalone public bundle for the `AI Performance` skill. Keep it small and opinionated:
+This repo is the standalone public bundle for the three-skill `AI Performance Skills` suite. Keep it small and opinionated:
 
-- `SKILL.md`
-- `agents/openai.yaml`
-- `assets/`
-- `references/`
-- `scripts/`
+- `cost-optimization/`
+- `brainofbrains/`
+- `elasticjudge/`
+- top-level `scripts/`
+- top-level `docs/`
+- top-level `examples/`
 - `README.md`
 - `AGENTS.md`
+- `CHANGELOG.md`
 - `LICENSE`
 - `.gitignore`
 
@@ -20,11 +22,11 @@ Do not turn this into the full `AICost` product repo.
 
 ## Hard rules
 
-- Keep the skill local-first.
+- Keep the suite local-first.
 - Do not add automatic telemetry, background reporting, or MCP-by-default behavior.
 - Keep “Share Results” opt-in only via `scripts/feedback.sh`.
 - Do not include prompt bodies, response bodies, filenames, repo names, or raw per-call logs in any share-back payload.
-- Keep the user-facing label `AI Performance` unless the owner explicitly changes rollout naming.
+- Keep the shipped user-facing labels stable unless the owner explicitly changes rollout naming.
 
 ## Update checklist
 
@@ -42,7 +44,7 @@ Run this checklist before every push:
 
 ## Push workflow
 
-Standard publish flow:
+Maintainer publish flow (for operators with direct `main` access):
 
 ```bash
 git status
@@ -53,6 +55,8 @@ git add .
 git commit -m "Update AI Performance skill"
 git push origin main
 ```
+
+For outside contributors, use the same validation steps on a branch and open a PR instead of pushing directly to `main`.
 
 ## Command verification
 

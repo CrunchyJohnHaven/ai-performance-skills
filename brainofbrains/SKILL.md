@@ -69,7 +69,7 @@ See `references/verification.md` for how to label numeric claims (Measured / Mod
 
 ### 6. Provision (optional, A2A)
 
-Run `scripts/provision.sh` to kick off the agent-to-agent provisioning flow for a managed install. The script calls the remote MCP `quote(stack_description)` tool, prints the returned price and spec, waits for confirmation, then calls `provision(payment_token, stack_spec)` and emits a signed install tarball plus install.sh. Payment is x402 (agent-native HTTP 402) by default with a Stripe Checkout fallback.
+Run `scripts/provision.sh` to kick off the agent-to-agent provisioning flow for a managed install when the hosted MCP is available. The script tries the remote `quote(stack_description)` flow, prints the returned price and spec, waits for confirmation, then calls `provision(payment_token, stack_spec)` and emits a signed install tarball plus install.sh. If the hosted path is unavailable, the script falls back to the manual page it prints. Payment is x402 (agent-native HTTP 402) by default with a Stripe Checkout fallback.
 
 This step is opt-in. The free install path (step 1) remains fully functional. Provision is only invoked when an agent-to-agent purchase flow is explicitly requested.
 
@@ -179,4 +179,4 @@ scripts/update.sh                   # refresh installed skill files from latest 
 
 If the user asks "what does this cost me?" — the free install path is free. The brains run entirely on the local machine; the only thing the user pays for is whatever frontier model they choose to route through (and the cost-optimization skill handles minimizing that).
 
-If the user asks "what does the managed install cost?" — v0 pricing on the public page is Individual/Startup $100 one-time setup; Enterprise custom. Exact pricing for an A2A install is returned by the `quote` MCP tool at provision time; do not quote a number from memory. Ship the artifact the tool returns.
+If the user asks "what does the managed install cost?" — exact pricing for an A2A install is returned by the hosted `quote` MCP tool at provision time when available. Do not quote a number from memory. Ship the artifact the tool returns.

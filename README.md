@@ -308,7 +308,7 @@ Wraps the `@sapperjohn/kostai` / `ai-cost` toolchain. It scans a repo for LLM ca
 
 42 cost-reduction techniques live in the underlying CLI across nine categories: model routing, context compression, waste detection, caching, shadow-mode A/B, local inference, batching, budget governance, and observability. The skill's job is to point Claude at the right verbs in the right order.
 
-Target: 60–92% input-token reduction with a one-page receipt an employee can show their manager or CIO. Every numeric claim carries a **Measured / Modeled / Needs verification** label — no bullshit claims leave the artifact.
+Reference-workload target: 60–92% input-token reduction with a one-page receipt an employee can show their manager or CIO. Every numeric claim carries a **Measured / Modeled / Needs verification** label — no bullshit claims leave the artifact.
 
 Companion landing page: [kostai.app](https://kostai.app/).
 

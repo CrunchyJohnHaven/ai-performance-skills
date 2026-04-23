@@ -1,3 +1,5 @@
+> Fictional demo input for ElasticJudge. Intentionally flawed; do not send or reuse externally.
+
 # Internal Memo — AI Cost Governance Proposal
 
 **To:** Mark Delano, Chief Information Officer, Pinnacle Health Systems

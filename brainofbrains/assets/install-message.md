@@ -73,9 +73,9 @@ On first run the user sees:
 
 Full runtime cost of the install: zero frontier-model calls. The install step is pure config + local scan + local tick. No local MCP server is started. No data leaves the machine.
 
-## Optional — buy a managed install via agent-to-agent flow
+## Optional — preview the managed install via agent-to-agent flow
 
-If the user's agent is speaking MCP and wants the remote install path instead of the local one:
+If the user's agent is speaking MCP and the hosted path is available, use the remote install flow instead of the local one:
 
 ```
 Use Brain Orchestration's scripts/provision.sh with a stack_description of my
@@ -83,4 +83,4 @@ current workspace. Quote first, then ask me to confirm before paying. Use the
 x402 payment rail if available.
 ```
 
-This is an opt-in flow. The free install path remains fully functional without it.
+This is an opt-in flow. If the hosted quote/provision path is unavailable, fall back to the manual page the script prints. The free install path remains fully functional without it.
