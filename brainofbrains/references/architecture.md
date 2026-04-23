@@ -65,7 +65,7 @@ Once installed, every brain operation is local:
 - **Queries** — `bin/brain query` composes L0/L1/L2 context against local closets and returns a synthesized answer. The only outbound call a query makes is to whichever frontier model the calling agent chose, and that call is outside the substrate.
 - **Health** — `bin/brain status` and `scripts/health.sh` read the local `STATE.json` and `brains.json` by default. The remote MCP `health_check` tool is only used when the user explicitly passes `--remote` (useful only for proving reliability to a buyer, not for day-to-day use).
 
-No cloud dependency for normal use. A machine that drops off the internet after install still produces synthesized answers. This is the structural reason default-off-MCP is a coherent posture — the product does not need the MCP to function; only the buy-flow does.
+No cloud dependency for normal use. A machine that drops off the internet after install still produces synthesized answers. This is the structural reason default-off-MCP is a coherent posture — the product does not need the MCP to function; only opt-in provisioning and hosted health checks do.
 
 ## Why default-MCP is off
 
@@ -75,7 +75,7 @@ Default-MCP reads as surveillance-adjacent inside large organizations. The reaso
 - some MCP integrations ingest filesystem state, terminal output, or keystrokes — the category reads as surveillance to a skeptical employee
 - employees who read "install the MCP server" as "my employer is watching me" opt out, permanently
 
-The BrainOfBrains install does not need a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is agent-callable for the buy-flow; after that, every brain operation happens through `bin/brain` on the local filesystem. If a local MCP surface is published later, treat it as opt-in; this bundle does not ship one today.
+The BrainOfBrains install does not need a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is agent-callable for provisioning and optional hosted health checks; otherwise every brain operation happens through `bin/brain` on the local filesystem. If a local MCP surface is published later, treat it as opt-in; this bundle does not ship one today.
 
 ## Why A2A compounds
 

@@ -146,7 +146,7 @@ Agent metadata (`agents/`):
 1. `bin/brain` does not exist until `scripts/install.sh` has run successfully — run the install step first, then use `scripts/health.sh` to verify the result.
 2. Closets are rebuilt every tick — do not hand-edit `.aaak` files; the next tick overwrites manual changes.
 3. BIV scores in `breach` status mean thresholds were not met, not that the system is broken — run `scripts/health.sh` for the full picture.
-4. The remote MCP at `brainofbrains.ai/mcp` is only needed for the A2A provisioning flow — normal queries are fully local.
+4. The remote MCP at `brainofbrains.ai/mcp` is only needed for opt-in provisioning or explicit remote health checks — normal queries are fully local.
 5. Do not confuse with generic agent orchestration (LangChain, multi-agent frameworks) — this skill only addresses the BrainOfBrains specialist-brain substrate.
 
 ## Quick reference

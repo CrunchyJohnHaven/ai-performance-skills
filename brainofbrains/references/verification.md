@@ -106,9 +106,9 @@ BIV captures quality as one of its five factors via `retrievalQuality`. A BIV dr
 
 Point at what the substrate does and does not do:
 
-- **Local operation after bootstrap** — every tick, query, and closet rebuild runs on the local machine. The install wrapper may contact the installer URL or package registry, and nothing else leaves the machine unless the user explicitly calls the remote `health_check` path.
+- **Local operation after bootstrap** — every tick, query, and closet rebuild runs on the local machine. The install wrapper may contact the installer URL or package registry, and nothing else leaves the machine unless the user explicitly calls the managed flow or the remote `health_check` path.
 - **No background telemetry** — the default install does not emit any telemetry to any central service. There is no "phone home" in the tick loop.
-- **No local MCP server** — the default install does not stand up a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is only touched for the buy-flow.
+- **No local MCP server** — the default install does not stand up a local MCP server. The remote MCP at `brainofbrains.ai/mcp` is only touched for explicit provisioning or remote health checks.
 - **No data ingestion without opt-in** — the closet builder reads commits, meeting transcripts, KB artifacts, and explicit messages. It does not read the user's screen, browser history, or keystrokes.
 - **Redaction** — the closet builder redacts known secret patterns before write; the redactor is a TABOO path and gates every closet rebuild.
 
