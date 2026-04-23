@@ -12,11 +12,65 @@ PKG="${ELASTICJUDGE_PKG:-elastic-judge}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+global_root_for_check() {
+  if command -v npm >/dev/null 2>&1; then
+    npm root -g
+    return 0
+  fi
+  if command -v bun >/dev/null 2>&1; then
+    local bun_root
+    bun_root="$(bun pm ls --global 2>/dev/null | awk '/node_modules/{print $1}' | head -1)"
+    if [[ -n "$bun_root" ]]; then
+      printf '%s\n' "$bun_root"
+    else
+      printf '%s/.bun/install/global/node_modules\n' "$HOME"
+    fi
+    return 0
+  fi
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm root --global
+    return 0
+  fi
+  if command -v yarn >/dev/null 2>&1; then
+    printf '%s/node_modules\n' "$(yarn global dir)"
+    return 0
+  fi
+  return 1
+}
+
+current_pkg_version() {
+  local global_root pkg_json
+  global_root="$(global_root_for_check 2>/dev/null || true)"
+  pkg_json="${global_root%/}/$PKG/package.json"
+
+  if [[ -n "$global_root" && -f "$pkg_json" ]]; then
+    sed -n 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$pkg_json" | head -1
+  else
+    echo "not installed"
+  fi
+}
+
+latest_pkg_version() {
+  if command -v npm >/dev/null 2>&1; then
+    npm show "$PKG" version 2>/dev/null || echo "unknown"
+    return 0
+  fi
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm view "$PKG" version 2>/dev/null || echo "unknown"
+    return 0
+  fi
+  if command -v yarn >/dev/null 2>&1; then
+    yarn info "$PKG" version --silent 2>/dev/null || echo "unknown"
+    return 0
+  fi
+  echo "unknown"
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --check)
-      CURRENT=$(npx @sapperjohn/kostai --version 2>/dev/null || echo "not installed")
-      LATEST=$(npm show @sapperjohn/kostai version 2>/dev/null || echo "unknown")
+      CURRENT="$(current_pkg_version)"
+      LATEST="$(latest_pkg_version)"
       echo "current: $CURRENT  latest: $LATEST"
       [[ "$CURRENT" == "$LATEST" ]] && echo "up to date" || echo "update available"
       exit 0

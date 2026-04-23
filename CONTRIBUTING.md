@@ -35,7 +35,7 @@ Work through all four steps before opening a PR:
 
 2. **Run ShellCheck.**
    ```bash
-   shellcheck {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh
+   shellcheck -S warning {cost-optimization,brainofbrains,elasticjudge}/scripts/*.sh scripts/*.sh
    ```
    Fix any warnings before pushing. SC2086 / SC2046 (quoting) are the most common.
 

@@ -4,7 +4,7 @@ How the BrainOfBrains product is delivered, paid for, and operated. This file co
 
 ## The thesis
 
-BrainOfBrains is A2A *distribution*, not A2A *software*. The product — a self-improving specialist-brain substrate — stays the same regardless of who installs it. The GTM is machine-callable: a customer's agent arrives, quotes, pays, and installs. John-time per customer trends toward zero. Engineering time compounds across every customer because every customer runs the same install recipe against the same stack-spec compiler.
+BrainOfBrains is A2A *distribution*, not A2A *software*. The product — a self-improving specialist-brain substrate — stays the same regardless of who installs it. The GTM is machine-callable: a customer's agent arrives, quotes, pays, and installs. John-time per customer trends toward zero. Engineering time compounds across every customer because every customer runs the same install recipe against the same install compiler.
 
 ## v0.1 surface
 
@@ -23,7 +23,7 @@ The hosted endpoints are the only always-on surface the product exposes. There i
 - **Primary**: x402 (agent-native HTTP 402). Cloudflare has native x402 support; the Worker in front of `provision` returns 402 with the quote, the customer's agent pays, and the 402 challenge is satisfied. No browser-mediated checkout is required.
 - **Fallback**: Stripe Checkout. If the customer's agent cannot speak x402, `quote` returns a Stripe Checkout URL instead. A human can complete checkout; the resulting payment token is accepted by `provision` the same way x402 payment tokens are.
 
-Either way, `provision` returns the same artifact: a signed tarball and an `install.sh`. The payment rail is a swap; the install payload is constant.
+Either way, `provision` returns the same kind of response: service-defined install instructions plus whatever proof of payment the hosted path requires. The payment rail is a swap; the provision contract stays constant.
 
 ## Delivery
 
@@ -31,9 +31,9 @@ The current public wrapper assumes `provision` returns service-defined install i
 
 ## Infrastructure
 
-- **Cloudflare Worker** — stateless provisioning logic. Receives MCP calls, builds the stack spec, compiles the brain substrate, signs the tarball, returns URLs.
+- **Cloudflare Worker** — stateless provisioning logic. Receives MCP calls, compiles the install request, and returns the next-step instructions the hosted path needs.
 - **Cloudflare Durable Object** — install records and payment state. One DO instance per install ID; survives Worker restarts; cheap at scale.
-- **Cloudflare R2** — signed tarball storage with short-lived presigned URLs.
+- **Cloudflare R2** — optional storage for hosted install payloads when the response includes downloadable artifacts.
 - **Cloudflare DNS** — already holds `brainofbrains.ai`; the MCP route and the install-script route live on the same zone.
 
 Near-zero infrastructure cost. Scales trivially. Matches the domain already being on Cloudflare, which is a hard rule for John's projects (see `feedback_cloudflare_cli.md`).
@@ -45,7 +45,7 @@ Agentic delivery raises the install-reliability bar:
 - Consulting-era install reliability: ~80% (a human is on the call to debug)
 - A2A install reliability: ~99% (auto-refund kicks in below this)
 
-This means **do not build the A2A layer first**. Build the deterministic install and the stack-spec compiler first, because those same components also make human-triggered setup frictionless. A2A is then a thin wrapper over the install pipeline, not a separate product.
+This means **do not build the A2A layer first**. Build the deterministic install and the install compiler first, because those same components also make human-triggered setup frictionless. A2A is then a thin wrapper over the install pipeline, not a separate product.
 
 The current dependency chain to unlock A2A:
 
@@ -86,7 +86,7 @@ Each customer added compounds engineering time in one direction only:
 - better closet compression → shipped once, reduces every future customer's context spend
 - better routing → shipped once, improves every future customer's synthesized-answer quality
 
-The only work that does not compound is bespoke per-customer customization, which is why feature requests from the landing page should be routed into the stack-spec compiler schema rather than into bespoke installs. The compiler is the product.
+The only work that does not compound is bespoke per-customer customization, which is why feature requests from the landing page should be routed into the install compiler inputs rather than into bespoke installs. The compiler is the product.
 
 ## What the skill does not do
 
@@ -94,7 +94,7 @@ This skill is an orientation layer. It does not:
 
 - reimplement the `bin/brain` CLI (it wraps it)
 - reimplement the MCP tools (it calls them via `scripts/provision.sh` and `scripts/health.sh --remote`)
-- rebuild the stack-spec compiler (the installer ships it; the skill does not touch compiler internals)
+- rebuild the install compiler (the installer ships it; the skill does not touch compiler internals)
 - host its own payment rail (payment is whatever the MCP returns)
 
 If a user needs behavior beyond what the CLI or the MCP tools expose, the correct path is to extend the upstream surface, not to add logic to this skill.

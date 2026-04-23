@@ -165,7 +165,7 @@ A grouped summary (PASS/FAIL counts per group) is printed at the end.
 
 ### ShellCheck
 
-The CI `shellcheck` job runs [ShellCheck](https://www.shellcheck.net/) at the `warning` severity level across every `.sh` in the repo. To run locally:
+The CI `shellcheck` job runs [ShellCheck](https://www.shellcheck.net/) at the `warning` severity level across the three shipped skill `scripts/` folders plus top-level `scripts/`. To run locally:
 
 ```bash
 # macOS

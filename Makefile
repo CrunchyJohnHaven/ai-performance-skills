@@ -3,7 +3,7 @@
 SKILLS_DIR := $(HOME)/.claude/skills
 SKILLS     := cost-optimization brainofbrains elasticjudge
 
-.PHONY: help install-all install-cost install-brains install-judge check clean lint smoke-test update-all diagnose uninstall shellcheck
+.PHONY: help install-all install-cost install-brains install-judge check clean lint smoke-test update-all diagnose uninstall uninstall-dry-run shellcheck
 
 help: ## Show this help message
 	@echo "AI Performance Skills — root-level tooling"
@@ -68,19 +68,22 @@ install-judge: ## Copy only elasticjudge to ~/.claude/skills/
 	cp -R elasticjudge "$(SKILLS_DIR)/"
 	@echo "Done. Restart your Claude Code session to pick up the skill."
 
-lint: check ## Alias for check (syntax-check all scripts)
+lint: check ## Alias for check (per-skill bash syntax check)
 
 diagnose: ## Run all three skill diagnostics and print a pass/fail summary
 	bash scripts/diagnose.sh
 
-shellcheck: ## Run ShellCheck -S warning on all scripts (requires shellcheck)
-	@find . -name "*.sh" | sort | xargs shellcheck -S warning
+shellcheck: ## Run ShellCheck -S warning on shipped skill and root scripts
+	shellcheck -S warning cost-optimization/scripts/*.sh brainofbrains/scripts/*.sh elasticjudge/scripts/*.sh scripts/*.sh
 
 smoke-test: ## Run the cost-optimization smoke test from repo root
 	bash cost-optimization/scripts/smoke-test.sh
 
-uninstall: ## Remove all skills from ~/.claude/skills/ (dry-run safe)
+uninstall: ## Remove all skills from ~/.claude/skills/
 	bash scripts/uninstall.sh
+
+uninstall-dry-run: ## Preview which installed skills would be removed
+	bash scripts/uninstall.sh --dry-run
 
 update-all: ## Run update.sh for all three installed skills
 	@for skill in $(SKILLS); do \
