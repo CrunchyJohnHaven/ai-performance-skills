@@ -53,7 +53,7 @@ User sees: a plain-English answer and the L0/L1/L2 source layers it was drawn fr
 
 **Step 5 — verify**
 Claude runs `~/.claude/skills/brainofbrains/scripts/health.sh`.
-User sees: a local PASS/FAIL health table with the last-tick timestamp. Remote health checks are only used if the operator explicitly adds `--remote`.
+User sees: a local status snapshot with the last-tick timestamp and per-brain labels such as `in-band`, `breach`, `awaiting-data`, or `unwired`. Remote health checks are only used if the operator explicitly adds `--remote`.
 
 ## ElasticJudge workflow (grade a memo)
 

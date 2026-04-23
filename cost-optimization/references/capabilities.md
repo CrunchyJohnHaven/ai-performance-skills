@@ -12,7 +12,7 @@ npx --yes @sapperjohn/kostai doctor         # diagnose config and prerequisites
 npx --yes @sapperjohn/kostai --help         # full CLI surface for the installed version
 ```
 
-The scan output groups detected opportunities by category and tells the user how to invoke them (wrapper script, CLI flag, config key, or automatic behavior). If you are maintaining the upstream product repo rather than using an installed skill, inspect the source-tree registry there too.
+The scan output groups detected opportunities by category and tells the user how to invoke them (wrapper script, CLI flag, config key, or automatic behavior).
 
 ## Categories
 

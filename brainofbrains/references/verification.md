@@ -117,7 +117,7 @@ Point at what the substrate does and does not do:
 Three checks, in order:
 
 1. `bin/brain status` — if the last-tick timestamp is stale by more than the expected cadence, the loop has stalled
-2. `scripts/health.sh` — per-brain PASS/FAIL surfaces which specific brain's health check is failing
+2. `scripts/health.sh` — per-brain labels surface which specific brain needs attention
 3. `tail -n 100 evidence/brain/ticks.log` (if present) — the tick loop appends status to this log; a silent tick loop has a silent log
 
 If the loop is dead, restart with `bin/brain tick` (manual) or restart the launchd plist if one was installed. Do not declare the substrate healthy if the loop has stalled — stale synthesized answers are worse than no answer.

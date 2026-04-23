@@ -113,6 +113,6 @@ The skill is working when:
 
 1. An employee installs it and sees `evidence/brain/brains.json` populate within seconds
 2. `scripts/ask.sh "<question>"` returns a synthesized answer citing local closets
-3. `scripts/health.sh` reports per-brain PASS/FAIL and the BIV headline
+3. `scripts/health.sh` reports the local status snapshot, per-brain labels, and the BIV headline
 4. The employee can hand a health snapshot to a manager without a walkthrough
 5. Adoption grows through word-of-mouth rather than mandate
