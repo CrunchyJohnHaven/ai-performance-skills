@@ -1,18 +1,18 @@
 # Capabilities
 
-KostAI exposes multiple cost-reduction techniques across routing, compression, caching, shadow-mode comparison, local inference, budget governance, and observability. The installed CLI plus the wrapper scripts in this skill are the public source of truth.
+KostAI currently implements 42 cost-reduction techniques across nine categories. The canonical inventory lives in `src/capabilities/registry.ts` and is rendered by the CLI.
 
 ## How to read the current list
 
-Never paraphrase this list from memory — it drifts. Inspect the public surfaces on the target machine:
+Never paraphrase this list from memory — it drifts. The authoritative capability inventory is in `src/capabilities/registry.ts`. To inspect it:
 
 ```bash
-scripts/scan.sh                             # detect local runtimes and candidate savings levers
-npx --yes @sapperjohn/kostai doctor         # diagnose config and prerequisites
-npx --yes @sapperjohn/kostai --help         # full CLI surface for the installed version
+npx kostai scan                   # detect active capabilities and local runtimes
+npx kostai doctor                 # check which capabilities are enabled in this project
+npx kostai --help                 # full CLI surface
 ```
 
-The scan output groups detected opportunities by category and tells the user how to invoke them (wrapper script, CLI flag, config key, or automatic behavior).
+The scan output groups every detected opportunity by category and tells the user how to invoke it (flag, config key, wrapper call, or automatic).
 
 ## Categories
 
@@ -24,7 +24,7 @@ Each category solves a different class of waste:
 | `context-compression` | Shrinks input tokens before they hit the frontier | Prose compressor, tool-result compression, local preprocess, DVP |
 | `waste-detection` | Scores every call against patterns that indicate waste | Surfaces oversized system prompts, redundant history, over-generation |
 | `caching` | Reuses prior computation when semantics match | Anthropic prompt cache (~90% discount on cached input), semantic cache |
-| `shadow-mode` | Runs baseline + optimized in parallel, logs the delta | Generates the comparison ledger that powers `kostai report` |
+| `shadow-mode` | Runs baseline + optimized in parallel, logs the delta | Generates the comparison ledger that powers `kostai proof` |
 | `local-inference` | Routes eligible calls to Ollama / LM Studio / local endpoints | Local is $0/token — only electricity cost |
 | `batching-deliberation` | LLM Council and review-ready passes with consensus short-circuit | Preserves quality while collapsing spend across multiple reviewers |
 | `budget-governance` | Per-wave and per-task hard dollar caps | Prevents runaway cost on orchestrated agent runs |
@@ -39,7 +39,7 @@ Each category solves a different class of waste:
 - Agent loop with long output → **context-compression** (Draft-Verify-Patch)
 - Drafting and reviewing → **batching-deliberation** (LLM Council, review-ready)
 - Running CI or overnight orchestration → **budget-governance** (budget gate)
-- Proving savings to a non-technical stakeholder → **observability** (`kostai report`)
+- Proving savings to a non-technical stakeholder → **observability** (`kostai proof`)
 
 ## Status tags
 
@@ -50,20 +50,45 @@ Every capability carries a status tag:
 - `experimental` — behind a feature flag; do not recommend to external users without verification
 
 Do not surface `experimental` capabilities in a CIO-facing artifact or customer proof. Filter by running:
-Check the installed CLI or scan output on the target machine before making a stakeholder-facing claim about availability.
 
-## Maintainer note
+```bash
+npx kostai features --json | jq '.capabilities[] | select(.status == "ga")'
+```
 
-If you are editing the upstream product repo, keep the capability registry aligned with the detectors that feed it. Installed-skill users can ignore the source-tree internals.
+## Adding a new capability
 
-## Wrapper-backed command surface
+See the header comment in `src/capabilities/registry.ts` for invariants. In short: kebab-case stable ID, source file path, one-line description, category, invoke mode, status. If a new waste-category constant is added under `src/core/score/*.ts`, add the matching capability row at the same time so the feature list never drifts from the detectors.
 
-This skill bundle relies on a small stable wrapper surface:
+## Available CLI Commands (v0.5.2)
 
-- `scripts/install.sh` — wraps `kostai init`
-- `scripts/scan.sh` — wraps `kostai scan`
-- `scripts/proof.sh` — wraps `kostai report`
-- `scripts/feedback.sh` — builds share-ready output from the local proof data
-- `scripts/update.sh` — refreshes the installed skill bundle from the published package
+Verified from the repo CLI source on 2026-04-24. Use this list as the authoritative CLI surface — do not invent commands not shown here.
 
-Before documenting any additional subcommand or flag, verify it against `npx --yes @sapperjohn/kostai --help` on the target machine instead of copying an old command table.
+| Command | Description |
+| --- | --- |
+| `init` | Initialize ai-cost configuration in the current project |
+| `connect` | Auto-stamp `ai-cost.config.json`, generate bridge token, detect Tailscale peers |
+| `install` | One-click bootstrap: configure the workspace, apply safe starter patches, refresh the savings plan |
+| `demo` | Seed deterministic before/after workload for proof demos |
+| `optimize` | Analyze the current repo and emit `.kostai/optimizations.md` |
+| `implement` | Magic-sentence entrypoint: scan, write, and print the optimization plan |
+| `dashboard` | Start the local ai-cost dashboard |
+| `report` | Print a markdown summary report |
+| `proof` | Emit one-page proof-of-savings with optional HTML and JSON outputs |
+| `features` / `capabilities` | List implemented cost-reduction techniques |
+| `export` | Export event data |
+| `kibana` | Export Kibana saved objects |
+| `doctor` | Check ai-cost configuration and prerequisites |
+| `reset` | Clear all stored event data |
+| `ingest` | Pull token usage from Claude Code, Codex, and Ollama into the event store |
+| `agent` | Stream token usage from this host to a central kostai bridge |
+| `scan` | Detect local LLM runtimes and LLM usage in the current repo |
+| `mcp` | Start the ai-cost MCP server (JSON-RPC over stdio) |
+| `proxy` | Start an OpenAI-compatible HTTP proxy that observes, routes, or shadows |
+| `bridge` | Run / inspect the cross-machine MCP bridge (HTTP + SSE with bearer auth) |
+| `queue` | Inspect or drive the 24-hour task queue (escalate / delegate / handoff) |
+| `compare` | Summarize shadow-mode comparisons (baseline vs. optimized) |
+| `evidence` | Reproducible evidence harness: benchmarks, receipts, reports, verification |
+| `research` | Run and inspect research-node workflows |
+| `compress` | Compress a markdown / text file in place (backs up original as `FILE.original.md`) |
+| `boil` | Run the BoilTheOcean orchestrator pass-through |
+| `help` | Display help for a command |

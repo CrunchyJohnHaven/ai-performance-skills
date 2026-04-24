@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # smoke-test.sh — verify the AI Performance skill is wired up correctly
-# Usage from repo root:  bash cost-optimization/scripts/smoke-test.sh
-# Usage from skill root: bash scripts/smoke-test.sh
+# Usage: bash scripts/smoke-test.sh
 # Exit: 0 if all critical checks pass, 1 if any critical check fails
 
 set -uo pipefail

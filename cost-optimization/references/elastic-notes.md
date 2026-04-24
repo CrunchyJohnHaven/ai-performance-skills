@@ -25,7 +25,7 @@ Three channels, same skill folder:
 2. **Agent Builder catalog** — publish the skill folder to the internal catalog. Employees install via whatever UX the catalog exposes for skill install.
 3. **Public GitHub** — open-source at https://github.com/CrunchyJohnHaven/ai-performance-skills.
 
-In this source repo the folder is `cost-optimization/`; packaged builds commonly export the same folder as `skills/cost-optimization/`.
+All three channels pull from the same source of truth. In this public repo the folder is `cost-optimization/`; the npm package ships the same contents under `skills/cost-optimization/`.
 
 ## Skill install footprint
 
@@ -52,7 +52,7 @@ Do not start with mechanism explanations. Do not start with the 42-technique inv
 - **Category:** Productivity / Developer Tools
 - **Short description:** Speeds up AI work, cuts LLM waste, and emits a proof-of-savings artifact suitable for manager or CIO review.
 - **Trigger phrases:** "AI Performance", "reduce my AI bill", "optimize LLM cost", "prove my Claude Code savings"
-- **Repo path:** source repo `cost-optimization/`; packaged builds may export `skills/cost-optimization/`
+- **Repo path:** `cost-optimization/`
 
 ## Update path
 
@@ -72,6 +72,7 @@ Opt-in posture:
 - `scripts/feedback.sh` generates a local aggregate packet from proof data
 - packet contains cost deltas, savings percentage, mechanism mix, optional employee note
 - packet excludes prompt and response bodies
+- packet also emits `DAY_30_MEMO.md` so the pilot has a clear expand / hand off / walk away decision surface
 - employee chooses whether to paste or attach it back to a rollout team
 
 ## Posture for an enterprise rollout
@@ -96,7 +97,7 @@ Outcome of the Adnan CIO meeting on 2026-04-22. These are binding commitments th
 
 - **Ship as Claude skill for Agent Builder catalog.** Do not create a new product line. Package as `AI Performance` in the existing skills catalog alongside Brain Orchestration and Quality Judge.
 - **Zero MCP default.** No MCP server is installed or enabled by default. MCP remains an opt-in integration. Default-off posture is non-negotiable for the enterprise rollout.
-- **10%-of-savings pricing.** The default pass-through rate for any managed offering is 10% of measured savings. The proof artifact renders the math so an employee can justify the rollout to their CIO without hand-waving. Do not hard-code a CLI flag for that rate without re-checking the installed report surface.
+- **10%-of-savings pricing.** The default pass-through rate for any managed offering is 10% of measured savings. The proof artifact renders the math so an employee can justify the rollout to their CIO without hand-waving. Rate is configurable via `--rate` on the `proof` command.
 - **Employee-benefit framing leads.** Every employee-facing message leads with personal benefit — faster responses, measurable savings, cleaner context — not with company cost reduction. Company-surveillance framing causes opt-out.
 - **Measured / Modeled / Needs-verification label on every numeric claim.** No numeric claim appears in any stakeholder-facing output without one of these three labels. This applies to PROOF.md, FEEDBACK.md, slide decks, and any email or Slack message that contains a savings figure.
 
@@ -120,16 +121,16 @@ Outcome of the Adnan CIO meeting on 2026-04-22. These are binding commitments th
   - "how much am I spending on Claude or Codex"
   - "am I wasting tokens"
   - "prove my LLM savings"
-- **One-sentence pitch:** Cut LLM spend on Claude Code, Codex, and Gemini CLI work on sampled workloads without changing what you ask for, and emit a one-page proof artifact any manager or CIO can read.
-- **Repo path:** source repo `cost-optimization/`; packaged builds may export `skills/cost-optimization/`
+- **One-sentence pitch:** Cut LLM spend on Claude Code, Codex, and Gemini CLI work by 60–92% without changing what you ask for, and emit a one-page proof artifact any manager or CIO can read.
+- **Repo path:** `cost-optimization/`
 
 ## Elastic pilot rollout checklist
 
 Five steps for an employee participating in the internal pilot.
 
-1. **Install the skill.** Clone the repo or run `npm install -g @sapperjohn/kostai` and symlink the packaged `skills/cost-optimization/` folder into `~/.claude/skills/cost-optimization/`, or install via the Agent Builder catalog if it is already published there.
-2. **Run the demo in your repo.** From the root of any Claude Code workspace, run `scripts/demo.sh`. This shows the scan/report flow and the artifact shape end-to-end. Fresh repos still need real usage or comparison data before the proof shows measured savings.
-3. **Review PROOF.md.** After at least one shadow-mode comparison has landed, run `scripts/proof.sh`. Open `deliverables/<audience>-<date>/PROOF.md`. Every number carries a Measured / Modeled / Needs-verification label. If the ledger is empty, say so rather than inferring savings.
+1. **Install the skill.** Clone this repo and copy `cost-optimization/` into `~/.claude/skills/cost-optimization/`, or run `npm install -g @sapperjohn/kostai` and symlink `skills/cost-optimization/` from the installed package, or install via the Agent Builder catalog if it is already published there.
+2. **Run the demo in your repo.** From the root of any Claude Code workspace, run `scripts/demo.sh`. This seeds a deterministic before/after workload and shows a 92% savings swing (Measured on reference hardware; Modeled for other workloads). Takes roughly two minutes.
+3. **Review PROOF.md.** After at least one shadow-mode comparison has landed, run `scripts/proof.sh`. Open `deliverables/<audience>-<date>/PROOF.md`. Every number carries a Measured / Modeled / Needs-verification label. If the ledger is empty, rerun the demo first.
 4. **Optionally run scripts/feedback.sh.** This generates a privacy-safe local feedback packet — aggregate counts, savings totals, mechanism breakdown, optional note. Prompt and response bodies stay local. No data is sent automatically.
 5. **Share FEEDBACK.md with the pilot coordinator if you choose.** Paste or attach `deliverables/<audience>-<date>/FEEDBACK.md` to the pilot coordinator's Slack thread or email. This step is fully opt-in; skipping it does not affect your install or savings.
 
@@ -138,7 +139,18 @@ Five steps for an employee participating in the internal pilot.
 The skill is working when:
 
 1. An employee installs it and sees their `.ai-cost-data/` ledger populate within a day of normal Claude Code use
-2. Running `kostai report` produces a one-pager showing non-zero measured savings
+2. Running `kostai proof` produces a one-pager showing non-zero measured savings
 3. The employee can hand that one-pager to a manager without a walkthrough
 4. The employee can optionally generate a `FEEDBACK.md` packet without exposing prompt bodies
 5. Adoption grows through word-of-mouth rather than mandate
+
+## Adnan pilot acceptance gates
+
+For any Elastic field test, load `references/adnan-pilot.md` and keep the pilot bounded:
+
+- One real workflow, one named owner, 30 days
+- Shadow mode only until explicit owner approval
+- At least 20% Measured savings on real workflow traffic
+- At least 95% quality parity against the agreed task set
+- Security/compliance review has no blocker
+- Day-30 memo says expand, hand off, or walk away
