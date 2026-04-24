@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Build an opt-in, privacy-safe feedback packet from local proof data.
-# No automatic send. The packet is intended for manual sharing back to the
-# rollout team and contains aggregate savings metrics only.
+# Build an opt-in, privacy-safe feedback packet from the proof-of-savings data.
+# No automatic send. The packet contains aggregate savings and pilot gates only.
 
 set -euo pipefail
 
@@ -25,11 +24,13 @@ Recognized flags:
   --audience <name>    deliverables folder prefix (default: elastic-pilot)
   --date <YYYY-MM-DD>  date suffix for the deliverables folder (default: today)
   --note <text>        optional free-text note appended to the feedback packet
+  --last <period>      time window forwarded to `kostai proof` (30d, 90d, all)
+  --rate <decimal>     pass-through pricing rate forwarded to `kostai proof`
 
 Examples:
   scripts/feedback.sh
   scripts/feedback.sh --audience elastic-pilot --date 2026-04-22
-  scripts/feedback.sh --note "Pilot week 1 results"
+  scripts/feedback.sh --last 30d --note "Pilot week 1 results"
 EOF
       exit 0
       ;;
@@ -45,6 +46,14 @@ EOF
       NOTE="$2"
       shift 2
       ;;
+    --last)
+      EXTRA_ARGS+=("--last" "$2")
+      shift 2
+      ;;
+    --rate)
+      EXTRA_ARGS+=("--rate" "$2")
+      shift 2
+      ;;
     *)
       EXTRA_ARGS+=("$1")
       shift
@@ -56,114 +65,162 @@ DELIV_DIR="deliverables/${AUDIENCE}-${DATE}"
 mkdir -p "$DELIV_DIR"
 
 echo "[cost-optimization] building local feedback packet in $DELIV_DIR"
-npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}" \
+npx --yes @sapperjohn/kostai proof \
+  --json "$DELIV_DIR/proof.json" \
+  --html "$DELIV_DIR/PROOF.html" \
+  "${EXTRA_ARGS[@]}" \
   > "$DELIV_DIR/PROOF.md"
-npx --yes @sapperjohn/kostai export \
-  --format json \
-  --output "$DELIV_DIR/feedback.json" \
-  "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
 
-FEEDBACK_JSON_PATH="$DELIV_DIR/feedback.json" \
+if [[ ! -s "$DELIV_DIR/proof.json" ]]; then
+  echo "error: proof.json was not created. Run scripts/demo.sh or collect shadow-mode comparisons first." >&2
+  exit 1
+fi
+
+FEEDBACK_JSON_PATH="$DELIV_DIR/proof.json" \
 FEEDBACK_MD_PATH="$DELIV_DIR/FEEDBACK.md" \
 FEEDBACK_SLACK_PATH="$DELIV_DIR/SLACK.md" \
+FEEDBACK_MEMO_PATH="$DELIV_DIR/DAY_30_MEMO.md" \
 FEEDBACK_NOTE="$NOTE" \
 node <<'EOF'
 const fs = require("node:fs");
 
-const jsonPath = process.env.FEEDBACK_JSON_PATH;
+const proofPath = process.env.FEEDBACK_JSON_PATH;
 const mdPath = process.env.FEEDBACK_MD_PATH;
 const slackPath = process.env.FEEDBACK_SLACK_PATH;
+const memoPath = process.env.FEEDBACK_MEMO_PATH;
 const note = (process.env.FEEDBACK_NOTE || "").trim();
 
-const events = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+const proof = JSON.parse(fs.readFileSync(proofPath, "utf8"));
 const money = (n, digits = 2) => `$${Number(n || 0).toFixed(digits)}`;
 const pct = (n) => `${Number(n || 0).toFixed(1)}%`;
 
-// Aggregate from raw event array (kostai export --format json)
-const baseline = events.filter((e) => e.shadowRole === "baseline");
-const optimized = events.filter((e) => e.shadowRole && e.shadowRole !== "baseline");
-const baselineCostUsd = baseline.reduce((s, e) => s + (e.costUsd || 0), 0);
-const optimizedCostUsd = optimized.reduce((s, e) => s + (e.costUsd || 0), 0);
-const savedUsd = Math.max(0, baselineCostUsd - optimizedCostUsd);
-const savedPct = baselineCostUsd > 0 ? (savedUsd / baselineCostUsd) * 100 : 0;
-const pairs = new Set(events.map((e) => e.comparisonId).filter(Boolean)).size;
-const qualityScores = events.map((e) => e.qualityScore).filter((q) => typeof q === "number");
-const avgQualityScore = qualityScores.length ? qualityScores.reduce((s, q) => s + q, 0) / qualityScores.length : null;
-const quality = avgQualityScore !== null ? avgQualityScore.toFixed(2) : "n/a";
+const pairs = Number(proof.pairs || 0);
+const savedPct = Number(proof.savedPct || 0);
+const savedUsd = Number(proof.savedUsd || 0);
+const qualityScore =
+  typeof proof.avgQualityScore === "number" ? Number(proof.avgQualityScore) : null;
+const qualityPct = qualityScore === null ? null : qualityScore <= 5 ? qualityScore * 20 : qualityScore;
+const savingsGate = savedPct >= 20;
+const qualityGate = qualityPct === null ? null : qualityPct >= 95;
+const decision =
+  pairs === 0
+    ? "No decision - no measured comparisons yet."
+    : savingsGate && qualityGate === true
+      ? "Expand - measured savings and quality parity both cleared the pilot gate."
+      : savingsGate && qualityGate === null
+        ? "Hold - savings cleared the gate, but quality parity still needs verification."
+        : savingsGate
+          ? "Retune - savings cleared the gate, but quality parity did not."
+          : "Walk away or hand off - measured savings did not clear the pilot gate.";
 
-// Mechanism breakdown from tags
-const tagCosts = {};
-for (const e of optimized) {
-  const saving = (baseline.find((b) => b.comparisonId === e.comparisonId)?.costUsd || 0) - (e.costUsd || 0);
-  for (const tag of (e.tags || [])) {
-    tagCosts[tag] = (tagCosts[tag] || 0) + Math.max(0, saving / Math.max(1, (e.tags || []).length));
-  }
-}
-const mechanisms = Object.entries(tagCosts)
-  .sort(([, a], [, b]) => b - a)
-  .slice(0, 3)
-  .map(([tag, usd]) => ({ tag, savedUsd: usd, pctOfTotal: savedUsd > 0 ? (usd / savedUsd) * 100 : 0 }));
-const mechLines = mechanisms.length
-  ? mechanisms.map((row) => `- ${row.tag}: ${money(row.savedUsd, 4)} (${pct(row.pctOfTotal)})`).join("\n")
-  : "- None";
+const mechanismLines = Array.isArray(proof.mechanisms) && proof.mechanisms.length
+  ? proof.mechanisms
+      .map((row) => `- ${row.tag}: ${money(row.savedUsd, 4)} Measured (${pct(row.pctOfTotal)} of attributed savings)`)
+      .join("\n")
+  : "- None measured yet";
 
-const timestamps = events.map((e) => e.ts).filter(Boolean).sort();
-const window = timestamps.length >= 2
-  ? `${timestamps[0].slice(0, 10)} to ${timestamps[timestamps.length - 1].slice(0, 10)}`
-  : timestamps.length === 1 ? timestamps[0].slice(0, 10) : "n/a";
+const qualityLine = qualityScore === null
+  ? "- Quality parity: Needs verification. Agree on the workflow owner's rubric before production routing."
+  : `- Quality parity: ${qualityGate ? "PASS" : "REVIEW"} - ${pct(qualityPct)} Measured-equivalent from average quality score ${qualityScore.toFixed(2)}.`;
 
-const lines = [
+const feedback = [
   "# AI Performance feedback packet",
   "",
   "## Summary",
   "",
-  `- Window: ${window}`,
-  `- Paired comparisons: ${pairs}`,
-  `- Baseline cost: ${money(baselineCostUsd, 4)}`,
-  `- Optimized cost: ${money(optimizedCostUsd, 4)}`,
-  `- Measured savings: ${money(savedUsd, 4)} (${pct(savedPct)})`,
-  `- Quality signal: ${quality}`,
+  `- Window: ${proof.window || "all"} Measured`,
+  `- Paired comparisons: ${pairs} Measured`,
+  `- Baseline cost: ${money(proof.baselineCostUsd, 4)} Measured`,
+  `- Optimized cost: ${money(proof.optimizedCostUsd, 4)} Measured`,
+  `- Savings: ${money(savedUsd, 4)} Measured (${pct(savedPct)} Measured)`,
+  qualityLine,
   "",
   "## Top mechanisms",
   "",
-  mechLines,
+  mechanismLines,
+  "",
+  "## Pilot gates",
+  "",
+  `- Savings gate >=20% on real workflow traffic: ${savingsGate ? "PASS" : "REVIEW"} (${pct(savedPct)} Measured)`,
+  qualityLine,
+  "- Production routing: HOLD. Pilot remains shadow-only until the workflow owner signs off.",
+  "- Security/compliance: Needs verification by the sponsor's normal review path.",
+  "",
+  "## Decision posture",
+  "",
+  decision,
   "",
   "## Privacy",
   "",
   "- Aggregate packet only",
   "- No prompt or response bodies included",
   "- No automatic send performed",
+  "- Default capture mode remains metadata_only",
   "",
 ];
 
 if (note) {
-  lines.push("## Employee note", "", note, "");
+  feedback.push("## Employee note", "", note, "");
 }
 
-lines.push("## Share guidance", "", "Paste this packet into Slack or email only if choosing to share results back with the rollout team.", "");
+feedback.push(
+  "## Share guidance",
+  "",
+  "Paste this packet into Slack or email only if choosing to share results back with the rollout team.",
+  "",
+);
 
-fs.writeFileSync(mdPath, lines.join("\n"), "utf8");
+fs.writeFileSync(mdPath, feedback.join("\n"), "utf8");
 
-const slackLines = [
-  "AI Performance results",
+const slack = [
+  "AI Performance pilot results",
   "",
   `Measured savings: ${money(savedUsd, 2)} (${pct(savedPct)}) over ${pairs} paired calls.`,
-  `Baseline: ${money(baselineCostUsd, 2)} -> Optimized: ${money(optimizedCostUsd, 2)}.`,
-  mechanisms.length
-    ? `Top drivers: ${mechanisms.map((row) => `${row.tag} ${pct(row.pctOfTotal)}`).join(", ")}.`
-    : "Top drivers: none yet.",
-  "Privacy: aggregate metrics only, no prompt bodies.",
+  `Quality: ${qualityScore === null ? "needs verification" : `${pct(qualityPct)} measured-equivalent`}.`,
+  `Decision posture: ${decision}`,
+  "Privacy: aggregate metrics only, no prompt bodies, no automatic send.",
+];
+if (note) slack.push(`Note: ${note}`);
+fs.writeFileSync(slackPath, slack.join("\n"), "utf8");
+
+const memo = [
+  "# Day-30 pilot decision memo",
+  "",
+  "## Decision",
+  "",
+  decision,
+  "",
+  "## Evidence",
+  "",
+  `- Paired comparisons: ${pairs} Measured`,
+  `- Baseline cost: ${money(proof.baselineCostUsd, 4)} Measured`,
+  `- Optimized cost: ${money(proof.optimizedCostUsd, 4)} Measured`,
+  `- Savings: ${money(savedUsd, 4)} Measured (${pct(savedPct)} Measured)`,
+  qualityLine,
+  "",
+  "## Open checks",
+  "",
+  "- Named next owner: TBD",
+  "- Security/compliance blocker: Needs verification",
+  "- Adjacent Elastic owner or duplicate effort: Needs verification",
+  "- Production routing approval: Not approved by default",
+  "",
+  "## Next action",
+  "",
+  savingsGate && qualityGate === true
+    ? "Name the next owner and expand to one additional workflow."
+    : "Retune or hand off before expanding. Do not move from shadow mode to production routing yet.",
+  "",
 ];
 
-if (note) {
-  slackLines.push(`Note: ${note}`);
-}
-
-fs.writeFileSync(slackPath, slackLines.join("\n"), "utf8");
+fs.writeFileSync(memoPath, memo.join("\n"), "utf8");
 EOF
 
 echo
 echo "[cost-optimization] feedback artifacts:"
+echo "  $DELIV_DIR/PROOF.md"
+echo "  $DELIV_DIR/PROOF.html"
+echo "  $DELIV_DIR/proof.json"
 echo "  $DELIV_DIR/FEEDBACK.md"
 echo "  $DELIV_DIR/SLACK.md"
-echo "  $DELIV_DIR/feedback.json"
+echo "  $DELIV_DIR/DAY_30_MEMO.md"
