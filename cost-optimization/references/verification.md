@@ -8,9 +8,9 @@ After real workload data has landed in `.ai-cost-data/events.jsonl` and shadow-m
 
 ```bash
 # From the target workspace root
-npx kostai report --html deliverables/<audience>-<YYYY-MM-DD>/PROOF.html
-npx kostai report --json deliverables/<audience>-<YYYY-MM-DD>/proof.json
-npx kostai report > deliverables/<audience>-<YYYY-MM-DD>/PROOF.md
+npx kostai proof --html deliverables/<audience>-<YYYY-MM-DD>/PROOF.html
+npx kostai proof --json deliverables/<audience>-<YYYY-MM-DD>/proof.json
+npx kostai proof > deliverables/<audience>-<YYYY-MM-DD>/PROOF.md
 ```
 
 Flags:
@@ -75,4 +75,4 @@ Nothing leaves the user's machine. No MCP server is installed by default. The pr
 
 ## Refresh cadence
 
-For ongoing pitches, re-run `kostai report` after any run of meaningful workload volume (≥100 calls on recent work). Date-stamp the artifact filename. Do not reuse a stale proof — the ledger is cumulative and the numbers will have moved.
+For ongoing pitches, re-run `kostai proof` after any run of meaningful workload volume (>=100 calls on recent work). Date-stamp the artifact filename. Do not reuse a stale proof — the ledger is cumulative and the numbers will have moved.

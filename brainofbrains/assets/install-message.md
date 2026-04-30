@@ -15,8 +15,8 @@ Use the Brain Orchestration skill to do the following, in order:
 1. Run `scripts/install.sh` to bootstrap the BrainOfBrains substrate into this
    workspace. It should populate `evidence/brain/` with a seeded
    `brains.json` registry, initial closets, and a `bin/brain` CLI. No code
-   outside of `evidence/brain/`, `bin/brain`, and `scripts/brain/` should
-   change.
+   outside of `evidence/brain/`, `bin/brain`, `scripts/brain/`, and ignored
+   `.ai-cost-data/brain/` runtime state should change.
 2. Run `scripts/scan.sh` to list the brains that now live in this workspace.
    Show me each brain's name, role, and status.
 3. Run `bin/brain tick` once to produce a first `STATE.json` snapshot.
@@ -24,8 +24,8 @@ Use the Brain Orchestration skill to do the following, in order:
    Use `--remote` only if I explicitly want the hosted health check too.
 5. Pick one question from my recent work (a stakeholder name, a product
    roadmap item, or a meeting follow-up), route it through
-   `scripts/ask.sh "<question>"`, and show me the synthesized answer inline
-   with the citations.
+   `scripts/ask.sh "<question>"`, synthesize the answer from the layered
+   packet, and cite any drawer paths you opened.
 6. Tell me three concrete next steps I can take to get more value from the
    substrate: which additional specialist brain to add, which closet is
    weakest, and which stakeholder brain would benefit from more signal.
@@ -69,7 +69,7 @@ On first run the user sees:
 2. `bin/brain` CLI available as an executable in the workspace
 3. A `scan.sh` output listing substrate + specialist brains, each with a current status
 4. A first tick snapshot showing BIV score, last-tick timestamp, and per-brain health
-5. One synthesized answer to a real question from the user's work, with citations back to local closets
+5. One grounded answer to a real question from the user's work, synthesized from the layered packet and drawer pointers
 
 Full runtime cost of the install: zero frontier-model calls. The install step is pure config + local scan + local tick. No local MCP server is started. No data leaves the machine.
 

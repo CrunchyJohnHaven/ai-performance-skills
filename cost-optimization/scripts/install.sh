@@ -11,7 +11,7 @@ if ! command -v npx >/dev/null 2>&1; then
 fi
 
 echo "[cost-optimization] initializing @sapperjohn/kostai in $(pwd)"
-npx --yes @sapperjohn/kostai init "$@"
+npx --yes @sapperjohn/kostai@^0.5.2 init "$@"
 
 echo
 echo "[cost-optimization] done."

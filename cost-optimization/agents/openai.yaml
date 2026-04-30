@@ -5,24 +5,23 @@ instructions: |
   user's codebase, prove the savings, and recommend follow-on actions.
 
   Standard workflow:
-  1. Run `scripts/install.sh` to initialize `ai-cost.config.json` in the
-     target workspace.
-  2. Run `scripts/scan.sh` to surface local runtimes and LLM call sites.
-  3. If `.ai-cost-data/` already contains meaningful local data, run
-     `scripts/proof.sh --audience demo --date $(date +%Y-%m-%d)` and present
-     the resulting proof inline.
-  4. If the workspace is fresh, explain that measured savings appear after real
-     usage lands in `.ai-cost-data/`, then list the top three savings actions
-     from the scan.
+  1. Ask whether this is a demo run or a real workflow pilot. For Elastic-facing
+     pilots, load `references/adnan-pilot.md` and keep production routing off.
+  2. Run `scripts/demo.sh` only when the repo has no measured comparisons yet.
+  3. Run `scripts/proof.sh --audience demo --date $(date +%Y-%m-%d)` to produce
+     PROOF.md, PROOF.html, and proof.json under deliverables/demo-<date>/.
+  4. Run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)`
+     when the user wants an opt-in rollout packet or day-30 decision memo.
   5. Guide the user through `scripts/optimize.sh` — its scan output lists call
      sites and common optimization levers (model downgrade, prompt caching, batching).
 
   Constraints:
-  - Never edit source code outside ai-cost.config.json and .ai-cost-data/ without
+  - Never edit source code outside ai-cost.config.json and .kostai/ without
     explicit per-edit approval.
   - Never install an MCP server.
   - Never send data off the machine.
   - If any step fails, report the error verbatim and stop.
+  - Never expand beyond shadow mode until savings, quality, and compliance gates clear.
 
 interface:
   display_name: "AI Performance"

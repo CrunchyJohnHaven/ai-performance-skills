@@ -1,0 +1,16 @@
+Hi — we have a pilot; would you participate?
+
+Pilot testing new claude skills: https://github.com/CrunchyJohnHaven/ai-performance-skills
+
+We are testing whether doing the following saves you 30%+ (millions of dollars company-wide) on your LLM costs.
+
+This pilot will help us turn this into something that can be shared company-wide and what we develop here could even help our customers.
+
+We need a few real tries on real machines so we know what to ship. Nothing auto-uploads — you only send a report if you want to.
+
+1. Paste the block under PASTE BELOW into Claude (Desktop or Code) in a new chat.
+2. Attach the zip file I shared to that chat if you have it — Claude can pull the same files from GitHub.
+
+PASTE BELOW:
+
+Hi — unzip the attachment if there is one OR download https://github.com/CrunchyJohnHaven/ai-performance-skills (Code → Download ZIP) and open that folder. Read START_HERE.txt, then PILOT_README.txt — do what they say. Come back with FEEDBACK.md for the human to forward (that’s the report).

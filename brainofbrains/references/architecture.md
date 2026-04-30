@@ -69,10 +69,10 @@ Once installed, every brain operation is local:
 
 - **Closet rebuilds** — `bin/brain closet` reads commits, meetings, KB artifacts from the local filesystem and writes updated `.aaak` files locally.
 - **Ticks** — `bin/brain tick` runs the full loop (ingest, rebuild, recompute, snapshot) without touching the network.
-- **Queries** — `bin/brain query` composes L0/L1/L2 context against local closets and returns a synthesized answer. The only outbound call a query makes is to whichever frontier model the calling agent chose, and that call is outside the substrate.
+- **Queries** — `bin/brain query` composes L0/L1/L2 context against local closets and returns a compact packet plus L3 drawer plan. The calling agent may use a frontier model to synthesize a final answer, but that call is outside the substrate.
 - **Health** — `bin/brain status` and `scripts/health.sh` read the local `STATE.json` and `brains.json` by default. The remote MCP `health_check` tool is only used when the user explicitly passes `--remote` (useful only for proving reliability to a buyer, not for day-to-day use).
 
-No cloud dependency for normal use. A machine that drops off the internet after install still produces synthesized answers. This is the structural reason default-off-MCP is a coherent posture — the product does not need the MCP to function; only the buy-flow does.
+No cloud dependency for normal use. A machine that drops off the internet after install still produces fresh packets and drawer plans, and any locally capable agent can synthesize from them. This is the structural reason default-off-MCP is a coherent posture — the product does not need the MCP to function; only the buy-flow does.
 
 ## Why default-MCP is off
 

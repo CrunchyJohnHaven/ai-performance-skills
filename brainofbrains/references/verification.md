@@ -20,7 +20,7 @@ This is the fastest check. The script reads `evidence/brain/STATE.json` and `evi
 scripts/ask.sh "what is the BIV score"
 ```
 
-This exercises the full local query path: routing, closet retrieval, L0/L1/L2 context assembly, and synthesis. A successful response returns a synthesized answer that cites at least one closet path. If the response is empty or contains no citations, closets are stale — run `bin/brain tick` and retry. If the response cites closets but the BIV number differs from `STATE.json`, the tick loop has run since the last `ask` call; that is expected and healthy.
+This exercises the local query path: routing, closet retrieval, L0/L1/L2 context assembly, and L3 drawer planning. A successful response returns a compact packet and reports at least one L3 candidate when the question matches stored memory. If the response is empty or has no candidates for a known stored fact, closets are stale — run `bin/brain tick` or `bin/brain closet --memory-only` and retry. If the packet's BIV number differs from `STATE.json`, the tick loop has run since the last `ask` call; that is expected and healthy.
 
 **Tier (c) — Tick freshness check**
 
@@ -28,7 +28,7 @@ This exercises the full local query path: routing, closet retrieval, L0/L1/L2 co
 bin/brain status
 ```
 
-Read the `last-tick timestamp` in the output. It should be within 24 hours of the current time. A timestamp older than 24 hours means the tick loop has stalled: restart with `bin/brain tick` (manual) or check the launchd plist if one was installed (`launchctl list | grep brain`). Do not present synthesized answers as current if the last tick is more than 24 hours old — say the substrate is stale and offer to re-tick before the briefing.
+Read the `last-tick timestamp` in the output. It should be within 24 hours of the current time. A timestamp older than 24 hours means the tick loop has stalled: restart with `bin/brain tick` (manual) or check the launchd plist if one was installed (`launchctl list | grep brain`). Do not brief from stale query packets if the last tick is more than 24 hours old — say the substrate is stale and offer to re-tick before the briefing.
 
 ## Produce a health snapshot
 
@@ -86,7 +86,7 @@ Lead with the business state, not the file path:
 
 - "The substrate emitted a fresh tick fourteen minutes ago. BIV is 81 out of 100."
 - "Seven of nine specialist brains are in-band. Two are awaiting data because the stakeholder closets are less than a day old."
-- "The regression fixture shows R@5 above 0.9 — synthesized answers are pulling the right closet on the first try."
+- "The regression fixture shows R@5 above 0.9 — query packets are pulling the right closet on the first try."
 
 Do not open with implementation detail. The stakeholder wants to know whether the substrate is alive, whether answers are trustworthy, and what action is indicated — in that order.
 
@@ -94,15 +94,15 @@ Do not open with implementation detail. The stakeholder wants to know whether th
 
 Point at three evidence surfaces:
 
-1. **The closets** — `evidence/brain/closet-*.aaak` are the evidence substrate. Every synthesized answer cites its contributing closets by path; the operator can open the citation and read the raw evidence.
-2. **The STATE file** — `evidence/brain/STATE.json` is rebuilt every tick. It holds the last-run BIV score, the last regression-fixture result, and the per-brain values used at synthesis time.
-3. **The regression fixture** — `bin/brain eval` runs a fixed set of questions against known-good answers and reports R@K. Quality regressions show up here before they show up in synthesized answers.
+1. **The closets** — `evidence/brain/closet-*.aaak` are the evidence substrate. Every grounded answer should trace back to the query packet's drawer paths; the operator can open the source memory or KB drawer and read the raw evidence.
+2. **The STATE file** — `evidence/brain/STATE.json` is rebuilt every tick. It holds the last-run BIV score, the last regression-fixture result, and the per-brain values used when assembling query packets.
+3. **The regression fixture** — `bin/brain eval` runs a fixed set of questions against known-good answers and reports R@K. Quality regressions show up here before agents synthesize from weak or wrong packets.
 
-If closets are empty (new install, no ticks), say so and run `bin/brain tick` to populate. Never invent a synthesized answer when the substrate is empty — the answer will be shaped by nothing, and the user's trust evaporates.
+If closets are empty (new install, no ticks), say so and run `bin/brain tick` to populate. Never invent an answer when the substrate is empty — the answer will be shaped by nothing, and the user's trust evaporates.
 
 ## Handling "what about quality?"
 
-The regression fixture (`bin/brain eval`) grades the substrate's retrieval and synthesis against a frozen benchmark. Health snapshots surface the latest R@K. If quality degrades, the snapshot will say so — do not suppress it. The correct response is to investigate (stale closets, broken routing, corrupted STATE) rather than hide the signal.
+The regression fixture (`bin/brain eval`) grades the substrate's retrieval and context assembly against a frozen benchmark. Health snapshots surface the latest R@K. If quality degrades, the snapshot will say so — do not suppress it. The correct response is to investigate (stale closets, broken routing, corrupted STATE) rather than hide the signal.
 
 BIV captures quality as one of its five factors via `retrievalQuality`. A BIV drop driven by `retrievalQuality` is the loudest quality signal the substrate emits. Treat a `retrievalQuality` drop as the highest-priority investigation.
 
@@ -124,7 +124,7 @@ Three checks, in order:
 2. `scripts/health.sh` — per-brain PASS/FAIL surfaces which specific brain's health check is failing
 3. `tail -n 100 evidence/brain/ticks.log` (if present) — the tick loop appends status to this log; a silent tick loop has a silent log
 
-If the loop is dead, restart with `bin/brain tick` (manual) or restart the launchd plist if one was installed. Do not declare the substrate healthy if the loop has stalled — stale synthesized answers are worse than no answer.
+If the loop is dead, restart with `bin/brain tick` (manual) or restart the launchd plist if one was installed. Do not declare the substrate healthy if the loop has stalled — answers synthesized from stale packets are worse than no answer.
 
 ## Refresh cadence for stakeholder-facing snapshots
 
@@ -136,6 +136,6 @@ Lead with posture and control, not mechanism. A CIO's first question is "what ri
 
 - **Local-only operation.** Every tick, query, and closet rebuild runs on the employee's machine. No data traverses the network unless the employee explicitly triggers the provisioning flow. There is no always-on outbound connection, no background sync, and no cloud dependency for normal use.
 - **No surveillance posture.** The substrate reads artifacts the employee deliberately points it at — commits, meeting transcripts, KB files, explicit messages. It does not read screens, browser history, keystrokes, clipboard content, or any file outside the configured paths. Known secret patterns are redacted before any closet is written.
-- **Employee controls the data.** The brains, closets, and STATE files live entirely on the employee's machine. The employer does not have visibility into individual employees' closets or synthesized answers. If an employee leaves or uninstalls, `rm -rf evidence/brain/` removes the substrate completely — no residue on any external service.
+- **Employee controls the data.** The brains, closets, STATE files, and query packets live entirely on the employee's machine. The employer does not have visibility into individual employees' local brain substrate. If an employee leaves or uninstalls, `rm -rf evidence/brain/` removes the substrate completely — no residue on any external service.
 - **Adoption is voluntary.** The skill installs into Claude Code from the Agent Builder catalog — employees choose to install it, choose which artifacts to include, and choose whether to run the tick loop. There is no org-wide push, no silent enrollment, and no manager dashboard.
 - **Aggregate-only sharing, if they choose.** If the org later wants to see aggregate health metrics (BIV distributions, routing quality trends across a team), that is a future opt-in flow. No individual's closet or query is ever part of an aggregate report without that employee's explicit consent. Default is: nothing shared, nothing visible to anyone but the employee.

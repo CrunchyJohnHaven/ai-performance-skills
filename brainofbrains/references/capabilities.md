@@ -16,15 +16,16 @@ The output groups every brain by role (`substrate`, `specialist`, `product`), re
 
 ## Layered context (L0 / L1 / L2)
 
-Every query resolves against three layers. The layers are the reason a synthesized answer beats a plain closet dump:
+Every query resolves against three layers. The layers are the reason a grounded answer beats a plain closet dump:
 
 | Layer | What it holds | Typical size | When it fires |
 | --- | --- | --- | --- |
 | **L0** | headline state — BIV score, BSV, last-tick timestamp, breach flags | ~200 tokens | always, first |
 | **L1** | specialist-brain summaries — one compressed paragraph per relevant brain, routed by keywords in the question | ~1–2k tokens | when the question mentions a known stakeholder, product, or meeting |
-| **L2** | full closet excerpts — AAAK-compressed evidence, citations, and raw quotes | 4–16k tokens | only when the L1 answer is insufficient and the caller asks for depth |
+| **L2** | topic-matched closet entries with paths and compact quotes | ~500 tokens | when the caller asks for topic depth |
+| **L3** | verbatim drawer reads from the paths returned by the query packet | caller-controlled | only when the packet is insufficient |
 
-`bin/brain query` composes these in order. The calling agent sees a single answer blob with inline citations back to closet paths. L2 is not loaded unless the question or config explicitly requests it, keeping typical queries cheap.
+`bin/brain query` composes these in order and emits a packet plus an L3 drawer plan. It is not an LLM answer by itself. The calling agent synthesizes the answer from the packet and only opens the listed drawers when the packet is insufficient. L2 is not loaded when callers choose `--depth l0` or `--depth l1`, keeping common lookups cheap.
 
 ## BIV tick loop
 
@@ -66,7 +67,22 @@ Standard closets after install:
 
 Additional closets appear when specialist brains are added (one closet per significant routing key — e.g., a new customer, a new product line, a new research thread).
 
-Closet rebuilds are driven by `bin/brain closet` and run automatically inside every tick. Hand-editing a closet is never correct — the next tick overwrites hand edits. Signal belongs in the source artifacts (commits, meetings, messages); the closet builder lifts it.
+Closet rebuilds are driven by `bin/brain closet` and run automatically inside every tick. Hand-editing a closet is never correct — the next tick overwrites hand edits. Signal belongs in the source artifacts (commits, meetings, messages) or in curated source memory written with `bin/brain remember`; the closet builder lifts it.
+
+## Curated memory writes
+
+Use `bin/brain remember` for durable facts that future agents should retrieve. The command writes source markdown under the workspace's Claude memory directory and links it from `MEMORY.md` so the next closet rebuild can weight it properly.
+
+Recommended kinds:
+
+- `feedback` — mistakes, reviewer preferences, operating rules
+- `decision` — chosen paths and rejected alternatives
+- `project` — current project state
+- `reference` — stable links, source maps, papers
+- `architecture` — durable system patterns
+- `user` — stakeholder profile facts
+
+Do not store secrets, raw customer PII, or transient TODOs as durable memory. If a fact needs to be queryable immediately, run `bin/brain closet --memory-only` after `remember`; otherwise let the scheduled tick pick it up.
 
 ## Specialist-brain templates
 
@@ -123,12 +139,12 @@ The registry is rebuilt every tick. `scripts/scan.sh` reads it directly. Do not 
 1. **Parse** — extract routing keys (stakeholder names, product names, meeting IDs, explicit `@brain` tags)
 2. **Route** — match routing keys against `brains.json`; select the matching specialists, fall back to substrate if none match
 3. **Compose** — assemble L0 headline + selected L1 summaries; load L2 only if requested
-4. **Synthesize** — return a single answer with inline citations to the contributing closets
+4. **Plan** — return L0/L1/L2 text plus L3 drawer pointers; the calling agent synthesizes the final answer
 
-The router is deterministic. The same question at the same tick produces the same answer. That determinism is what lets `scripts/ask.sh` be used inside agent loops without variance surprises.
+The router is deterministic. The same question at the same tick produces the same query packet. That determinism is what lets `scripts/ask.sh` be used inside agent loops without variance surprises.
 
 ## What the substrate does not do
 
-- It does not replace the frontier. The synthesized answer shapes frontier input; the frontier still runs when the question warrants.
+- It does not replace the frontier. The query packet shapes frontier input; the frontier still runs when the question warrants.
 - It does not ingest data it has not been given. The closet builder reads commits, meeting transcripts, KB artifacts, and explicit messages — not the user's screen, not the user's browser history, not the user's keystrokes.
 - It does not mutate its own substrate during a query. Queries are read-only against the last STATE snapshot. Only ticks mutate state.

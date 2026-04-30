@@ -1,6 +1,8 @@
 # Copy-Paste Install Message
 
-One-shot installer — an Elastic employee (or any Claude Code / Codex user) pastes the block below into their AI coding tool and the `AI Performance` skill initializes the workspace, scans for waste, and explains the next savings steps.
+One-shot installer — an Elastic employee (or any Claude Code / Codex user) pastes the block below into their AI coding tool and the `AI Performance` skill bootstraps itself, produces a proof, and explains what happened.
+
+**Elastic employee pilot (coordinators):** email templates, zip layout, return artifacts (`FEEDBACK.md`, `SLACK.md`, `PILOT_ROLLUP.json`, `SCAN_SNAPSHOT.txt`), and claim discipline live in [`elastic-employee-pilot-send-kit.md`](./elastic-employee-pilot-send-kit.md). Build the attachment with `npm run package:elastic-pilot-zip` from the KostAI repo root. Participants paste **[`elastic-pilot-participant-prompt.txt`](./elastic-pilot-participant-prompt.txt)** (same bytes as zip root **`ELASTIC_PILOT_PROMPT.txt`**). **Wow first run:** `cd` into the installed skill folder, then **`./scripts/pilot-complete.sh`**.
 
 ---
 
@@ -12,19 +14,17 @@ Copy the block between the fences and paste into Claude Code or Codex as a singl
 I'd like to see how much I could save on my AI bill.
 
 Use the AI Performance skill to do the following, in order:
-1. Run `scripts/install.sh` to write `ai-cost.config.json` and initialize the
-   local ai-cost workspace.
-2. Run `scripts/scan.sh` to detect local runtimes and LLM call sites in this
-   repo.
-3. If `.ai-cost-data/` already contains real usage or comparison data, run
-   `scripts/proof.sh --audience demo --date $(date +%Y-%m-%d)` and show me
-   the resulting `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md` inline.
-4. If the repo is fresh and there is no data yet, explain that the first proof
-   will be a baseline until real usage lands in `.ai-cost-data/`, then tell
-   me the three highest-leverage next steps from the scan output.
-5. Optionally run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)` only if there is meaningful local data to summarize. Do not send anything automatically.
+1. Run `scripts/demo.sh` to write local configuration and seed the ten-question
+   before/after workload so there is real ledger data. No source code should change. The demo workload is
+   deterministic — the numbers will be stable across runs.
+2. Run `scripts/proof.sh --audience demo --date $(date +%Y-%m-%d)` to write
+   `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md`, `PROOF.html`, and `proof.json`.
+3. Show me `deliverables/demo-$(date +%Y-%m-%d)/PROOF.md` inline.
+4. Tell me three concrete next steps I can take based on the scan output from
+   `scripts/scan.sh`.
+5. Optionally run `scripts/feedback.sh --audience elastic-pilot --date $(date +%Y-%m-%d)` to prepare a local aggregate feedback packet I can choose to share back with the rollout team. Do not send anything automatically.
 
-Do not edit source code outside of `ai-cost.config.json` and `.ai-cost-data/` unless I
+Do not edit source code outside of ai-cost.config.json, .ai-cost-data/, .kostai/, and deliverables/ unless I
 explicitly approve each edit. Do not install an MCP server. Do not send any
 data off my machine. If any step fails, report the error verbatim and stop.
 ```
@@ -37,7 +37,7 @@ Claude Code auto-discovers skills from three locations. Pick one:
 
 ```bash
 git clone https://github.com/CrunchyJohnHaven/ai-performance-skills.git
-cp -r ai-performance-skills/cost-optimization ~/.claude/skills/cost-optimization
+cp -r ai-performance-skills/skills/cost-optimization ~/.claude/skills/cost-optimization
 ```
 
 Claude Code will pick up the skill on next session start.
@@ -57,7 +57,7 @@ ln -s "$(npm prefix -g)/lib/node_modules/@sapperjohn/kostai/skills/cost-optimiza
 
 ## For Elastic Agent Builder
 
-When publishing from this source repo, ship `cost-optimization/` as-is. If you are publishing from a packaged build instead, use its exported `skills/cost-optimization/` folder. No rename required; the frontmatter `name: cost-optimization` is the canonical identifier.
+When publishing to the internal Agent Builder skills catalog, the folder is self-contained — ship `skills/cost-optimization/` as-is. No rename required; the frontmatter `name: cost-optimization` is the canonical identifier.
 
 Published display name: `AI Performance`
 
@@ -66,9 +66,9 @@ Published display name: `AI Performance`
 On first run the user sees:
 
 1. `ai-cost.config.json` written to their repo (capture mode `metadata_only`, router default rules, shadow-mode enabled)
-2. A local `.ai-cost-data/` directory once real calls or comparisons begin landing
-3. `scripts/scan.sh` output showing detected runtimes and candidate call sites
-4. `deliverables/demo-<date>/PROOF.md` if real data already exists in the repo
-5. Optional: `deliverables/elastic-pilot-<date>/FEEDBACK.md` if `scripts/feedback.sh` is run after meaningful data exists
+2. `.ai-cost-data/` directory with demo ledger seeded
+3. `deliverables/demo-<date>/PROOF.md` — the one-pager showing ~92% cost reduction on the ten-question demo workload
+4. A short summary of three next steps (typically: run `scan`, review `.kostai/optimizations.md`, apply top-three patches)
+5. Optional: `deliverables/elastic-pilot-<date>/FEEDBACK.md` and `DAY_30_MEMO.md` if `scripts/feedback.sh` is run
 
-Full runtime cost of the install step: zero frontier-model calls. The install flow is pure config + local scan.
+Full runtime cost of the install: zero frontier-model calls. The install step is pure config + local scan.

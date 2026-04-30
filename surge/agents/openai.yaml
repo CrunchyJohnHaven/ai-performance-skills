@@ -1,0 +1,4 @@
+interface:
+  display_name: "SURGE"
+  short_description: "Creates a single deliverables tracker around what, due date, pages, audience, and format."
+  default_prompt: "Use $surge to build or update a canonical deliverables tracker for this workspace."

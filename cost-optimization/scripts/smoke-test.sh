@@ -146,6 +146,72 @@ else
   record "scripts/feedback.sh --help" "FAIL"
 fi
 
+# ── check 8: package-elastic-pilot-zip.sh --help exits 0 ────────────────────
+echo
+echo -e "${BOLD}Check 8: scripts/package-elastic-pilot-zip.sh --help${RESET}"
+ZIP_SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ZIP_SH="$ZIP_SKILL_DIR/scripts/package-elastic-pilot-zip.sh"
+if [[ -x "$ZIP_SH" ]]; then
+  ZIP_HELP=$(bash "$ZIP_SH" --help 2>&1)
+  ZIP_EXIT=$?
+  if [[ $ZIP_EXIT -eq 0 ]]; then
+    pass "package-elastic-pilot-zip.sh --help exited 0"
+    info "$ZIP_HELP"
+    record "scripts/package-elastic-pilot-zip.sh --help" "PASS"
+  else
+    fail "package-elastic-pilot-zip.sh --help exited $ZIP_EXIT"
+    info "$ZIP_HELP"
+    record "scripts/package-elastic-pilot-zip.sh --help" "FAIL"
+  fi
+else
+  fail "package-elastic-pilot-zip.sh not found or not executable at $ZIP_SH"
+  record "scripts/package-elastic-pilot-zip.sh --help" "FAIL"
+fi
+
+# ── check 9: scripts/pilot-complete.sh --help exits 0 ───────────────────────
+echo
+echo -e "${BOLD}Check 9: scripts/pilot-complete.sh --help${RESET}"
+PC_SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PC_SH="$PC_SKILL_DIR/scripts/pilot-complete.sh"
+if [[ -x "$PC_SH" ]]; then
+  PC_OUT=$(bash "$PC_SH" --help 2>&1)
+  PC_EXIT=$?
+  if [[ $PC_EXIT -eq 0 ]]; then
+    pass "pilot-complete.sh --help exited 0"
+    info "$PC_OUT"
+    record "scripts/pilot-complete.sh --help" "PASS"
+  else
+    fail "pilot-complete.sh --help exited $PC_EXIT"
+    info "$PC_OUT"
+    record "scripts/pilot-complete.sh --help" "FAIL"
+  fi
+else
+  fail "pilot-complete.sh not found or not executable at $PC_SH"
+  record "scripts/pilot-complete.sh --help" "FAIL"
+fi
+
+# ── check 10: scripts/pilot-30d-report.sh --help exits 0 ────────────────────
+echo
+echo -e "${BOLD}Check 10: scripts/pilot-30d-report.sh --help${RESET}"
+P30_SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+P30_SH="$P30_SKILL_DIR/scripts/pilot-30d-report.sh"
+if [[ -x "$P30_SH" ]]; then
+  P30_OUT=$(bash "$P30_SH" --help 2>&1)
+  P30_EXIT=$?
+  if [[ $P30_EXIT -eq 0 ]]; then
+    pass "pilot-30d-report.sh --help exited 0"
+    info "$P30_OUT"
+    record "scripts/pilot-30d-report.sh --help" "PASS"
+  else
+    fail "pilot-30d-report.sh --help exited $P30_EXIT"
+    info "$P30_OUT"
+    record "scripts/pilot-30d-report.sh --help" "FAIL"
+  fi
+else
+  fail "pilot-30d-report.sh not found or not executable at $P30_SH"
+  record "scripts/pilot-30d-report.sh --help" "FAIL"
+fi
+
 # ── summary ──────────────────────────────────────────────────────────────────
 echo
 echo -e "${BOLD}────────────────────────────────────────────────────${RESET}"

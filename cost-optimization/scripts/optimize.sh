@@ -11,7 +11,7 @@ if ! command -v npx >/dev/null 2>&1; then
 fi
 
 echo "[cost-optimization] scanning for LLM call sites..."
-npx --yes @sapperjohn/kostai scan "$@"
+npx --yes @sapperjohn/kostai@^0.5.2 scan "$@"
 
 echo
 echo "[cost-optimization] scan complete. output is above."

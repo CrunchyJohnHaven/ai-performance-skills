@@ -12,7 +12,7 @@ This skill is packaged as a Claude skill — voluntary install, no MCP server ru
 - An internal skills catalog (Agent Builder, or equivalent) is the natural distribution channel. Publish the skill folder and let adoption grow bottom-up.
 
 Framing for employees:
-- Lead with **employee benefit** (synthesized expert answers, fewer tabs, less re-pasting of context)
+- Lead with **employee benefit** (grounded expert context for better answers, fewer tabs, less re-pasting of context)
 - Not with company visibility into employee knowledge (reads as surveillance)
 - Goodwill / open-source framing plays well with infra-heritage companies
 
@@ -38,7 +38,7 @@ No always-on process. No background network calls. No local MCP server. No surve
 
 ## What an employee sees on first invocation
 
-1. One-sentence description ("route expert questions to specialist brains and get a synthesized answer")
+1. One-sentence description ("route expert questions to specialist brains and get grounded context packets the calling agent can synthesize from")
 2. One install step (`scripts/install.sh`)
 3. One ask step (`scripts/ask.sh "<question>"`)
 4. One health check (`scripts/health.sh`)
@@ -49,7 +49,7 @@ Do not start with mechanism explanations. Do not start with BIV formula math. Le
 
 - **Skill name:** Brain Orchestration
 - **Category:** Productivity / Developer Tools
-- **Short description:** Routes expert questions to specialist brains and returns synthesized answers — one question, one synthesized answer shaped by every specialist who already knows the relevant stakeholder, product, or codebase.
+- **Short description:** Routes expert questions to specialist brains and returns grounded context packets for the calling agent to synthesize from — one question, one packet shaped by every specialist who already knows the relevant stakeholder, product, or codebase.
 - **Version:** 0.1.0
 - **Trigger phrases** (from SKILL.md description frontmatter): "Brain Orchestration", "brain orchestration", "install brains", "brainofbrains", "BrainOfBrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "bootstrap brains into this workspace", "set up specialist brains"
 - **Repo path:** `skills/brainofbrains/`
@@ -62,7 +62,7 @@ Use these bullets when explaining the skill to a skeptical Elastic employee — 
 - **Privacy is the default, not a policy promise.** Every tick, query, and closet rebuild runs entirely on your own machine. Nothing leaves unless you explicitly run the provisioning script. There is no phone-home, no background telemetry, and no local server listening for connections.
 - **No surveillance surface.** The skill reads commits, meeting transcripts, and KB artifacts that you point it at. It does not read your screen, browser history, keystrokes, or any file outside the paths you configure. The closet builder redacts known secret patterns before writing any closet.
 - **Opt-in remote, opt-out local.** The remote MCP at `brainofbrains.ai/mcp` is only touched if you run `scripts/provision.sh`. All other operations — queries, tick loops, BIV scoring, health checks — stay local. You can revoke remote access by removing the MCP config line; no data persists on the remote side.
-- **What you personally gain:** ask one question and get a synthesized answer shaped by every specialist context you have already built — without opening a second tab, re-pasting background, or waiting for a colleague to respond. The longer you run the tick loop, the more relevant your synthesized answers become.
+- **What you personally gain:** ask one question and get grounded context shaped by every specialist context you have already built — without opening a second tab, re-pasting background, or waiting for a colleague to respond. The longer you run the tick loop, the more relevant your answers become.
 
 ## 2026-04-22 commitments
 
@@ -112,7 +112,7 @@ Opt-in posture:
 The skill is working when:
 
 1. An employee installs it and sees `evidence/brain/brains.json` populate within seconds
-2. `scripts/ask.sh "<question>"` returns a synthesized answer citing local closets
+2. `scripts/ask.sh "<question>"` returns a layered packet with drawer paths the calling agent can cite
 3. `scripts/health.sh` reports per-brain PASS/FAIL and the BIV headline
 4. The employee can hand a health snapshot to a manager without a walkthrough
 5. Adoption grows through word-of-mouth rather than mandate

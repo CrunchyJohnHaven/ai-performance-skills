@@ -1,0 +1,15 @@
+Elastic AI Performance pilot — read this first
+
+1. Unzip this package. If you did not get our zip file, download from GitHub: https://github.com/CrunchyJohnHaven/ai-performance-skills — click the green “Code” button, then “Download ZIP” — then unzip that file.
+
+2. Open the folder you unzipped.
+
+   • If this is our **small pilot package**, you should see START_HERE.txt, PILOT_README.txt, ELASTIC_PILOT_PROMPT.txt, and a folder named cost-optimization at the **top level**.
+
+   • If you downloaded the **whole ai-performance-skills** project from GitHub instead, open the repo root and read **START_HERE.txt**, then **PILOT_README.txt**.
+
+   • If you have **ai-performance-skills-main** (or similar) from https://github.com/CrunchyJohnHaven/ai-performance-skills — open the repo root and read **START_HERE.txt**, then **PILOT_README.txt**.
+
+3. Open PILOT_README.txt next (same folder as START_HERE here, or in that **assets** folder on GitHub). Read it and do what it says.
+
+Nothing in this pilot uploads itself from your computer. Your coordinator will tell you what to send back when you are done (usually a file called FEEDBACK.md).

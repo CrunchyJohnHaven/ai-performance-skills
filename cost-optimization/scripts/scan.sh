@@ -12,4 +12,4 @@ if ! command -v npx >/dev/null 2>&1; then
 fi
 
 echo "[cost-optimization] scanning local runtimes + repo call sites"
-npx --yes @sapperjohn/kostai scan "$@"
+npx --yes @sapperjohn/kostai@^0.5.2 scan "$@"

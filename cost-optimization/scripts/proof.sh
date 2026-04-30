@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Emit a one-page proof of savings from the shadow-mode ledger.
-# Produces a markdown report via `kostai report`.
+# Produces the CIO-grade proof artifact via `kostai proof`.
 # Usage:
 #   scripts/proof.sh                                    # markdown to stdout
 #   scripts/proof.sh --audience adnan-cio --date 2026-04-22
@@ -9,9 +9,10 @@
 # Recognized flags:
 #   --audience <name>   write output to deliverables/<name>-<date>/PROOF.md
 #   --date <YYYY-MM-DD> date suffix for the deliverables folder (default: today)
-#   --last <period>     time window forwarded to `kostai report` (e.g. 7d, 30d)
+#   --last <period>     time window forwarded to `kostai proof` (30d, 90d, all)
+#   --rate <decimal>    pass-through pricing rate forwarded to `kostai proof`
 #
-# Any unrecognized flags are forwarded to `kostai report`.
+# Any unrecognized flags are forwarded to `kostai proof`.
 
 set -euo pipefail
 
@@ -33,15 +34,16 @@ Usage: scripts/proof.sh [flags] [pass-through-flags]
 Recognized flags:
   --audience <name>    write output to deliverables/<name>-<date>/PROOF.md
   --date <YYYY-MM-DD>  date suffix for the deliverables folder (default: today)
-  --last <period>      time window forwarded to `kostai report` (e.g. 7d, 30d)
+  --last <period>      time window forwarded to `kostai proof` (30d, 90d, all)
+  --rate <decimal>     pass-through pricing rate forwarded to `kostai proof`
 
 Pass-through flags:
-  Any unrecognized flag is forwarded directly to `kostai report`.
+  Any unrecognized flag is forwarded directly to `kostai proof`.
 
 Examples:
   scripts/proof.sh
   scripts/proof.sh --audience adnan-cio --date 2026-04-22
-  scripts/proof.sh --last 30d
+  scripts/proof.sh --last 30d --rate 0.10
 EOF
       exit 0
       ;;
@@ -55,6 +57,10 @@ EOF
       ;;
     --last)
       EXTRA_ARGS+=("--last" "$2")
+      shift 2
+      ;;
+    --rate)
+      EXTRA_ARGS+=("--rate" "$2")
       shift 2
       ;;
     *)
@@ -72,13 +78,28 @@ if [[ -n "$AUDIENCE" ]]; then
   mkdir -p "$DELIV_DIR"
 
   echo "[cost-optimization] writing proof to $DELIV_DIR"
-  npx --yes @sapperjohn/kostai report \
-    "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}" \
-    > "$DELIV_DIR/PROOF.md"
+  if [[ ${#EXTRA_ARGS[@]} -eq 0 ]]; then
+    npx --yes @sapperjohn/kostai@^0.5.2 proof \
+      --html "$DELIV_DIR/PROOF.html" \
+      --json "$DELIV_DIR/proof.json" \
+      > "$DELIV_DIR/PROOF.md"
+  else
+    npx --yes @sapperjohn/kostai@^0.5.2 proof \
+      --html "$DELIV_DIR/PROOF.html" \
+      --json "$DELIV_DIR/proof.json" \
+      "${EXTRA_ARGS[@]}" \
+      > "$DELIV_DIR/PROOF.md"
+  fi
 
   echo
   echo "[cost-optimization] proof artifact:"
   echo "  $DELIV_DIR/PROOF.md"
+  echo "  $DELIV_DIR/PROOF.html"
+  echo "  $DELIV_DIR/proof.json"
 else
-  npx --yes @sapperjohn/kostai report "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
+  if [[ ${#EXTRA_ARGS[@]} -eq 0 ]]; then
+    npx --yes @sapperjohn/kostai@^0.5.2 proof
+  else
+    npx --yes @sapperjohn/kostai@^0.5.2 proof "${EXTRA_ARGS[@]}"
+  fi
 fi

@@ -118,6 +118,7 @@ if [[ "$HTTP_STATUS" != "200" ]]; then
   exit 1
 fi
 
+SCORES_JSON="$(
 ELASTICJUDGE_VERDICT_JSON="$VERDICT_PATH" \
 node <<'EOF'
 const fs = require("node:fs");
@@ -134,9 +135,12 @@ for (const key of [
   out[key] = axes[key] && typeof axes[key].score === "number" ? axes[key].score : null;
 }
 out.verdict = report.verdict || null;
-process.stdout.write(JSON.stringify(out) + "\n");
+process.stdout.write(JSON.stringify(out));
 EOF
+)"
+
+printf '%s\n' "$SCORES_JSON"
 
 if [[ -n "$OUT_PATH" ]]; then
-  cp "$VERDICT_PATH" "$OUT_PATH"
+  printf '%s\n' "$SCORES_JSON" > "$OUT_PATH"
 fi

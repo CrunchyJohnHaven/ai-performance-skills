@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Ask the right specialist brain. Routes the question through the substrate
-# via `bin/brain query` and returns a synthesized answer with citations.
+# via `bin/brain query` and returns a layered context packet plus drawer plan.
 # Usage:
 #   scripts/ask.sh "<question>"
 #   scripts/ask.sh --json "<question>"
-#   scripts/ask.sh "<question>" [--deep]          # include L2 closet excerpts
+#   scripts/ask.sh "<question>" [--deep]          # include L2 topic matches
 #   scripts/ask.sh --depth l0|l1|l2 "<question>"  # closet depth (default: l1)
-#   scripts/ask.sh --output <file> "<question>"   # save answer to file
+#   scripts/ask.sh --output <file> "<question>"   # save packet to file
 #
 # Any unrecognized flags are forwarded to `bin/brain query`.
 
@@ -43,9 +43,9 @@ Positional:
 
 Recognized flags:
   --depth l0|l1|l2     closet depth for retrieval (default: l1)
-  --output <file>      save the answer to <file> instead of stdout
+  --output <file>      save the query packet to <file> instead of stdout
   --json               return raw JSON response from bin/brain query
-  --deep               include L2 closet excerpts in the response
+  --deep               include L2 topic matches in the response
   --trace              show internal routing trace
 
 Pass-through flags:
@@ -54,7 +54,7 @@ Pass-through flags:
 Examples:
   scripts/ask.sh "what does the Jesse brain say about Q3?"
   scripts/ask.sh --depth l2 "summarize revenue pipeline"
-  scripts/ask.sh --output answer.md "top risks this week?"
+  scripts/ask.sh --output packet.md "top risks this week?"
 EOF
       exit 0
       ;;
@@ -80,7 +80,11 @@ EOF
       OUTPUT_FILE="$2"
       shift 2
       ;;
-    --json|--deep|--trace)
+    --deep)
+      DEPTH="l2"
+      shift
+      ;;
+    --json|--trace)
       PASSTHROUGH+=("$1")
       shift
       ;;

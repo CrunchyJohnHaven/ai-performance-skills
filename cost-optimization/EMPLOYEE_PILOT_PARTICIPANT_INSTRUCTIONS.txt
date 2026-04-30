@@ -1,0 +1,59 @@
+================================================================================
+ELASTIC AI PERFORMANCE PILOT — PARTICIPANT INSTRUCTIONS (PLAIN TEXT)
+================================================================================
+Voluntary pilot. Local-first. No automatic data send. Default capture is
+metadata-oriented (no raw prompts stored by default).
+
+HOW YOU ACTUALLY DO THIS (DEFAULT — NO HAND-TYPED SHELL)
+--------------------------------------------------------
+1) Attach **elastic-ai-performance-skill-pilot.zip** to **Claude Code / Cowork**
+   in one conversation.
+
+2) Paste the **entire** contents of **ELASTIC_PILOT_PROMPT.txt** from that zip
+   (your coordinator may paste the same text in a follow-up message).
+
+3) **Your coding assistant** unpacks the zip, copies the skill into
+   ~/.claude/skills/cost-optimization, runs the bundled pilot scripts using its
+   **Bash / shell tool**, and shows you what to send back. You are not expected
+   to open a Terminal app or type shell commands yourself.
+
+4) Forward **FEEDBACK.md** (required) and, when present, **SLACK.md**,
+   **PILOT_ROLLUP.json**, **SCAN_SNAPSHOT.txt**, and a short **proof.json**
+   excerpt — all aggregate; no customer data, proprietary code, or prompts.
+
+ZIP SOURCES
+-----------
+  A) Coordinator pack **elastic-ai-performance-skill-pilot.zip** (best).
+
+  B) Full **ai-performance-skills** GitHub ZIP:
+     open the unzip root, then follow **START_HERE.txt** and
+     **PILOT_README.txt** in that folder.
+
+Repository: https://github.com/CrunchyJohnHaven/ai-performance-skills
+
+PREREQUISITES (ASSISTANT CHECKS; HUMAN DOES NOT RUN CHECKS BY HAND UNLESS ASKED)
+--------------------------------------------------------------------------------
+  * Node.js 18+ with npx (IT-managed dev stack is fine)
+  * Claude Code / Cowork (or Codex build with user skills + agent shell)
+
+RARE / IT-ASSISTED
+------------------
+If your org blocks agent shell access, ask the pilot coordinator for an
+IT-assisted path. The product default remains: **LLM performs install and pilot
+run**, not the employee typing into Terminal.
+
+TROUBLESHOOTING (FOR THE ASSISTANT TO REPORT, NOT THE HUMAN TO DEBUG BY HAND)
+-----------------------------------------------------------------------------
+  * npx / Node missing -> one-line ask to install Node 18+ LTS (IT or nodejs.org).
+  * permission denied on scripts -> chmod +x on the script paths you invoke.
+  * paste stderr + failing command to the coordinator; do not improvise partial installs.
+
+ABOUT THE NUMBERS
+-----------------
+Demo workload shows a large labeled swing. Real savings vary. "~30%" / scale
+language is Modeled / directional unless explicitly labeled Measured in the
+artifacts — see references/adnan-pilot.md in the skill folder.
+
+================================================================================
+END OF INSTRUCTIONS
+================================================================================

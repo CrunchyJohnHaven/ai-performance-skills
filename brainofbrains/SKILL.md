@@ -1,6 +1,6 @@
 ---
 name: brainofbrains
-description: Use when the user says "Brain Orchestration", "install brains", "brainofbrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "set up specialist brains", or mentions needing a synthesized answer from multiple expert views. Bootstraps specialist brains into the workspace, routes expert questions to the right brain, and returns synthesized answers. No data egress without explicit opt-in.
+description: Use when the user says "Brain Orchestration", "install brains", "brainofbrains", "call the expert", "ask an expert brain", "specialist brains", "route this to the right brain", "agent-to-agent install", "set up specialist brains", or mentions needing grounded context from multiple expert views. Bootstraps specialist brains into the workspace, routes expert questions to the right brain, and returns grounded context packets for the calling agent to synthesize from. No data egress without explicit opt-in.
 version: 0.1.0
 allowed-tools: Bash
 when_to_use: "Use when the user wants to query or install specialist context brains in the current workspace."
@@ -10,7 +10,7 @@ when_to_use: "Use when the user wants to query or install specialist context bra
 
 User-facing catalog label: `Brain Orchestration`.
 
-Route expert questions to the right specialist brain and return synthesized answers. Lead with the employee benefit: ask one question, get an answer shaped by every specialist that already knows the relevant stakeholder, product, meeting, or codebase — without opening a second tab or reposting context.
+Route expert questions to the right specialist brain and return grounded context packets the calling agent can synthesize from. Lead with the employee benefit: ask one question, get a packet shaped by every specialist that already knows the relevant stakeholder, product, meeting, or codebase — without opening a second tab or reposting context.
 
 ## When to use
 
@@ -28,7 +28,7 @@ Do not trigger on unrelated orchestration questions (workflow engines, generic m
 
 The skill delegates to two surfaces and does not reimplement either:
 
-1. **Local** — the `bin/brain` CLI (ships inside the target workspace after install). Handles queries, tick loops, closet rebuilds, BIV metric emission, and brain-to-brain claims. All state stays on the machine.
+1. **Local** — the `bin/brain` CLI (ships inside the target workspace after install). Handles layered queries, curated memory writes, tick loops, closet rebuilds, BIV metric emission, and brain-to-brain claims. All state stays on the machine.
 2. **Remote** — the BrainOfBrains MCP at `brainofbrains.ai/mcp` with three agent-callable tools: `quote(stack_description)`, `provision(payment_token, stack_spec)`, `health_check(install_id)`. Remote is opt-in and only touched for the A2A install flow.
 
 Distribution detail: the user-facing label is `Brain Orchestration`. In this source repo the folder is `brainofbrains/`; packaged builds commonly nest the same folder under `skills/brainofbrains/`. The skill is one of three shipped in the public repo at https://github.com/CrunchyJohnHaven/ai-performance-skills.
@@ -51,29 +51,43 @@ Run `scripts/scan.sh` to list the brains that now live in the workspace. Output 
 
 ### 3. Ask
 
-Run `scripts/ask.sh "<question>"` to route an expert question through the substrate. The script delegates to `bin/brain query --query "<question>"`, which builds a layered (L0/L1/L2) context from the relevant closets and returns a synthesized answer along with the citations. The calling agent reads the answer, not the closet paths.
+Run `scripts/ask.sh "<question>"` to route an expert question through the substrate. The script delegates to `bin/brain query --query "<question>"`, which builds a layered (L0/L1/L2) context packet and L3 drawer plan from the relevant closets. The calling agent synthesizes the answer from that packet and only opens the listed drawers when the packet is insufficient.
 
-The router picks which specialist brain(s) answer based on the question's routing keys (stakeholder names, product names, meeting IDs). If the question does not match a specialist, the substrate brain answers with a cross-closet synthesis.
+The router picks context based on routing keys (stakeholder names, product names, meeting IDs). If the question does not match a specialist, the substrate returns the best cross-closet packet. Never pretend `bin/brain query` is an LLM answer; it is the memory layer that makes the answer cheap and grounded.
 
-### 4. Tick (optional, background)
+### 4. Remember (curated source memory)
+
+Use `bin/brain remember --kind <kind> --topic "<topic>" --text "<fact>"` when the current turn reveals durable guidance, a repeated mistake, a new stakeholder fact, or a decision that future agents must retrieve. This writes the source markdown under the workspace's Claude memory directory and links it from `MEMORY.md`.
+
+Use kinds deliberately:
+- `feedback` for operating rules, mistakes, and reviewer preferences
+- `decision` for chosen paths and rejected alternatives
+- `project` for current project state
+- `reference` for stable links, papers, and external source pointers
+- `architecture` for durable system patterns
+- `user` for stakeholder profile facts
+
+Do not write directly to `.aaak` closets. Closets are generated pointer indexes. If the new fact must be queryable immediately, run `bin/brain closet --memory-only` after `remember`; otherwise let the next tick rebuild.
+
+### 5. Tick (optional, background)
 
 Run `bin/brain tick` directly (or wire it to a launchd plist — the installer offers to set this up) to run one always-on iteration. Each tick refreshes closets, recomputes BIV, checks thresholds, and writes a new `STATE.json` snapshot. The landing-page promise of "a plain-English email each week" is powered by the aggregate of these ticks; the tick loop is the engine behind every subsequent query.
 
 This step is optional for one-shot use. A workspace that is only asked questions occasionally can skip always-on ticks and run `bin/brain tick` on demand before a query.
 
-### 5. Verify
+### 6. Verify
 
 Run `scripts/health.sh` to prove the brains are alive. By default it reads the local `STATE.json` and `brains.json` and prints PASS/FAIL per brain along with the last-tick timestamp. Add `--remote` only if you explicitly want to call the hosted `health_check(install_id)` endpoint. Any brain in `breach` or `unwired` prints the remediation hint from the registry.
 
 See `references/verification.md` for how to label numeric claims (Measured / Modeled / Needs verification) when reporting status to a stakeholder.
 
-### 6. Provision (optional, A2A)
+### 7. Provision (optional, A2A)
 
 Run `scripts/provision.sh` to kick off the agent-to-agent provisioning flow for a managed install. The script calls the remote MCP `quote(stack_description)` tool, prints the returned price and spec, waits for confirmation, then calls `provision(payment_token, stack_spec)` and emits a signed install tarball plus install.sh. Payment is x402 (agent-native HTTP 402) by default with a Stripe Checkout fallback.
 
 This step is opt-in. The free install path (step 1) remains fully functional. Provision is only invoked when an agent-to-agent purchase flow is explicitly requested.
 
-### 7. Update the skill (optional)
+### 8. Update the skill (optional)
 
 Run `scripts/update.sh` when the skill was installed from npm or copied into a local skills directory and a refresh is needed. The update path mirrors the cost-optimization pattern:
 - refreshes the globally installed `@sapperjohn/brainofbrains` package
@@ -105,7 +119,7 @@ Questions that do not benefit: generic world knowledge, novel reasoning unrelate
 ## Safety and data posture
 
 - No data leaves the machine unless the user explicitly enables a remote endpoint. Closets, STATE files, and query results all stay local.
-- No secrets are persisted in closets. The closet builder redacts known secret patterns before write; the redactor is a TABOO path and gates every closet rebuild.
+- No secrets are persisted in closets or curated memory. The closet builder redacts known secret patterns before write; the redactor is a TABOO path and gates every closet rebuild. If the remembered fact contains a credential, do not write it.
 - No MCP server is installed by default. The remote MCP at `brainofbrains.ai/mcp` is agent-callable but nothing in the default install runs a local MCP process. Default-MCP reads as surveillance-adjacent in large orgs; default is off.
 - No background telemetry is sent to a central service. Ticks are local. Health checks only call the remote MCP if the user explicitly runs `scripts/health.sh --remote`.
 - No expensive frontier calls run without consent. The substrate's router prefers the lowest-tier sufficient model for every internal query; the frontier is only engaged when a question explicitly demands it.
@@ -115,9 +129,11 @@ Questions that do not benefit: generic world knowledge, novel reasoning unrelate
 If a step fails, the CLI emits structured errors. Report the error to the user verbatim, check `docs/BUG_LEDGER.md` for known issues, and fall back to:
 - `bin/brain status` — last tick, BIV score, registry rollup
 - `bin/brain registry --json` — machine-readable brain list
+- `bin/brain query --query "<topic>" --json` — layered packet plus L3 drawer plan
+- `bin/brain remember --help` — durable source-memory write path
 - `bin/brain --help` — full CLI surface
 
-Never fabricate a synthesized answer. If closets are empty (new install, no ticks run yet), say so and run `bin/brain tick` to populate. If a brain's status is `awaiting-data` or `breach`, surface that in the answer — do not pretend the brain is healthy.
+Never synthesize past the substrate. If closets are empty (new install, no ticks run yet), say so and run `bin/brain tick` to populate. If a brain's status is `awaiting-data` or `breach`, surface that in the answer — do not pretend the brain is healthy. If the substrate returns only weak drawer pointers, say what is missing instead of stretching the closest match.
 
 ## Bundled resources
 
@@ -145,9 +161,10 @@ Agent metadata (`agents/`):
 
 1. `bin/brain` does not exist until `scripts/install.sh` has run successfully — run the install step first, then use `scripts/health.sh` to verify the result.
 2. Closets are rebuilt every tick — do not hand-edit `.aaak` files; the next tick overwrites manual changes.
-3. BIV scores in `breach` status mean thresholds were not met, not that the system is broken — run `scripts/health.sh` for the full picture.
-4. The remote MCP at `brainofbrains.ai/mcp` is only needed for the A2A provisioning flow — normal queries are fully local.
-5. Do not confuse with generic agent orchestration (LangChain, multi-agent frameworks) — this skill only addresses the BrainOfBrains specialist-brain substrate.
+3. `bin/brain tick`, `bin/brain closet`, and `bin/brain remember --rebuild` intentionally write generated `evidence/brain/` files. In repos where `evidence/` is taboo, run read-only `query/status` during ordinary coding tasks and leave generated evidence unstaged unless the task is specifically about the evidence harness.
+4. BIV scores in `breach` status mean thresholds were not met, not that the system is broken — run `scripts/health.sh` for the full picture.
+5. The remote MCP at `brainofbrains.ai/mcp` is only needed for the A2A provisioning flow — normal queries are fully local.
+6. Do not confuse with generic agent orchestration (LangChain, multi-agent frameworks) — this skill only addresses the BrainOfBrains specialist-brain substrate.
 
 ## Quick reference
 
@@ -159,7 +176,8 @@ All paths below are relative to the workspace root (the repo you cloned or the d
 # Full workflow (from the target repo's root)
 scripts/install.sh                  # bootstrap brain substrate — writes bin/brain + evidence/brain/
 scripts/scan.sh                     # list installed brains + status (reads evidence/brain/brains.json)
-scripts/ask.sh "<question>"         # route an expert question and return a synthesized answer
+scripts/ask.sh "<question>"         # route an expert question and return layered context
+bin/brain remember --kind feedback --topic "short rule" --text "durable fact"
 bin/brain tick                      # one iteration (refresh closets, recompute BIV) — requires bin/brain
 scripts/health.sh                   # PASS/FAIL per brain (local STATE.json; add --remote for MCP check)
 

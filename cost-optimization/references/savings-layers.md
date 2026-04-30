@@ -84,7 +84,7 @@ Every optimization runs in shadow mode first:
 - Delta is logged to `.ai-cost-data/comparisons.jsonl`
 - Quality evaluator (`src/core/evaluator.ts`) grades optimized-vs-baseline so savings carry a quality signal
 
-Shadow mode is the reason `kostai report` can claim measured savings without hand-waving — every number has a side-by-side comparison behind it.
+Shadow mode is the reason `kostai proof` can claim measured savings without hand-waving — every number has a side-by-side comparison behind it.
 
 ## Waste detectors
 
@@ -92,4 +92,4 @@ Eleven detectors in `src/core/score/*.ts` identify specific waste categories on 
 
 ## How savings are attributed
 
-Each optimized call is tagged with the technique that saved the money. The ledger (`src/store/comparisons.ts`) powers the mechanism-breakdown table in `kostai report`, so a CIO artifact can say "$X saved via prose compression, $Y via router downgrade, $Z via prompt cache" rather than a single opaque total.
+Each optimized call is tagged with the technique that saved the money. The ledger (`src/store/comparisons.ts`) powers the mechanism-breakdown table in `kostai proof`, so a CIO artifact can say "$X saved via prose compression, $Y via router downgrade, $Z via prompt cache" rather than a single opaque total.
